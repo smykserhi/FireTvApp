@@ -5,9 +5,10 @@ export const UPCOMING = "/upcoming"
 export const MYLIST = "/mylist"
 
 //Constants 
-export const host = 'doneright.tv';
-export const domain = 'https://doneright.tv';
-
+// export const host = 'doneright.tv';
+// export const domain = 'https://doneright.tv';
+export const host = 'speedsport.tv';
+export const domain = 'https://speedsport.tv';
 
 
 
