@@ -3,10 +3,10 @@ import Logo from "../../images/main-logo.png"
 import styled from 'styled-components';
 import api from "../../api"
 import { RouteComponentProps, withRouter } from 'react-router';
-import { HOME } from "../../constants"
+import { PAGES } from "../../constants"
 import { useDispatch, useSelector } from 'react-redux';
 import { saveToken } from "../../store/actions"
-import {StorageType} from "../../store/types"
+import { StorageType } from "../../store/types"
 
 const LogInBox = styled.div`
     position: absolute;
@@ -64,10 +64,9 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [error, setError] = useState<string>("")
-
     const selectToken = (state: StorageType) => state.logIn.token
     const LogIn = useSelector(selectToken)
-    const dispatch = useDispatch()
+    const dispatch = useDispatch()    
 
     const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.name === "email") setEmail(e.target.value)
@@ -89,7 +88,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     //api.saveToken(res.data.token)
                     clearStates()
                     dispatch(saveToken(res.data.token))
-                    history.push(HOME)
+                    history.push(`${PAGES}/45`)
                 })
                 .catch((err) => {
                     setError(err.response.data.error);
@@ -97,9 +96,9 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                 });
         }
     }
-    
+
     useEffect(() => {
-        if (LogIn) history.push(HOME) //if user already LogIn
+        if (LogIn) history.push(`${PAGES}/45`) //if user already LogIn        
     })
 
     return (

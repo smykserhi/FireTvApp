@@ -1,4 +1,5 @@
 import { RouteComponentProps } from 'react-router';
+import {page} from "../componets/Home"
 
 
 //Actions types
@@ -10,7 +11,7 @@ export interface LogInStateType {
     token:string,       
 }
 export interface DataStateType {
-    data:{},       
+    data:page[],       
 }
 
 

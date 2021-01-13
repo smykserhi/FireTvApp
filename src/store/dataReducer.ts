@@ -1,8 +1,7 @@
 import {AddDataActionsType,DataStateType} from "./types"
 
-
 const initialState: DataStateType ={
-    data: {}
+    data: []
 }
 
 

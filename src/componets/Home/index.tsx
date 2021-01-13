@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react"
 import { useSelector } from 'react-redux';
 import { StorageType } from "../../store/types"
 import { RouteComponentProps, withRouter } from 'react-router';
-//import { LOGIN } from "../../constants"
 import api from "../../api"
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import Showcase from "./Showcase";
+import Normal from "./Normal"
+import { LOGIN, PAGES } from "../../constants"
+import moment from 'moment';
 
 const MenuBox = styled.div`
   display: flex;
-  //overflow: scroll;
-  height: 2.5rem;
+  height: 2.5rem;  
 `
 const MenuElement = styled.div`
   margin-right: 20px;
@@ -20,102 +22,190 @@ const SelectedMenuElement = styled(MenuElement)`
   border-bottom: #ff0000 5px solid;
 `
 const MainDis = styled.div`
-  display: flex;  
-  height: 20vh;
+  display: block;  
+  position: relative;
+  min-height: 400px;
 `
+const VideoDis = styled.div`
+  align-self: center;
+  min-height: 350px;
+  height: 30vh;
+  width: 90%;
+  display: contents;
+`
+const ImageDis = styled.div`
+  align-self: center;   
+  width: 35vw;
+  position: absolute;
+  top: -30px;
+  right: 30px;
+  z-index: -1;  
+  box-shadow: 0px 0px 60px #d03939;
+  border-radius: 10px;  
+`
+const DisH2 = styled.h2`
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  margin-top: 15px;
+`
+const TimeBox = styled.div`
+  font-size: 2em;
+  margin-bottom: 20px;
+  text-align: left;
+  color: #37c237;
+`
+const DiscriptionBox = styled.div`
+  white-space: normal;
+  width: 60%;
+  font-size: 1.5em;
+`
+const LiveBox = styled.div`
+  display: inline-block;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 5px 10px 5px 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+`
+const ReplayBox = styled.div`
+  display: inline-block;
+  background-color: orange;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 5px 10px 5px 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;  
+`
+
 const CategoryBox = styled.div`
   display: flex;  
   flex-direction: column;
 `
-const CategorRow = styled.div`
-  display: flex;  
-  flex-direction: row;
-  margin-bottom: 20px;
-  overflow: scroll;
-`
-const VideoElement = styled.div`  
-  margin: 10px;
-  min-width: 15rem;
-`
-const SelectedVideoElement = styled(VideoElement)`    
-  border: #ff0000 5px solid;
-
+const DiscriptionText = styled.div`
+  white-space: normal;
+  width: 70%;
+  font-size: 1em;
+  display: inline;
 `
 const Image = styled.img`
   width: 100%;
+  border-radius: 10px;
+`
+const LoadingComponent = styled.div`
+  width: 100vw;
+  height:100vh
+`
+const hourglass = keyframes`
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+`
+const Spin = styled.div`
+  top: 45%;
+  left:45%;
+  display: inline-block;
+  position: relative;
+  width: 150px;
+  height: 150px;
+  &:after {
+    content: " ";
+    display: block;
+    border-radius: 50%;
+    width: 0;
+    height: 0;
+    margin: 8px;
+    box-sizing: border-box;
+    border: 75px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: ${hourglass} 1.2s infinite;
 `
 
 
-interface pageCategoriesType {
+
+export interface pageCategoriesType {
   description: string,
   id: number,
   name: string,
   total: number,
   type: string,
-
-
 }
-interface page {
+export interface page {
   default: boolean,
-  id: number,
+  id: string,
   name: string,
 }
 
-interface videoDis {
+interface videoDisListType {
+  description: string
+  id: number
+  image: string
+  mediumImage: string
+  metadata: metadataType
+  smallImage: string
+  title: string
+  type: string
+
+}
+export interface videoDisType {
   id: number,
-  list: {
-    description: string
-    id: number
-    image: string
-    mediumImage: string
-    metadata: object
-    smallImage: string
-    title: string
-    type: string
-  }[]
+  list: videoDisListType[]
+}
+interface metadataType {
+  duration: null | number
+  facility: facilityType
+  live: false
+  producer: producerType
+  start_time: string
+  state: string
+  timezone: string
+  timezoneIANA: string
+}
+interface facilityType {
+  name: string,
+  logo: string,
+  slug: string
+}
+interface producerType {
+  logo: string
+  name: string
+  slug: string
+}
+interface matchParamsType {
+  id: string
+}
+interface Props extends RouteComponentProps<matchParamsType> {
+  pageId: string
 }
 
-
-// const defVideo :videoDis  = {
-//   description: "",
-//   id: 1,
-//   image: "",
-//   mediumImage: "",
-//   metadata: {},
-//   smallImage: "",
-//   title: "",
-//   type: "",
-
-// }
-const defCategoties = {
-  description: "",
-  id: 0,
-  name: "",
-  total: 1,
-  type: "",
-}
-
-
-
-
-const Home: React.FC<RouteComponentProps> = ({ history }) => {
+const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
-  const LogIn = useSelector(selectToken)
+  const Token = useSelector(selectToken) //token 
+  //let myHistory = useHistory();
   const [loading, setLoading] = useState<boolean>(true)
-  let topMenuLength = 5
+  let topMenuLength = 10 //how many pages would be displayed in top menu
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
-  const [categoriesContent, setCategoriesContent] = useState<videoDis[]>([])
+  const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
   const [selectedRow, setSelectedRow] = useState<number>(0)
   const [selectedCol, setSelectedCol] = useState<number>(0)
 
-
-  const sortContent = (cats: pageCategoriesType[], cont: videoDis[]) => {
-    let result: videoDis[] = []
-    for (let i = 0; i < cats.length; i++) {
-      for (let j = 0; j < cont.length; j++) {
-        if (cats[i].id === cont[j].id) {
-          result.push(cont[j])
+  const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {
+    let result: videoDisType[] = []
+    for (let i = 0; i < categor.length; i++) {
+      for (let j = 0; j < content.length; j++) {
+        if (categor[i].id === content[j].id) {
+          result.push(content[j])
         }
       }
     }
@@ -125,89 +215,123 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   //Functions
   useEffect(() => {
     //Componentdidmount
-    //if (!LogIn) history.push(LOGIN)
-    //else {
-    if (loading) {
-      const categoriesContents: videoDis[] = []
-      api.getPages()
-        .then((res) => {
-          //console.log(res)
-          const pagesData = res
-          //setPages(res)
-          pagesData.map((el: any, index: number) => {
-            if (el.default) {
-              let pageCategories: pageCategoriesType[] = []
-              api.getPageContent(el.id)
-                .then((res) => {
-                  pageCategories = res
-                  let list: any[] = []
-                  //setCategories(pageCategories)
-                  pageCategories.map((el) => {
-                    list.push(
-                      api.getCategoriContent(el.id)
-                        .then((res) => {
-                          categoriesContents.push({ id: el.id, list: res })
-                          //console.log(categoriesContents)
-                        })
-                    )
-                    return true
-                  })
-                  Promise.all(list).then(() => {
-                    //console.log("Sorted content", sortContent(pageCategories,categoriesContents))
-                    const sortedConyent = sortContent(pageCategories, categoriesContents)
-                    setLoading(false)
-                    setCategoriesContent(sortedConyent)
-                    setCategories(pageCategories)
-                    setPages(pagesData)
-                    addListeners()
-                  })
+    if (!Token) history.push(LOGIN)
+    else {
+      if (loading) {
+        api.getPages()
+          .then((res) => {
+            let pagesData: page[] = res
+            api.getPageContent(pageId)
+              .then((res) => {
+                const categoriesContents: videoDisType[] = []
+                const pageCategories: pageCategoriesType[] = res
+                let list: any[] = []
+                pageCategories.map((el) => {
+                  list.push(
+                    api.getCategoriContent(el.id)
+                      .then((res) => {
+                        categoriesContents.push({ id: el.id, list: res })
+                      })
+                  )
+                  return true
                 })
-            }
-            return true
+                Promise.all(list).then(() => {
+                  const sortedContent = sortContent(pageCategories, categoriesContents)
+                  setSelectedCol(0)
+                  setSelectedRow(0)
+                  setPages(pagesData)
+                  setCategories(pageCategories)
+                  setCategoriesContent(sortedContent)
+                  setLoading(false)
+                  addListeners()
+                })
+              })
           })
-
-        })
-        //.then(() => setLoading(false))
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    addListeners()
-    return () => {
-      //component will unmount
-      removeListeners()
-
+          .catch((err) => {
+            console.log(err);
+          });
+      } else addListeners()
+      return () => {
+        //component will unmount
+        removeListeners()
+      }
     }
   }
-
-    //}
   )
+
+  //console.log("match", match.params)
   //console.log("pages", pages)
   //console.log("categories", categories)
-  //console.log("categoriesContent", categoriesContent)  
-
+  console.log("categoriesContent", categoriesContent)
+  console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  const uploadCategories = () => {
+    if (categories.length !== 0 && (categories.length - selectedRow) < 5) {
+      const offset = categories.length
+      console.log("offset", offset)
+      api.getPageContent(pageId, 10, offset)
+        .then((newCategiry) => {
+          const categoriesContents: videoDisType[] = []
+          const pageCategories: pageCategoriesType[] = newCategiry
+          let list: any[] = []
+          pageCategories.forEach((el) => {
+            list.push(
+              api.getCategoriContent(el.id)
+                .then((res) => {
+                  categoriesContents.push({ id: el.id, list: res })
+                })
+            )
+          })
+          Promise.all(list).then(() => {
+            let tempCategoriesContent = categoriesContent
+            let tempCategories = categories
+            categoriesContents.forEach(el => tempCategoriesContent.push(el))
+            pageCategories.forEach(el => tempCategories.push(el))
+            const uniqCategory = Array.from(new Map(tempCategories.map((item: pageCategoriesType) => [item.id, item])).values());
+            const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());
+            const sortedContent = sortContent(uniqCategory, uniqContent)
+            setCategories(uniqCategory)
+            setCategoriesContent(sortedContent)
+            console.log("add categories to page ", pageId)
+          })
+        })
+    }
+  }
+  const uploadCategoiesContent = (category: pageCategoriesType) => {
+    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 10) {
+      const offset = categoriesContent[selectedRow].list.length
+      api.getCategoriContent(category.id, 10, offset).then(res => {
+        let tempCategoriesContent = categoriesContent
+        res.forEach((el: videoDisListType) => tempCategoriesContent[selectedRow].list.push(el))
+        setCategoriesContent(tempCategoriesContent)
+        console.log(`Add data to category ${tempCategoriesContent[selectedRow].id}`)
+      })
+    }
+  }
   const addListeners = () => {
     document.addEventListener("keydown", handleKeyDown, true);
-    //document.addEventListener("keyup", e=>handleUp(e), true);
+    document.addEventListener("keyup", handleKeyUp, true);
   }
-
 
   const removeListeners = () => {
     document.removeEventListener("keydown", handleKeyDown, true);
-    //document.removeEventListener("keyup", e=>handleUp(e), false);
+    document.removeEventListener("keyup", handleKeyUp, true);
   }
-  // const handleUp = (e: KeyboardEvent) => {
-  //   //if (e.key === 'Enter'){
-  //   removeListeners();
-  //   //this.setState({ showDetails: true });
-  //   console.log("handleUp", e)
+  const handleKeyUp = (e: KeyboardEvent) => {
+    removeListeners();
+    switch (e.key) {
+      case 'Enter':
+        handleEnter()
+        break;
+      default:
+        addListeners()
+    }
+    e.preventDefault();
+  }
 
-  // }
 
 
   const handleKeyDown = (e: KeyboardEvent) => {
     removeListeners();
-    //console.log('Videos:handleDown', e.key);
     switch (e.key) {
       case 'ArrowRight':
         handleArrowRight()
@@ -221,9 +345,6 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
       case 'ArrowDown':
         handleArrowDown()
         break;
-      case 'Enter':
-        handleEnter()
-        break;
       default:
         addListeners()
     }
@@ -231,111 +352,144 @@ const Home: React.FC<RouteComponentProps> = ({ history }) => {
   }
 
   const handleEnter = () => {
-    console.log("enter, element ", selectedCol, selectedRow)
-    if(selectedCol===-1){
-      console.log("Menu item", pages[selectedRow])
-    }else{
-      console.log("Video",categoriesContent[selectedCol].list[selectedRow] )
+    if (selectedRow === -1) {
+      if (selectedCol <= topMenuLength - 1) {
+        const selectedPageId = pages[selectedCol].id
+        console.log("Menu item", selectedPageId)
+        history.push(`${PAGES}/${selectedPageId}`)
+        setLoading(true)
+      } else {
+        console.log("My list item")
+      }
+    } else {
+      console.log("Video", currentVideo())
+
     }
-    
     addListeners()
   }
 
   const handleArrowUp = () => {
-    console.log("Up", selectedCol, selectedRow)
-    if (selectedCol > -1) {
-      setSelectedCol(selectedCol - 1)
-      setSelectedRow(0)
+    if (selectedRow > -1) {
+      setSelectedCol(0)
+      setSelectedRow(selectedRow - 1)
     } else {
       addListeners()
     }
   }
   const handleArrowDown = () => {
-    console.log("down", selectedCol, selectedRow)
-
-    setSelectedCol(selectedCol + 1)
-    setSelectedRow(0)
-    //Need handle new API call for extra categories!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    uploadCategories()
+    if (selectedRow < categoriesContent.length - 1) {
+      setSelectedCol(0)
+      setSelectedRow(selectedRow + 1)
+    } else addListeners()
   }
   const hendleArrowLeft = () => {
-    console.log("left", selectedCol, selectedRow)
-    if (selectedRow > 0) {
-      setSelectedRow(selectedRow - 1)
+    if (selectedCol > 0) {
+      setSelectedCol(selectedCol - 1)
     } else {
-      console.log("left more 0")
+      console.log("left more 0 Open side menu")
       addListeners()
     }
   }
   const handleArrowRight = () => {
-    console.log("Right", selectedCol, selectedRow)
-    if (selectedCol === -1 && selectedRow < topMenuLength - 1) {
-      setSelectedRow(selectedRow + 1)
-    } else if (selectedCol > -1) {
-      if (selectedRow < categoriesContent[selectedCol].list.length - 1) {
-        setSelectedRow(selectedRow + 1)
-      } else {
-        addListeners()
-      }      
+    //top menu selector topMenuLength
+    if (selectedRow === -1 && selectedCol < topMenuLength) {
+      setSelectedCol(selectedCol + 1)
+      //main content selector
     } else {
-      addListeners()
+      if (categoriesContent.length > 0) {
+        uploadCategoiesContent(categories[selectedRow])
+        if (selectedCol < categoriesContent[selectedRow].list.length - 1) { //if not end of the row
+          setSelectedCol(selectedCol + 1)
+        } else addListeners()
+      } else addListeners()
     }
-
-
+  }
+  const currentVideo = (): videoDisListType => {
+    if (selectedRow > 0 && categoriesContent.length > 0) {
+      return categoriesContent[selectedRow].list[selectedCol]
+    } else {
+      return categoriesContent[0].list[0]
+    }
   }
 
   return (
     <>
-      {loading ? <div>Loading</div> :
+      {loading ? <LoadingComponent><Spin ></Spin></LoadingComponent> :
         <div>
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
               if (topMenuIndex < topMenuLength) {
-                if (selectedCol === -1 && topMenuIndex === selectedRow) {
+                if (selectedRow === -1 && topMenuIndex === selectedCol) {
+                  return (<SelectedMenuElement key={topMenuIndex}>{el.name}</SelectedMenuElement>)
+                }
+                else {
+                  return (<MenuElement key={topMenuIndex}>{el.name}</MenuElement>)
+                }
+              } else return false
+            }
+            )}
+            {selectedRow === -1 && topMenuLength === selectedCol
+              ?
+              <SelectedMenuElement>MyList</SelectedMenuElement>
+              :
+              <MenuElement>MyList</MenuElement>
+            }
+          </MenuBox>
+          <MainDis>
+            <VideoDis>
+              <DisH2>{currentVideo() ? currentVideo().title : ""}</DisH2>
+              <TimeBox>
+                {currentVideo().metadata.live ?
+                  moment(currentVideo().metadata.start_time).format("hh:mm A dddd MMMM D, YYYY") :
+                  moment(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")}
+              </TimeBox>
+              <DiscriptionBox>
+                {currentVideo().metadata.live
+                  ? <LiveBox>Live</LiveBox>
+                  : <ReplayBox>Replay</ReplayBox>
+                }
+                <DiscriptionText>
+                  {currentVideo().description}
+                </DiscriptionText>
+              </DiscriptionBox>
+            </VideoDis>
+            <ImageDis>
+              <Image src={currentVideo().smallImage} alt="Imag"></Image>
+            </ImageDis>
+          </MainDis>
+          <CategoryBox>
+            {categories.map((catEl, sellIndex) => {
+              if (sellIndex >= selectedRow) {
+                if (catEl.type === "showcase") {
                   return (
-                    <SelectedMenuElement key={topMenuIndex}>{el.name}</SelectedMenuElement>
+                    <Showcase
+                      key={catEl.id}
+                      sellIndex={sellIndex}
+                      categories={categories}
+                      categoriesContent={categoriesContent}
+                      selectedCol={selectedCol}
+                      selectedRow={selectedRow}
+                    />
                   )
                 } else {
                   return (
-                    <MenuElement key={topMenuIndex}>{el.name}</MenuElement>
+                    <Normal
+                      key={catEl.id}
+                      sellIndex={sellIndex}
+                      categories={categories}
+                      categoriesContent={categoriesContent}
+                      selectedCol={selectedCol}
+                      selectedRow={selectedRow}
+                    />
                   )
                 }
-              }
+              } else return false
             }
             )}
-          </MenuBox>
-          <MainDis>
-            Main  disc ription
-          </MainDis>
-          <CategoryBox>
-            {categories.map((catEl, sellIndex) => (
-              <CategorRow key={sellIndex}>
-                {categoriesContent.filter(el => el.id === catEl.id)[0].list.map((el, rowIndex) => {
-                  if (sellIndex === selectedCol && rowIndex === selectedRow) {
-                    return (
-                      <SelectedVideoElement key={rowIndex} >
-                        <Image src={el.smallImage} alt="Imag"></Image>
-                        <div>{el.title}</div>
-                      </SelectedVideoElement>
-                    )
-                  } else {
-                    return (
-                      <VideoElement key={rowIndex} >
-                        <Image src={el.smallImage} alt="Imag"></Image>
-                        <div>{el.title}</div>
-                      </VideoElement>
-                    )
-                  }
-                })}
-              </CategorRow>
-            ))}
           </CategoryBox>
-
-
         </div>
-
       }
-
-
     </>
   )
 }

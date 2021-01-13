@@ -1,5 +1,6 @@
 //Here all router path in one place
-export const HOME = "/"
+export const ROOT = "/"
+export const PAGES = "/pages"
 export const LOGIN = "/login"
 export const UPCOMING = "/upcoming"
 export const MYLIST = "/mylist"

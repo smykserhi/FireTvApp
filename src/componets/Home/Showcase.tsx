@@ -1,0 +1,90 @@
+import React from "react"
+import styled from 'styled-components';
+import { pageCategoriesType, videoDisType } from "./index"
+
+
+const CategorRow = styled.div`
+  display: flex;  
+  flex-direction: row;
+  margin-bottom: 20px;
+  overflow: hidden;  
+  align-items: center;
+`
+
+const VideoElementShowcase = styled.div`  
+  margin: 10px;
+  min-width: 450px;
+  max-width: 450px;
+`
+
+const SelectedVideoElementShowcase = styled(VideoElementShowcase)`    
+  /*border: #ff0000 5px solid;*/
+  /*transform: scale(1.3) translateX(53px);*/
+  /*margin-right: 150px;*/  
+  min-width: 500px;
+  
+  
+  `
+const Image = styled.img`
+  width: 100%;
+  border-radius: 5px;
+
+`
+const SelectedImage = styled.img`
+    box-shadow: 0px 0px 25px #37c237;
+    width: 100%;
+    border-radius: 5px;
+`
+
+type ShowcaseProps = {
+    sellIndex: number,
+    categories: pageCategoriesType[],
+    categoriesContent: videoDisType[],
+    selectedCol: number,
+    selectedRow: number
+
+}; /* could also use interface */
+
+
+
+const Showcase = ({ sellIndex, categories, categoriesContent, selectedCol, selectedRow }: ShowcaseProps) => {
+    return (
+        <CategorRow key={sellIndex} >
+            {categoriesContent[sellIndex].list.map((el, colIndex) => {
+                if (selectedRow === sellIndex) { ////if selected row
+                    if (colIndex >= selectedCol) {//don't show elements before selected
+                        if (sellIndex === selectedRow && colIndex === selectedCol) {
+                            return (
+                                <SelectedVideoElementShowcase key={colIndex} >
+                                    <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
+                                    <div>{el.title}</div>
+                                </SelectedVideoElementShowcase>
+                            )
+                        } else {
+                            return (
+                                <VideoElementShowcase key={colIndex} >
+                                    <Image src={el.smallImage} alt="Imag"></Image>
+                                    <div>{el.title}</div>
+                                </VideoElementShowcase>
+                            )
+                        }
+                    }else return false
+                } else {
+                    return (
+                        <VideoElementShowcase key={colIndex} >
+                            <Image src={el.smallImage} alt="Imag"></Image>
+                            <div>{el.title}</div>
+                        </VideoElementShowcase>
+                    )
+                }
+
+
+            })}
+        </CategorRow>
+
+
+    )
+}
+
+
+export default Showcase
