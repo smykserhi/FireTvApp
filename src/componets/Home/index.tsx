@@ -213,56 +213,57 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
 
   //Functions
+ //add listners
   useEffect(() => {
-    //Componentdidmount
-    if (!Token) history.push(LOGIN)
-    else {
-      if (loading) {
-        api.getPages()
-          .then((res) => {
-            let pagesData: page[] = res
-            api.getPageContent(pageId)
-              .then((res) => {
-                const categoriesContents: videoDisType[] = []
-                const pageCategories: pageCategoriesType[] = res
-                let list: any[] = []
-                pageCategories.map((el) => {
-                  list.push(
-                    api.getCategoriContent(el.id)
-                      .then((res) => {
-                        categoriesContents.push({ id: el.id, list: res })
-                      })
-                  )
-                  return true
-                })
-                Promise.all(list).then(() => {
-                  const sortedContent = sortContent(pageCategories, categoriesContents)
-                  setSelectedCol(0)
-                  setSelectedRow(0)
-                  setPages(pagesData)
-                  setCategories(pageCategories)
-                  setCategoriesContent(sortedContent)
-                  setLoading(false)
-                  addListeners()
-                })
-              })
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else addListeners()
-      return () => {
-        //component will unmount
-        removeListeners()
-      }
+    addListeners()
+    return () => {
+      //component will unmount
+      removeListeners()
     }
-  }
-  )
+  })
+//update all page or redirect to LOGIN page
+  useEffect(() => {
+    console.log("in loading")
+    if (!Token) history.push(LOGIN)
+    else if(loading) {
+      api.getPages()
+        .then((res) => {
+          let pagesData: page[] = res
+          api.getPageContent(pageId)
+            .then((res) => {
+              const categoriesContents: videoDisType[] = []
+              const pageCategories: pageCategoriesType[] = res
+              let list: any[] = []
+              pageCategories.map((el) => {
+                list.push(
+                  api.getCategoriContent(el.id)
+                    .then((res) => {
+                      categoriesContents.push({ id: el.id, list: res })
+                    })
+                )
+                return true
+              })
+              Promise.all(list).then(() => {
+                const sortedContent = sortContent(pageCategories, categoriesContents)                
+                setSelectedCol(0)
+                setSelectedRow(0)
+                setPages(pagesData)
+                setCategories(pageCategories)
+                setCategoriesContent(sortedContent)
+                setLoading(false) 
+              })
+            })
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [loading,Token, history,pageId]) //run this effect only if this variebles changed  
 
   //console.log("match", match.params)
   //console.log("pages", pages)
   //console.log("categories", categories)
-  console.log("categoriesContent", categoriesContent)
+  //console.log("categoriesContent", categoriesContent)
   console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 5) {
