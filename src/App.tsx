@@ -3,7 +3,7 @@ import { Switch, Route } from "react-router-dom";
 //import Home from "./componets/Home"
 import LogIn from "./componets/LogIn"
 import Pages from "./componets/Pages"
-import Upcoming from "./componets/Upcoming"
+import Video from "./componets/Video"
 import MyList from "./componets/MyList"
 import NotFound from "./componets/NotFound"
 import * as ROUTIES from "./constants"
@@ -16,7 +16,7 @@ const App: React.FC = () => {
         <Route exact path={ROUTIES.ROOT}> <LogIn /></Route>
         <Route path={`${ROUTIES.PAGES}/:id`}> <Pages /></Route>
         <Route path={ROUTIES.LOGIN}> <LogIn /></Route>
-        <Route path={ROUTIES.UPCOMING}> < Upcoming /></Route>
+        <Route path={`${ROUTIES.VIDEO}/:id`}> < Video /></Route>
         <Route path={ROUTIES.MYLIST}> <MyList /></Route>
         <Route > <NotFound /></Route>
       </Switch>

@@ -2,7 +2,7 @@
 export const ROOT = "/"
 export const PAGES = "/pages"
 export const LOGIN = "/login"
-export const UPCOMING = "/upcoming"
+export const VIDEO = "/video"
 export const MYLIST = "/mylist"
 
 //Constants 

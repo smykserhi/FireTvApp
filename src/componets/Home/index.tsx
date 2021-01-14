@@ -6,7 +6,7 @@ import api from "../../api"
 import styled, { keyframes } from 'styled-components';
 import Showcase from "./Showcase";
 import Normal from "./Normal"
-import { LOGIN, PAGES } from "../../constants"
+import { LOGIN, PAGES,VIDEO,MYLIST } from "../../constants"
 import moment from 'moment';
 
 const MenuBox = styled.div`
@@ -193,7 +193,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const Token = useSelector(selectToken) //token 
   //let myHistory = useHistory();
   const [loading, setLoading] = useState<boolean>(true)
-  let topMenuLength = 10 //how many pages would be displayed in top menu
+  let topMenuLength = 3 //how many pages would be displayed in top menu
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
   const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
@@ -213,7 +213,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
 
   //Functions
- //add listners
+  //add listners
   useEffect(() => {
     addListeners()
     return () => {
@@ -221,11 +221,11 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       removeListeners()
     }
   })
-//update all page or redirect to LOGIN page
+  //update all page or redirect to LOGIN page
   useEffect(() => {
-    console.log("in loading")
+    //console.log("in loading")
     if (!Token) history.push(LOGIN)
-    else if(loading) {
+    else if (loading) {
       api.getPages()
         .then((res) => {
           let pagesData: page[] = res
@@ -244,13 +244,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 return true
               })
               Promise.all(list).then(() => {
-                const sortedContent = sortContent(pageCategories, categoriesContents)                
+                const sortedContent = sortContent(pageCategories, categoriesContents)
                 setSelectedCol(0)
                 setSelectedRow(0)
                 setPages(pagesData)
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
-                setLoading(false) 
+                setLoading(false)
               })
             })
         })
@@ -258,13 +258,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           console.log(err);
         });
     }
-  }, [loading,Token, history,pageId]) //run this effect only if this variebles changed  
+  }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
 
   //console.log("match", match.params)
   //console.log("pages", pages)
   //console.log("categories", categories)
   //console.log("categoriesContent", categoriesContent)
-  console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 5) {
       const offset = categories.length
@@ -357,16 +357,18 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       if (selectedCol <= topMenuLength - 1) {
         const selectedPageId = pages[selectedCol].id
         console.log("Menu item", selectedPageId)
-        history.push(`${PAGES}/${selectedPageId}`)
+        history.push(`${PAGES}/${selectedPageId}`)        
         setLoading(true)
       } else {
-        console.log("My list item")
+        //console.log("My list item")
+        history.push(MYLIST)
+        //addListeners()
+
       }
     } else {
       console.log("Video", currentVideo())
-
+      history.push(`${VIDEO}/${currentVideo().id}`)
     }
-    addListeners()
   }
 
   const handleArrowUp = () => {
@@ -439,7 +441,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           </MenuBox>
           <MainDis>
             <VideoDis>
-              <DisH2>{currentVideo() ? currentVideo().title : ""}</DisH2>
+              <DisH2>{currentVideo()? currentVideo().title : ""}</DisH2>
               <TimeBox>
                 {currentVideo().metadata.live ?
                   moment(currentVideo().metadata.start_time).format("hh:mm A dddd MMMM D, YYYY") :
