@@ -247,7 +247,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 const sortedContent = sortContent(pageCategories, categoriesContents)
                 setSelectedCol(0)
                 setSelectedRow(0)
-                setPages(pagesData)
+                setPages(pagesData.filter(el=>el.id != pageId))//skip current page from list
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
                 setLoading(false)
