@@ -9,6 +9,7 @@ const CategorRow = styled.div`
   margin-bottom: 20px;
   overflow: hidden;  
   align-items: center;
+  font-size: 25px;
 `
 
 const VideoElementShowcase = styled.div`  

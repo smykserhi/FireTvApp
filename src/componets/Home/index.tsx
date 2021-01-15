@@ -6,9 +6,13 @@ import api from "../../api"
 import styled, { keyframes } from 'styled-components';
 import Showcase from "./Showcase";
 import Normal from "./Normal"
-import { LOGIN, PAGES,VIDEO,MYLIST } from "../../constants"
+import { LOGIN, PAGES, VIDEO, MYLIST } from "../../constants"
+import {Loading} from "../Loading"
 import moment from 'moment';
 
+const MainBox = styled.div`
+  margin: 0 1rem;
+`
 const MenuBox = styled.div`
   display: flex;
   height: 2.5rem;  
@@ -87,51 +91,12 @@ const CategoryBox = styled.div`
 const DiscriptionText = styled.div`
   white-space: normal;
   width: 70%;
-  font-size: 1em;
   display: inline;
 `
 const Image = styled.img`
   width: 100%;
   border-radius: 10px;
 `
-const LoadingComponent = styled.div`
-  width: 100vw;
-  height:100vh
-`
-const hourglass = keyframes`
-  0% {
-    transform: rotate(0);
-    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  }
-  50% {
-    transform: rotate(900deg);
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-  }
-  100% {
-    transform: rotate(1800deg);
-  }
-`
-const Spin = styled.div`
-  top: 45%;
-  left:45%;
-  display: inline-block;
-  position: relative;
-  width: 150px;
-  height: 150px;
-  &:after {
-    content: " ";
-    display: block;
-    border-radius: 50%;
-    width: 0;
-    height: 0;
-    margin: 8px;
-    box-sizing: border-box;
-    border: 75px solid #fff;
-    border-color: #fff transparent #fff transparent;
-    animation: ${hourglass} 1.2s infinite;
-`
-
-
 
 export interface pageCategoriesType {
   description: string,
@@ -193,7 +158,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const Token = useSelector(selectToken) //token 
   //let myHistory = useHistory();
   const [loading, setLoading] = useState<boolean>(true)
-  let topMenuLength = 3 //how many pages would be displayed in top menu
+  let topMenuLength = 10 //how many pages would be displayed in top menu
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
   const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
@@ -247,7 +212,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 const sortedContent = sortContent(pageCategories, categoriesContents)
                 setSelectedCol(0)
                 setSelectedRow(0)
-                setPages(pagesData.filter(el=>el.id != pageId))//skip current page from list
+                setPages(pagesData.filter(el => el.id != pageId))//skip current page from list
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
                 setLoading(false)
@@ -357,13 +322,10 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       if (selectedCol <= topMenuLength - 1) {
         const selectedPageId = pages[selectedCol].id
         console.log("Menu item", selectedPageId)
-        history.push(`${PAGES}/${selectedPageId}`)        
+        history.push(`${PAGES}/${selectedPageId}`)
         setLoading(true)
       } else {
-        //console.log("My list item")
         history.push(MYLIST)
-        //addListeners()
-
       }
     } else {
       console.log("Video", currentVideo())
@@ -396,7 +358,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
   const handleArrowRight = () => {
     //top menu selector topMenuLength
-    if (selectedRow === -1 && selectedCol < topMenuLength) {
+    if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + My List
       setSelectedCol(selectedCol + 1)
       //main content selector
     } else {
@@ -417,8 +379,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
 
   return (
-    <>
-      {loading ? <LoadingComponent><Spin ></Spin></LoadingComponent> :
+    <MainBox>
+      {loading ? <Loading/>:
         <div>
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
@@ -441,7 +403,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           </MenuBox>
           <MainDis>
             <VideoDis>
-              <DisH2>{currentVideo()? currentVideo().title : ""}</DisH2>
+              <DisH2>{currentVideo() ? currentVideo().title : ""}</DisH2>
               <TimeBox>
                 {currentVideo().metadata.live ?
                   moment(currentVideo().metadata.start_time).format("hh:mm A dddd MMMM D, YYYY") :
@@ -463,7 +425,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           </MainDis>
           <CategoryBox>
             {categories.map((catEl, sellIndex) => {
-              if (sellIndex >= selectedRow) {
+              if (sellIndex >= selectedRow) { //skip content after move
                 if (catEl.type === "showcase") {
                   return (
                     <Showcase
@@ -493,7 +455,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           </CategoryBox>
         </div>
       }
-    </>
+    </MainBox>
   )
 }
 
