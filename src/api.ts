@@ -37,7 +37,7 @@ let api = {
         return await fetch(`${domain}/api/v2/pages`, fetchConfig).then((res)=> res.json())
     },
     getPageContent: async(page:string, limit:number=10, offset:number=0 )=>{
-        return await fetch(`${domain}/api/v2/categories?page=${page}offset=${offset}&limit=${limit}&`,fetchConfig).then((res)=> res.json())           
+        return await fetch(`${domain}/api/v2/categories?page=${page}&offset=${offset}&limit=${limit}&`,fetchConfig).then((res)=> res.json())           
     },
     getCategoriContent: async(category:number, limit:number=10, offset:number=0 )=>{
         return await fetch(`${domain}/api/v2/categories/${category}?offset=${offset}&limit=${limit}`, fetchConfig).then((res)=> res.json())
