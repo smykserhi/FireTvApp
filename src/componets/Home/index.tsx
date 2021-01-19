@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { StorageType } from "../../store/types"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import Showcase from "./Showcase";
 import Normal from "./Normal"
 import { LOGIN, PAGES, VIDEO, MYLIST } from "../../constants"
@@ -97,6 +97,10 @@ const Image = styled.img`
   width: 100%;
   border-radius: 10px;
 `
+const LoadingComponent = styled.div`
+  width: 100vw;
+  height:100vh
+`
 
 export interface pageCategoriesType {
   description: string,
@@ -107,7 +111,7 @@ export interface pageCategoriesType {
 }
 export interface page {
   default: boolean,
-  id: string,
+  id: number,
   name: string,
 }
 
@@ -150,31 +154,27 @@ interface matchParamsType {
   id: string
 }
 interface Props extends RouteComponentProps<matchParamsType> {
-  pageId: string
+  pageId: number
 }
 
 const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
   const Token = useSelector(selectToken) //token 
   //let myHistory = useHistory();
-  const [loading, setLoading] = useState<boolean>(true)
-  let topMenuLength = 10 //how many pages would be displayed in top menu
+  const [loading, setLoading] = useState<boolean>(true) // main content loading
+  const [categiryContentLoading, setCategiryContentLoading] = useState<boolean>(false) // categiry Content Loading
+  const [categoryesloading, setCategoryesloading] = useState<boolean>(false) // main content loading
+  let topMenuLength = 5 //how many pages would be displayed in top menu
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
   const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
   const [selectedRow, setSelectedRow] = useState<number>(0)
   const [selectedCol, setSelectedCol] = useState<number>(0)
 
-  const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {
-    let result: videoDisType[] = []
-    for (let i = 0; i < categor.length; i++) {
-      for (let j = 0; j < content.length; j++) {
-        if (categor[i].id === content[j].id) {
-          result.push(content[j])
-        }
-      }
-    }
-    return result
+
+  
+  const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {    
+    return categor.map(el => content.filter(cont=> cont.id === el.id)).flat()
   }
 
   //Functions
@@ -212,7 +212,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 const sortedContent = sortContent(pageCategories, categoriesContents)
                 setSelectedCol(0)
                 setSelectedRow(0)
-                setPages(pagesData.filter(el => el.id != pageId))//skip current page from list
+                //console.log("pagesData", pagesData, "pageId", pageId)
+                setPages(pagesData.filter((el:page) => el.id !== pageId))//skip current page from list
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
                 setLoading(false)
@@ -231,7 +232,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   //console.log("categoriesContent", categoriesContent)
   //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
-    if (categories.length !== 0 && (categories.length - selectedRow) < 5) {
+    if (categories.length !== 0 && (categories.length - selectedRow) < 5 && !categoryesloading) {
+      setCategoryesloading(true)
       const offset = categories.length
       console.log("offset", offset)
       api.getPageContent(pageId, 10, offset)
@@ -257,18 +259,21 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             const sortedContent = sortContent(uniqCategory, uniqContent)
             setCategories(uniqCategory)
             setCategoriesContent(sortedContent)
+            setCategoryesloading(false)
             console.log("add categories to page ", pageId)
           })
         })
     }
   }
   const uploadCategoiesContent = (category: pageCategoriesType) => {
-    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 10) {
+    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 10 && !categiryContentLoading) {
+      setCategiryContentLoading(true) 
       const offset = categoriesContent[selectedRow].list.length
       api.getCategoriContent(category.id, 10, offset).then(res => {
         let tempCategoriesContent = categoriesContent
         res.forEach((el: videoDisListType) => tempCategoriesContent[selectedRow].list.push(el))
         setCategoriesContent(tempCategoriesContent)
+        setCategiryContentLoading(false)
         console.log(`Add data to category ${tempCategoriesContent[selectedRow].id}`)
       })
     }
@@ -380,7 +385,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   return (
     <MainBox>
-      {loading ? <Loading/>:
+      {loading ? <LoadingComponent><Loading/></LoadingComponent>:
         <div>
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
@@ -422,7 +427,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             <ImageDis>
               <Image src={currentVideo().smallImage} alt="Imag"></Image>
             </ImageDis>
-          </MainDis>
+          </MainDis>  
           <CategoryBox>
             {categories.map((catEl, sellIndex) => {
               if (sellIndex >= selectedRow) { //skip content after move
@@ -451,7 +456,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 }
               } else return false
             }
-            )}
+            )}            
           </CategoryBox>
         </div>
       }

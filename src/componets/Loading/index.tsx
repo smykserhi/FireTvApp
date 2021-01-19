@@ -2,10 +2,7 @@
 import React from "react"
 import styled, { keyframes } from 'styled-components';
 
-const LoadingComponent = styled.div`
-  width: 100vw;
-  height:100vh
-`
+
 const hourglass = keyframes`
   0% {
     transform: rotate(0);
@@ -38,4 +35,4 @@ const Spin = styled.div`
     border-color: #fff transparent #fff transparent;
     animation: ${hourglass} 1.2s infinite;
 `
-export const Loading:React.FC = ()=>(<LoadingComponent><Spin ></Spin></LoadingComponent>)
+export const Loading:React.FC = ()=>(<Spin ></Spin>)
