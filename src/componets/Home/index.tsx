@@ -6,9 +6,11 @@ import api from "../../api"
 import styled from 'styled-components';
 import Showcase from "./Showcase";
 import Normal from "./Normal"
-import { LOGIN, PAGES, VIDEO, MYLIST } from "../../constants"
-import {Loading} from "../Loading"
+import Guide from "./Guide"
+import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength,colors } from "../../constants"
+import { Loading } from "../Loading"
 import moment from 'moment';
+
 
 const MainBox = styled.div`
   margin: 0 1rem;
@@ -23,7 +25,7 @@ const MenuElement = styled.div`
   font-weight: bold;
 `
 const SelectedMenuElement = styled(MenuElement)`  
-  border-bottom: #ff0000 5px solid;
+  border-bottom: ${colors.primary} 5px solid;
 `
 const MainDis = styled.div`
   display: block;  
@@ -44,19 +46,20 @@ const ImageDis = styled.div`
   top: -30px;
   right: 30px;
   z-index: -1;  
-  box-shadow: 0px 0px 60px #d03939;
+  box-shadow: 0px 0px 60px ${colors.borderPrimary};
   border-radius: 10px;  
 `
 const DisH2 = styled.h2`
   font-size: 2.5em;
   margin-bottom: 20px;
   margin-top: 15px;
+  width: 60%;
 `
 const TimeBox = styled.div`
   font-size: 2em;
   margin-bottom: 20px;
   text-align: left;
-  color: #37c237;
+  color: ${colors.textFocus};
 `
 const DiscriptionBox = styled.div`
   white-space: normal;
@@ -65,8 +68,8 @@ const DiscriptionBox = styled.div`
 `
 const LiveBox = styled.div`
   display: inline-block;
-  background-color: red;
-  color: white;
+  background-color: ${colors.primary};
+  color: ${colors.textPrimary};
   font-weight: bold;
   border-radius: 5px;
   padding: 5px 10px 5px 10px;
@@ -75,8 +78,8 @@ const LiveBox = styled.div`
 `
 const ReplayBox = styled.div`
   display: inline-block;
-  background-color: orange;
-  color: white;
+  background-color: ${colors.atention};
+  color: ${colors.textPrimary};
   font-weight: bold;
   border-radius: 5px;
   padding: 5px 10px 5px 10px;
@@ -115,7 +118,7 @@ export interface page {
   name: string,
 }
 
-interface videoDisListType {
+export interface videoDisListType {
   description: string
   id: number
   image: string
@@ -130,7 +133,7 @@ export interface videoDisType {
   id: number,
   list: videoDisListType[]
 }
-interface metadataType {
+export interface metadataType {
   duration: null | number
   facility: facilityType
   live: false
@@ -164,7 +167,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [loading, setLoading] = useState<boolean>(true) // main content loading
   const [categiryContentLoading, setCategiryContentLoading] = useState<boolean>(false) // categiry Content Loading
   const [categoryesloading, setCategoryesloading] = useState<boolean>(false) // main content loading
-  let topMenuLength = 5 //how many pages would be displayed in top menu
+  //let topMenuLength = 5 //how many pages would be displayed in top menu
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
   const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
@@ -172,9 +175,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [selectedCol, setSelectedCol] = useState<number>(0)
 
 
-  
-  const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {    
-    return categor.map(el => content.filter(cont=> cont.id === el.id)).flat()
+//sort content by categories
+  const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {
+    return categor.map(el => content.filter(cont => cont.id === el.id)).flat()
   }
 
   //Functions
@@ -213,7 +216,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 setSelectedCol(0)
                 setSelectedRow(0)
                 //console.log("pagesData", pagesData, "pageId", pageId)
-                setPages(pagesData.filter((el:page) => el.id !== pageId))//skip current page from list
+                setPages(pagesData.filter((el: page) => el.id !== pageId))//skip current page from list
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
                 setLoading(false)
@@ -232,10 +235,10 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   //console.log("categoriesContent", categoriesContent)
   //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
-    if (categories.length !== 0 && (categories.length - selectedRow) < 5 && !categoryesloading) {
+    if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)
       const offset = categories.length
-      console.log("offset", offset)
+      console.log("Categories offset", offset)
       api.getPageContent(pageId, 10, offset)
         .then((newCategiry) => {
           const categoriesContents: videoDisType[] = []
@@ -267,7 +270,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
   const uploadCategoiesContent = (category: pageCategoriesType) => {
     if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 10 && !categiryContentLoading) {
-      setCategiryContentLoading(true) 
+      setCategiryContentLoading(true)
       const offset = categoriesContent[selectedRow].list.length
       api.getCategoriContent(category.id, 10, offset).then(res => {
         let tempCategoriesContent = categoriesContent
@@ -339,22 +342,32 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
 
   const handleArrowUp = () => {
-    if (selectedRow > -1) {
-      setSelectedCol(0)
-      setSelectedRow(selectedRow - 1)
+    if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
+      setSelectedCol(selectedCol - 1)
     } else {
-      addListeners()
+      if (selectedRow > -1) {
+        setSelectedCol(0)
+        setSelectedRow(selectedRow - 1)
+      } else {
+        addListeners()
+      }
     }
   }
   const handleArrowDown = () => {
-    uploadCategories()
-    if (selectedRow < categoriesContent.length - 1) {
-      setSelectedCol(0)
-      setSelectedRow(selectedRow + 1)
-    } else addListeners()
+    if (categories[selectedRow]?.type === "guide" && selectedCol < categoriesContent[selectedRow].list.length - 1) { //inside guide category
+      if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
+      uploadCategoiesContent(categories[selectedRow])
+    } else {
+      uploadCategories()
+      if (selectedRow < categoriesContent.length - 1) {
+        setSelectedCol(0)
+        setSelectedRow(selectedRow + 1)
+      } else addListeners()
+    }
+
   }
   const hendleArrowLeft = () => {
-    if (selectedCol > 0) {
+    if (selectedCol > 0 && (categories[selectedRow]?.type !== "guide" || selectedRow === -1)) {
       setSelectedCol(selectedCol - 1)
     } else {
       console.log("left more 0 Open side menu")
@@ -367,16 +380,16 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       setSelectedCol(selectedCol + 1)
       //main content selector
     } else {
-      if (categoriesContent.length > 0) {
+      if (categoriesContent.length > 0 && selectedRow > -1) {
         uploadCategoiesContent(categories[selectedRow])
-        if (selectedCol < categoriesContent[selectedRow].list.length - 1) { //if not end of the row
+        if (selectedCol < categoriesContent[selectedRow].list.length - 1 && categories[selectedRow]?.type !== "guide") { //if not end of the row
           setSelectedCol(selectedCol + 1)
         } else addListeners()
       } else addListeners()
     }
   }
   const currentVideo = (): videoDisListType => {
-    if (selectedRow > 0 && categoriesContent.length > 0) {
+    if (selectedRow >= 0 && categoriesContent.length > 0) {
       return categoriesContent[selectedRow].list[selectedCol]
     } else {
       return categoriesContent[0].list[0]
@@ -385,7 +398,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   return (
     <MainBox>
-      {loading ? <LoadingComponent><Loading/></LoadingComponent>:
+      {loading ? <LoadingComponent><Loading /></LoadingComponent> :
         <div>
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
@@ -410,14 +423,14 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             <VideoDis>
               <DisH2>{currentVideo() ? currentVideo().title : ""}</DisH2>
               <TimeBox>
-                {currentVideo().metadata.live ?
+                {currentVideo().metadata?.live ?
                   moment(currentVideo().metadata.start_time).format("hh:mm A dddd MMMM D, YYYY") :
                   moment(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")}
               </TimeBox>
               <DiscriptionBox>
                 {currentVideo().metadata.live
-                  ? <LiveBox>Live</LiveBox>
-                  : <ReplayBox>Replay</ReplayBox>
+                  ? <LiveBox>LIVE</LiveBox>
+                  : <ReplayBox>REPLAY</ReplayBox>
                 }
                 <DiscriptionText>
                   {currentVideo().description}
@@ -427,7 +440,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             <ImageDis>
               <Image src={currentVideo().smallImage} alt="Imag"></Image>
             </ImageDis>
-          </MainDis>  
+          </MainDis>
           <CategoryBox>
             {categories.map((catEl, sellIndex) => {
               if (sellIndex >= selectedRow) { //skip content after move
@@ -437,6 +450,16 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                       key={catEl.id}
                       sellIndex={sellIndex}
                       categories={categories}
+                      categoriesContent={categoriesContent}
+                      selectedCol={selectedCol}
+                      selectedRow={selectedRow}
+                    />
+                  )
+                } else if (catEl.type === "guide") {
+                  return (
+                    <Guide
+                      key={catEl.id}
+                      sellIndex={sellIndex}
                       categoriesContent={categoriesContent}
                       selectedCol={selectedCol}
                       selectedRow={selectedRow}
@@ -456,7 +479,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 }
               } else return false
             }
-            )}            
+            )}
           </CategoryBox>
         </div>
       }

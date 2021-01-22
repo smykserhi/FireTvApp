@@ -11,7 +11,36 @@ export const MYLIST = "/mylist"
 export const host = 'speedsport.tv';
 export const domain = 'https://speedsport.tv';
 
+//How many items would be displayed in top menu + My List
+export const topMenuLength = 5
 
+//colors for all application
+export interface ColorsType {
+    primary: string,
+    seconary: string,
+    atention: string,
+    bgPrimary: string,
+    bgSecondary: string,
+    bgAtention: string,
+    textPrimary: string,
+    textSecondary: string,
+    textFocus: string,
+    borderPrimary: string,
+    borderSecondary: string,
+}
+export const colors:ColorsType={
+    primary: "#c02425", //#ff0000
+    seconary: "#37c237", //#37c237
+    atention: "#ffb400",//#ffa500
+    bgPrimary: "#000000",
+    bgSecondary: "#222",// #222222
+    bgAtention: "#6c757d",
+    textPrimary: "#ffffff",
+    textSecondary: "#f5deb3",
+    textFocus: "#37c237", 
+    borderPrimary: "#d03939",
+    borderSecondary: "#37c237"
+}
 
 
 

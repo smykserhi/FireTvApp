@@ -1,6 +1,6 @@
-
 import React from "react"
 import styled, { keyframes } from 'styled-components';
+import {colors} from "../../constants"
 
 
 const hourglass = keyframes`
@@ -32,7 +32,7 @@ const Spin = styled.div`
     margin: 8px;
     box-sizing: border-box;
     border: 75px solid #fff;
-    border-color: #fff transparent #fff transparent;
+    border-color: ${colors.textPrimary} transparent ${colors.textPrimary} transparent;
     animation: ${hourglass} 1.2s infinite;
 `
 export const Loading:React.FC = ()=>(<Spin ></Spin>)

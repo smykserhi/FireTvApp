@@ -1,6 +1,7 @@
 import React from "react"
 import styled from 'styled-components';
 import { pageCategoriesType, videoDisType } from "./index"
+import {colors} from "../../constants"
 
 
 const CategorRow = styled.div`
@@ -19,7 +20,7 @@ const VideoElementShowcase = styled.div`
 `
 
 const SelectedVideoElementShowcase = styled(VideoElementShowcase)`    
-  /*border: #ff0000 5px solid;*/
+  /*border: ${colors.primary} 5px solid;*/
   /*transform: scale(1.3) translateX(53px);*/
   /*margin-right: 150px;*/  
   min-width: 500px;
@@ -32,7 +33,8 @@ const Image = styled.img`
 
 `
 const SelectedImage = styled.img`
-    box-shadow: 0px 0px 25px #37c237;
+    box-shadow: 0px 0px 40px ${colors.borderPrimary};
+    border: solid ${colors.borderPrimary} 2px;
     width: 100%;
     border-radius: 5px;
 `
