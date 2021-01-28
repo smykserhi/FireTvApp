@@ -1,6 +1,6 @@
 import React from "react"
 import styled, { keyframes } from 'styled-components';
-import { videoDisType, videoDisListType } from "./index"
+import { videoDisListType, ListProps } from "./index"
 import moment from 'moment';
 import {colors} from "../../constants"
 
@@ -108,6 +108,7 @@ const DisLife = styled.div`
     text-align: center;
     border-radius: 0.25rem;
     height: 1.5rem;
+    text-shadow: 2px 2px #130f10;
 `
 const DisLifeAnime = styled(DisLife)`    
     animation: ${jelloHorizontal}  0.9s both;
@@ -119,22 +120,11 @@ const DisFacility = styled.div`
     margin: 10px 0;
 `
 const DisDiscription = styled.div`
-    max-height: 45px;
+    max-height: 40px;
     overflow: hidden;
 `
 
-
-type GuideProps = {
-    sellIndex: number,    
-    categoriesContent: videoDisType[],
-    selectedCol: number,
-    selectedRow: number
-
-}; /* could also use interface */
-
-
-
-const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: GuideProps) => {
+const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
     const CategoryData = (el: videoDisListType, anime: boolean) => {
         return (
             <>

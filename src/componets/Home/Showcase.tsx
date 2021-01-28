@@ -1,6 +1,6 @@
 import React from "react"
 import styled from 'styled-components';
-import { pageCategoriesType, videoDisType } from "./index"
+import {ListProps } from "./index"
 import {colors} from "../../constants"
 
 
@@ -9,7 +9,7 @@ const CategorRow = styled.div`
   flex-direction: row;
   margin-bottom: 20px;
   overflow: hidden;  
-  align-items: center;
+  align-items: flex-start;
   font-size: 25px;
 `
 
@@ -39,18 +39,7 @@ const SelectedImage = styled.img`
     border-radius: 5px;
 `
 
-type ShowcaseProps = {
-    sellIndex: number,
-    categories: pageCategoriesType[],
-    categoriesContent: videoDisType[],
-    selectedCol: number,
-    selectedRow: number
-
-}; /* could also use interface */
-
-
-
-const Showcase = ({ sellIndex, categories, categoriesContent, selectedCol, selectedRow }: ShowcaseProps) => {
+const Showcase = ({ sellIndex, categories, categoriesContent, selectedCol, selectedRow }: ListProps) => {
     return (
         <CategorRow key={sellIndex} >
             {categoriesContent[sellIndex].list.map((el, colIndex) => {

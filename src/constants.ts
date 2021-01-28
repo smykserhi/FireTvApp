@@ -29,7 +29,7 @@ export interface ColorsType {
     borderSecondary: string,
 }
 export const colors:ColorsType={
-    primary: "#c02425", //#ff0000
+    primary: '#c02425', //#ff0000
     seconary: "#37c237", //#37c237
     atention: "#ffb400",//#ffa500
     bgPrimary: "#000000",

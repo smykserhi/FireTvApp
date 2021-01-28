@@ -7,9 +7,11 @@ import styled from 'styled-components';
 import Showcase from "./Showcase";
 import Normal from "./Normal"
 import Guide from "./Guide"
-import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength,colors } from "../../constants"
+import Full from "./Full"
+import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors } from "../../constants"
 import { Loading } from "../Loading"
 import moment from 'moment';
+
 
 
 const MainBox = styled.div`
@@ -17,15 +19,18 @@ const MainBox = styled.div`
 `
 const MenuBox = styled.div`
   display: flex;
-  height: 2.5rem;  
+  height: 2.5rem;    
 `
 const MenuElement = styled.div`
   margin-right: 20px;
-  font-size: 1.7em;
+  font-size: 2em;
   font-weight: bold;
+  margin-top: 5px;
 `
 const SelectedMenuElement = styled(MenuElement)`  
-  border-bottom: ${colors.primary} 5px solid;
+  border-bottom: ${colors.primary} 5px solid;  
+  padding-bottom: 45px;
+  color: ${colors.primary}
 `
 const MainDis = styled.div`
   display: block;  
@@ -75,6 +80,7 @@ const LiveBox = styled.div`
   padding: 5px 10px 5px 10px;
   margin-right: 10px;
   margin-bottom: 10px;
+  text-shadow: 2px 2px #54462387;
 `
 const ReplayBox = styled.div`
   display: inline-block;
@@ -84,7 +90,8 @@ const ReplayBox = styled.div`
   border-radius: 5px;
   padding: 5px 10px 5px 10px;
   margin-right: 10px;
-  margin-bottom: 10px;  
+  margin-bottom: 10px;
+  text-shadow: 2px 2px #54462387;  
 `
 
 const CategoryBox = styled.div`
@@ -95,6 +102,10 @@ const DiscriptionText = styled.div`
   white-space: normal;
   width: 70%;
   display: inline;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  font-size: 1.3em;
+  
 `
 const Image = styled.img`
   width: 100%;
@@ -104,6 +115,14 @@ const LoadingComponent = styled.div`
   width: 100vw;
   height:100vh
 `
+export type ListProps = {
+  sellIndex: number,
+  categories: pageCategoriesType[],
+  categoriesContent: videoDisType[],
+  selectedCol: number,
+  selectedRow: number
+
+}
 
 export interface pageCategoriesType {
   description: string,
@@ -175,7 +194,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [selectedCol, setSelectedCol] = useState<number>(0)
 
 
-//sort content by categories
+  //sort content by categories
   const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {
     return categor.map(el => content.filter(cont => cont.id === el.id)).flat()
   }
@@ -231,15 +250,15 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   //console.log("match", match.params)
   //console.log("pages", pages)
-  //console.log("categories", categories)
-  //console.log("categoriesContent", categoriesContent)
-  //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  console.log("categories", categories)
+  console.log("categoriesContent", categoriesContent)
+  console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)
       const offset = categories.length
       console.log("Categories offset", offset)
-      api.getPageContent(pageId, 10, offset)
+      api.getPageContent(pageId, 20, offset)
         .then((newCategiry) => {
           const categoriesContents: videoDisType[] = []
           const pageCategories: pageCategoriesType[] = newCategiry
@@ -269,9 +288,12 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     }
   }
   const uploadCategoiesContent = (category: pageCategoriesType) => {
-    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 10 && !categiryContentLoading) {
+    console.log("uploadCategoiesContent")
+    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 20 && !categiryContentLoading) {
+      console.log("offset uploadCategoiesContent")
       setCategiryContentLoading(true)
       const offset = categoriesContent[selectedRow].list.length
+      console.log("offset uploadCategoiesContent", offset)
       api.getCategoriContent(category.id, 10, offset).then(res => {
         let tempCategoriesContent = categoriesContent
         res.forEach((el: videoDisListType) => tempCategoriesContent[selectedRow].list.push(el))
@@ -344,10 +366,16 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const handleArrowUp = () => {
     if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
       setSelectedCol(selectedCol - 1)
+    } else if (categories[selectedRow]?.type === "full" && selectedCol > 4) { //inside full category
+      setSelectedCol(selectedCol - 5)
     } else {
       if (selectedRow > -1) {
-        setSelectedCol(0)
-        setSelectedRow(selectedRow - 1)
+        setSelectedRow(selectedRow - 1) //set previous row
+        if (selectedRow > 0 && categories[selectedRow - 1]?.type === "full") { //if previous category type full         
+          setSelectedCol(categoriesContent[selectedRow - 1].list.length - 1)  // select the last item in the list
+        } else {
+          setSelectedCol(0)
+        }
       } else {
         addListeners()
       }
@@ -356,6 +384,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const handleArrowDown = () => {
     if (categories[selectedRow]?.type === "guide" && selectedCol < categoriesContent[selectedRow].list.length - 1) { //inside guide category
       if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
+      uploadCategoiesContent(categories[selectedRow])
+    } else if (categories[selectedRow]?.type === "full" && selectedCol < categoriesContent[selectedRow].list.length - 5) { //inside full category
+      if (selectedCol < categoriesContent[selectedRow].list.length - 5) setSelectedCol(selectedCol + 5)
       uploadCategoiesContent(categories[selectedRow])
     } else {
       uploadCategories()
@@ -460,6 +491,18 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                     <Guide
                       key={catEl.id}
                       sellIndex={sellIndex}
+                      categories={categories}
+                      categoriesContent={categoriesContent}
+                      selectedCol={selectedCol}
+                      selectedRow={selectedRow}
+                    />
+                  )
+                } else if (catEl.type === "full") {
+                  return (
+                    <Full
+                      key={catEl.id}
+                      sellIndex={sellIndex}
+                      categories={categories}
                       categoriesContent={categoriesContent}
                       selectedCol={selectedCol}
                       selectedRow={selectedRow}

@@ -1,6 +1,6 @@
 import React from "react"
 import styled from 'styled-components';
-import { pageCategoriesType, videoDisType } from "./index"
+import { ListProps } from "./index"
 import {colors} from "../../constants"
 
 
@@ -9,18 +9,21 @@ const CategorRow = styled.div`
   flex-direction: row;
   margin-bottom: 20px;
   overflow: hidden;
-  align-items: center;  
+  align-items: flex-start;
   font-size: 25px;
 `
 const VideoElementNormal = styled.div`  
   margin: 10px;
   min-width: 300px;
   max-width: 300px;
+  margin-top: 25px;
+  
 `
 
 const SelectedVideoElementNormal = styled(VideoElementNormal)`    
   /*border: ${colors.primary} 3px solid;*/ 
     min-width: 450px;  
+    margin-top: 0;
   
 `
 const Title = styled.div`
@@ -37,19 +40,12 @@ const SelectedImage = styled.img`
   width: 100%;
   border-radius: 5px;
 `
+const VideoTitle = styled.div`
+    /*max-height: 55px;*/
+    overflow: hidden;
+`
 
-type NormalProps = {
-    sellIndex: number,
-    categories: pageCategoriesType[],
-    categoriesContent: videoDisType[],
-    selectedCol: number,
-    selectedRow: number
-
-}; /* could also use interface */
-
-
-
-const Normal = ({ sellIndex, categories, categoriesContent, selectedCol, selectedRow }: NormalProps) => {
+const Normal = ({ sellIndex, categories, categoriesContent, selectedCol, selectedRow }: ListProps) => {
     return (
         <>
             <Title >{categories[sellIndex].name}</Title>
@@ -61,14 +57,14 @@ const Normal = ({ sellIndex, categories, categoriesContent, selectedCol, selecte
                                 return (
                                     <SelectedVideoElementNormal key={colIndex} >
                                         <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
-                                        <div>{el.title}</div>
+                                        <VideoTitle>{el.title}</VideoTitle>
                                     </SelectedVideoElementNormal>
                                 )
                             } else {
                                 return (
                                     <VideoElementNormal key={colIndex} >
                                         <Image src={el.smallImage} alt="Imag"></Image>
-                                        <div>{el.title}</div>
+                                        <VideoTitle>{el.title}</VideoTitle>
                                     </VideoElementNormal>
                                 )
                             }
@@ -77,7 +73,7 @@ const Normal = ({ sellIndex, categories, categoriesContent, selectedCol, selecte
                         return (
                             <VideoElementNormal key={colIndex} >
                                 <Image src={el.smallImage} alt="Imag"></Image>
-                                <div>{el.title}</div>
+                                <VideoTitle>{el.title}</VideoTitle>
                             </VideoElementNormal>
                         )
                     }
