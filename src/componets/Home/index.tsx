@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { StorageType } from "../../store/types"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import Showcase from "./Showcase";
 import Normal from "./Normal"
 import Guide from "./Guide"
@@ -11,8 +11,19 @@ import Full from "./Full"
 import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors } from "../../constants"
 import { Loading } from "../Loading"
 import moment from 'moment';
+var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
-
+const menuItem = keyframes`
+    from{        
+        opacity:0.5 ;
+    }
+    to{
+        
+        opacity: 1;
+        
+    }
+    
+`
 
 const MainBox = styled.div`
   margin: 0 1rem;
@@ -30,7 +41,8 @@ const MenuElement = styled.div`
 const SelectedMenuElement = styled(MenuElement)`  
   border-bottom: ${colors.primary} 5px solid;  
   padding-bottom: 45px;
-  color: ${colors.primary}
+  color: ${colors.primary};
+  animation: ${menuItem}  0.3s ease-in-out ;  
 `
 const MainDis = styled.div`
   display: block;  
@@ -46,13 +58,15 @@ const VideoDis = styled.div`
 `
 const ImageDis = styled.div`
   align-self: center;   
-  width: 35vw;
+  width: 50vw;
   position: absolute;
-  top: -30px;
-  right: 30px;
+  top: -60px;
+  right: -20px;
   z-index: -1;  
-  box-shadow: 0px 0px 60px ${colors.borderPrimary};
+  /*box-shadow: 0px 0px 60px ${colors.borderPrimary};*/
   border-radius: 10px;  
+  mask-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 15%) ;
+  
 `
 const DisH2 = styled.h2`
   font-size: 2.5em;
@@ -110,6 +124,9 @@ const DiscriptionText = styled.div`
 const Image = styled.img`
   width: 100%;
   border-radius: 10px;
+  mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 25%) ;
+
+  /*transform: scale(1.4);*/
 `
 const LoadingComponent = styled.div`
   width: 100vw;
@@ -185,8 +202,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   //let myHistory = useHistory();
   const [loading, setLoading] = useState<boolean>(true) // main content loading
   const [categiryContentLoading, setCategiryContentLoading] = useState<boolean>(false) // categiry Content Loading
-  const [categoryesloading, setCategoryesloading] = useState<boolean>(false) // main content loading
-  //let topMenuLength = 5 //how many pages would be displayed in top menu
+  const [categoryesloading, setCategoryesloading] = useState<boolean>(false) // main content loading  
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
   const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
@@ -250,8 +266,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   //console.log("match", match.params)
   //console.log("pages", pages)
-  console.log("categories", categories)
-  console.log("categoriesContent", categoriesContent)
+  //console.log("categories", categories)
+  //console.log("categoriesContent", categoriesContent)
   console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
@@ -408,9 +424,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const handleArrowRight = () => {
     //top menu selector topMenuLength
     if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + My List
-      setSelectedCol(selectedCol + 1)
+      setSelectedCol(selectedCol + 1)      
       //main content selector
-    } else {
+    } else {      
       if (categoriesContent.length > 0 && selectedRow > -1) {
         uploadCategoiesContent(categories[selectedRow])
         if (selectedCol < categoriesContent[selectedRow].list.length - 1 && categories[selectedRow]?.type !== "guide") { //if not end of the row
@@ -469,10 +485,14 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
               </DiscriptionBox>
             </VideoDis>
             <ImageDis>
-              <Image src={currentVideo().smallImage} alt="Imag"></Image>
+              <Image src={currentVideo().mediumImage} alt="Imag"></Image>
             </ImageDis>
-          </MainDis>
-          <CategoryBox>
+          </MainDis>          
+          <CSSTransitionGroup
+            component={CategoryBox}
+            transitionName="category"
+            transitionEnterTimeout={300}
+            transitionLeaveTimeout={300}>
             {categories.map((catEl, sellIndex) => {
               if (sellIndex >= selectedRow) { //skip content after move
                 if (catEl.type === "showcase") {
@@ -523,7 +543,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
               } else return false
             }
             )}
-          </CategoryBox>
+          </CSSTransitionGroup>
         </div>
       }
     </MainBox>

@@ -1,8 +1,12 @@
 import React from "react"
+import Example from './Galery'
 
-const  MyList = ()=>{
+const MyList = () => {
     return (
-        <h1>MyList component</h1>
+        <>
+            <h1>MyList component</h1>
+            <Example />
+        </>
     )
 }
 

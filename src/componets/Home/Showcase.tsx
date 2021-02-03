@@ -1,9 +1,40 @@
 import React from "react"
-import styled from 'styled-components';
-import {ListProps } from "./index"
-import {colors} from "../../constants"
+import styled, { keyframes } from 'styled-components';
+import { ListProps } from "./index"
+import { colors } from "../../constants"
+var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
 
+const selectItem = keyframes`
+    from{
+        opacity: 1;
+    }
+    to{
+        margin-left: -370px;
+        opacity: 0;
+    }
+    
+`
+const selectedCategory = keyframes`
+    from{
+        transform: scale(1) ; 
+        opacity: 1;
+    }
+    to{
+        transform: scale(0.5) ; 
+        margin-top: -170px;
+        opacity: 0;
+    }
+    
+`
+const MainContainer = styled.div`
+    &.category-enter.category-enter-active {   
+        animation: ${selectedCategory}  0.3s ease-in-out reverse;            
+    }     
+    &.category-leave.category-leave-active {   
+        animation: ${selectedCategory}  0.3s ease-in-out ;     
+    }
+`
 const CategorRow = styled.div`
   display: flex;  
   flex-direction: row;
@@ -19,11 +50,14 @@ const VideoElementShowcase = styled.div`
   max-width: 450px;
 `
 
-const SelectedVideoElementShowcase = styled(VideoElementShowcase)`    
-  /*border: ${colors.primary} 5px solid;*/
-  /*transform: scale(1.3) translateX(53px);*/
-  /*margin-right: 150px;*/  
+const SelectedVideoElementShowcase = styled(VideoElementShowcase)`     
   min-width: 500px;
+  &.list-enter.list-enter-active {   
+    animation: ${selectItem}  0.3s ease-in-out reverse;            
+  }     
+    &.list-leave.list-leave-active {   
+    animation: ${selectItem}  0.3s ease-in-out ;     
+  }
   
   
   `
@@ -33,48 +67,51 @@ const Image = styled.img`
 
 `
 const SelectedImage = styled.img`
-    box-shadow: 0px 0px 40px ${colors.borderPrimary};
+    /*box-shadow: 0px 0px 40px ${colors.borderPrimary};*/
     border: solid ${colors.borderPrimary} 2px;
     width: 100%;
     border-radius: 5px;
 `
 
-const Showcase = ({ sellIndex, categories, categoriesContent, selectedCol, selectedRow }: ListProps) => {
+const Showcase = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
     return (
-        <CategorRow key={sellIndex} >
-            {categoriesContent[sellIndex].list.map((el, colIndex) => {
-                if (selectedRow === sellIndex) { ////if selected row
-                    if (colIndex >= selectedCol) {//don't show elements before selected
-                        if (sellIndex === selectedRow && colIndex === selectedCol) {
-                            return (
-                                <SelectedVideoElementShowcase key={colIndex} >
-                                    <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
-                                    <div>{el.title}</div>
-                                </SelectedVideoElementShowcase>
-                            )
-                        } else {
-                            return (
-                                <VideoElementShowcase key={colIndex} >
-                                    <Image src={el.smallImage} alt="Imag"></Image>
-                                    <div>{el.title}</div>
-                                </VideoElementShowcase>
-                            )
-                        }
-                    }else return false
-                } else {
-                    return (
-                        <VideoElementShowcase key={colIndex} >
-                            <Image src={el.smallImage} alt="Imag"></Image>
-                            <div>{el.title}</div>
-                        </VideoElementShowcase>
-                    )
-                }
-
-
-            })}
-        </CategorRow>
-
-
+        <MainContainer>
+            <CSSTransitionGroup
+                key={sellIndex}
+                component={CategorRow}
+                transitionName="list"
+                transitionEnterTimeout={200}
+                transitionLeaveTimeout={200}>
+                {categoriesContent[sellIndex].list.map((el, colIndex) => {
+                    if (selectedRow === sellIndex) { ////if selected row
+                        if (colIndex >= selectedCol) {//don't show elements before selected
+                            if (sellIndex === selectedRow && colIndex === selectedCol) {
+                                return (
+                                    <SelectedVideoElementShowcase key={colIndex} >
+                                        <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
+                                        <div>{el.title}</div>
+                                    </SelectedVideoElementShowcase>
+                                )
+                            } else {
+                                return (
+                                    <VideoElementShowcase key={colIndex} >
+                                        <Image src={el.smallImage} alt="Imag"></Image>
+                                        <div>{el.title}</div>
+                                    </VideoElementShowcase>
+                                )
+                            }
+                        } else return false
+                    } else {
+                        return (
+                            <VideoElementShowcase key={colIndex} >
+                                <Image src={el.smallImage} alt="Imag"></Image>
+                                <div>{el.title}</div>
+                            </VideoElementShowcase>
+                        )
+                    }
+                })}
+            </CSSTransitionGroup>
+        </MainContainer>
     )
 }
 

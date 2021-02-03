@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import { videoDisListType, ListProps } from "./index"
 import moment from 'moment';
 import {colors} from "../../constants"
+var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
 const jelloHorizontal = keyframes`
     0% {
@@ -27,6 +28,18 @@ const jelloHorizontal = keyframes`
         transform: scale3d(1, 1, 1);
     }
 `
+const selectedCategory = keyframes`
+    from{
+        transform: scale(1) ; 
+        opacity: 1;
+    }
+    to{
+        transform: scale(0.4) ; 
+        margin-top: -170px;
+        opacity: 0;
+    }
+    
+`
 const CategorRow = styled.div`
     display: flex;
     color: ${colors.textPrimary};
@@ -41,6 +54,12 @@ const CategorRow = styled.div`
 const SelectedCategorRow = styled(CategorRow)`
     border: solid ${colors.borderPrimary} 2px;
     box-shadow: 0px 0px 50px 5px ${colors.borderPrimary};
+    &.category-enter.category-enter-active {   
+        animation: ${selectedCategory}  0.3s ease-in-out reverse;            
+    }     
+    &.category-leave.category-leave-active {   
+        animation: ${selectedCategory}  0.3s ease-in-out ;     
+    }
 `
 
 
@@ -149,7 +168,11 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
         )
     }
     return (
-        <>
+        <CSSTransitionGroup        
+        component="div"
+        transitionName="category"
+        transitionEnterTimeout={200}
+        transitionLeaveTimeout={200}>
             {categoriesContent[sellIndex].list.map((el, colIndex) => {
                 if (selectedRow === sellIndex) {
                     if (colIndex >= selectedCol) {
@@ -163,7 +186,7 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
 
             })}
 
-        </>
+        </CSSTransitionGroup>
 
     )
 }
