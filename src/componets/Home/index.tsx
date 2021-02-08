@@ -8,8 +8,9 @@ import Showcase from "./Showcase";
 import Normal from "./Normal"
 import Guide from "./Guide"
 import Full from "./Full"
-import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors } from "../../constants"
+import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors , SEARCH, SETTINGS, HOME} from "../../constants"
 import { Loading } from "../Loading"
+import { SideMenu } from "../SideMenu"
 import moment from 'moment';
 var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
@@ -17,26 +18,26 @@ const menuItem = keyframes`
     from{        
         opacity:0.5 ;
     }
-    to{
-        
-        opacity: 1;
-        
-    }
-    
+    to{        
+        opacity: 1;        
+    }    
 `
 
 const MainBox = styled.div`
-  margin: 0 1rem;
+  margin: 0 5rem;
+  
 `
 const MenuBox = styled.div`
   display: flex;
-  height: 2.5rem;    
+  height: 2.5rem;
+   
 `
 const MenuElement = styled.div`
   margin-right: 20px;
   font-size: 2em;
   font-weight: bold;
   margin-top: 5px;
+  z-index: 5;
 `
 const SelectedMenuElement = styled(MenuElement)`  
   border-bottom: ${colors.primary} 5px solid;  
@@ -62,7 +63,7 @@ const ImageDis = styled.div`
   position: absolute;
   top: -60px;
   right: -20px;
-  z-index: -1;  
+  z-index: 0;  
   /*box-shadow: 0px 0px 60px ${colors.borderPrimary};*/
   border-radius: 10px;  
   mask-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 15%) ;
@@ -82,7 +83,7 @@ const TimeBox = styled.div`
 `
 const DiscriptionBox = styled.div`
   white-space: normal;
-  width: 60%;
+  width: 55%;
   font-size: 1.5em;
 `
 const LiveBox = styled.div`
@@ -111,6 +112,7 @@ const ReplayBox = styled.div`
 const CategoryBox = styled.div`
   display: flex;  
   flex-direction: column;
+ 
 `
 const DiscriptionText = styled.div`
   white-space: normal;
@@ -119,6 +121,7 @@ const DiscriptionText = styled.div`
   line-height: 1.4;
   letter-spacing: 1px;
   font-size: 1.3em;
+  
   
 `
 const Image = styled.img`
@@ -196,6 +199,8 @@ interface Props extends RouteComponentProps<matchParamsType> {
   pageId: number
 }
 
+type sideMenuType = "home" | "search" | "settings" | null
+
 const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
   const Token = useSelector(selectToken) //token 
@@ -208,6 +213,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
   const [selectedRow, setSelectedRow] = useState<number>(0)
   const [selectedCol, setSelectedCol] = useState<number>(0)
+  const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
+  const [sideMenuItem, setSideMenuItem] = useState<sideMenuType>(null)
 
 
   //sort content by categories
@@ -268,7 +275,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   //console.log("pages", pages)
   //console.log("categories", categories)
   //console.log("categoriesContent", categoriesContent)
-  console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)
@@ -364,52 +371,80 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
 
   const handleEnter = () => {
-    if (selectedRow === -1) {
-      if (selectedCol <= topMenuLength - 1) {
-        const selectedPageId = pages[selectedCol].id
-        console.log("Menu item", selectedPageId)
-        history.push(`${PAGES}/${selectedPageId}`)
+    if (expandSideMenue) {
+      if (sideMenuItem === "home"){
+        history.push(`${PAGES}/${HOME}`)
         setLoading(true)
-      } else {
-        history.push(MYLIST)
-      }
+        setSideMenuItem(null)
+        setExpandSideMenue(false)        
+      } else if (sideMenuItem === "search")  history.push(`${SEARCH}`)
+      else if (sideMenuItem === "settings")  history.push(`${SETTINGS}`)
+      
     } else {
-      console.log("Video", currentVideo())
-      history.push(`${VIDEO}/${currentVideo().id}`)
+      if (selectedRow === -1) {
+        if (selectedCol <= topMenuLength - 1) {
+          const selectedPageId = pages[selectedCol].id
+          console.log("Menu item", selectedPageId)
+          history.push(`${PAGES}/${selectedPageId}`)
+          setLoading(true)
+        } else {
+          history.push(MYLIST)
+        }
+      } else {
+        console.log("Video", currentVideo())
+        history.push(`${VIDEO}/${currentVideo().id}`)
+      }
     }
+
   }
 
   const handleArrowUp = () => {
-    if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
-      setSelectedCol(selectedCol - 1)
-    } else if (categories[selectedRow]?.type === "full" && selectedCol > 4) { //inside full category
-      setSelectedCol(selectedCol - 5)
+    if (expandSideMenue) {
+      console.log("side up")
+      if (sideMenuItem === "search") setSideMenuItem("home")
+      else if (sideMenuItem === "settings") setSideMenuItem("search")
+      else addListeners()
     } else {
-      if (selectedRow > -1) {
-        setSelectedRow(selectedRow - 1) //set previous row
-        if (selectedRow > 0 && categories[selectedRow - 1]?.type === "full") { //if previous category type full         
-          setSelectedCol(categoriesContent[selectedRow - 1].list.length - 1)  // select the last item in the list
-        } else {
-          setSelectedCol(0)
-        }
+      if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
+        setSelectedCol(selectedCol - 1)
+      } else if (categories[selectedRow]?.type === "full" && selectedCol > 4) { //inside full category
+        setSelectedCol(selectedCol - 5)
       } else {
-        addListeners()
+        if (selectedRow > -1) {
+          setSelectedRow(selectedRow - 1) //set previous row
+          if (selectedRow > 0 && categories[selectedRow - 1]?.type === "full") { //if previous category type full         
+            setSelectedCol(categoriesContent[selectedRow - 1].list.length - 1)  // select the last item in the list
+          } else {
+            setSelectedCol(0)
+          }
+        } else {
+          addListeners()
+        }
       }
     }
+
   }
   const handleArrowDown = () => {
-    if (categories[selectedRow]?.type === "guide" && selectedCol < categoriesContent[selectedRow].list.length - 1) { //inside guide category
-      if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
-      uploadCategoiesContent(categories[selectedRow])
-    } else if (categories[selectedRow]?.type === "full" && selectedCol < categoriesContent[selectedRow].list.length - 5) { //inside full category
-      if (selectedCol < categoriesContent[selectedRow].list.length - 5) setSelectedCol(selectedCol + 5)
-      uploadCategoiesContent(categories[selectedRow])
+    if (expandSideMenue) {
+      console.log("side down")
+      if (sideMenuItem === "home") setSideMenuItem("search")
+      else if (sideMenuItem === "search") setSideMenuItem("settings")
+      else addListeners()
     } else {
-      uploadCategories()
-      if (selectedRow < categoriesContent.length - 1) {
-        setSelectedCol(0)
-        setSelectedRow(selectedRow + 1)
-      } else addListeners()
+      if (categories[selectedRow]?.type === "guide" && selectedCol < categoriesContent[selectedRow].list.length - 1) { //inside guide category
+        if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
+        uploadCategoiesContent(categories[selectedRow])
+      } else if (categories[selectedRow]?.type === "full" && selectedCol < categoriesContent[selectedRow].list.length - 5) { //inside full category
+        if (selectedCol < categoriesContent[selectedRow].list.length - 5) setSelectedCol(selectedCol + 5)
+        uploadCategoiesContent(categories[selectedRow])
+      } else {
+        uploadCategories()
+        if (selectedRow < categoriesContent.length - 1) {
+          setSelectedCol(0)
+          setSelectedRow(selectedRow + 1)
+        } else addListeners()
+      }
+
     }
 
   }
@@ -418,22 +453,33 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       setSelectedCol(selectedCol - 1)
     } else {
       console.log("left more 0 Open side menu")
-      addListeners()
+      if (!expandSideMenue) {
+        setSideMenuItem("search")
+        setExpandSideMenue(true)        
+      } else addListeners()
+
+      //addListeners()
     }
   }
   const handleArrowRight = () => {
-    //top menu selector topMenuLength
-    if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + My List
-      setSelectedCol(selectedCol + 1)      
-      //main content selector
-    } else {      
-      if (categoriesContent.length > 0 && selectedRow > -1) {
-        uploadCategoiesContent(categories[selectedRow])
-        if (selectedCol < categoriesContent[selectedRow].list.length - 1 && categories[selectedRow]?.type !== "guide") { //if not end of the row
-          setSelectedCol(selectedCol + 1)
+    if (expandSideMenue) {
+      setExpandSideMenue(false)
+      setSideMenuItem(null)
+    } else {
+      //top menu selector topMenuLength
+      if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + My List
+        setSelectedCol(selectedCol + 1)
+        //main content selector
+      } else {
+        if (categoriesContent.length > 0 && selectedRow > -1) {
+          uploadCategoiesContent(categories[selectedRow])
+          if (selectedCol < categoriesContent[selectedRow].list.length - 1 && categories[selectedRow]?.type !== "guide") { //if not end of the row
+            setSelectedCol(selectedCol + 1)
+          } else addListeners()
         } else addListeners()
-      } else addListeners()
+      }
     }
+
   }
   const currentVideo = (): videoDisListType => {
     if (selectedRow >= 0 && categoriesContent.length > 0) {
@@ -447,6 +493,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     <MainBox>
       {loading ? <LoadingComponent><Loading /></LoadingComponent> :
         <div>
+          <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
               if (topMenuIndex < topMenuLength) {
@@ -487,7 +534,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             <ImageDis>
               <Image src={currentVideo().mediumImage} alt="Imag"></Image>
             </ImageDis>
-          </MainDis>          
+          </MainDis>
           <CSSTransitionGroup
             component={CategoryBox}
             transitionName="category"

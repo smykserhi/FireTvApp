@@ -3,7 +3,7 @@ import Logo from "../../images/main-logo.png"
 import styled from 'styled-components';
 import api from "../../api"
 import { RouteComponentProps, withRouter } from 'react-router';
-import { PAGES } from "../../constants"
+import { PAGES, HOME } from "../../constants"
 import { useDispatch, useSelector } from 'react-redux';
 import { saveToken } from "../../store/actions"
 import { StorageType } from "../../store/types"
@@ -88,7 +88,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     //api.saveToken(res.data.token)
                     clearStates()
                     dispatch(saveToken(res.data.token))
-                    history.push(`${PAGES}/45`)
+                    history.push(`${PAGES}/${HOME}`)
                 })
                 .catch((err) => {
                     setError(err.response.data.error);
@@ -98,7 +98,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     }
 
     useEffect(() => {
-        if (LogIn) history.push(`${PAGES}/45`) //if user already LogIn        
+        if (LogIn) history.push(`${PAGES}/${HOME}`) //if user already LogIn        
     })
 
     return (

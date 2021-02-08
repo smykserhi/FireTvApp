@@ -28,6 +28,7 @@ const selectedCategory = keyframes`
     
 `
 const MainContainer = styled.div`
+    z-index: 1; 
     &.category-enter.category-enter-active {   
         animation: ${selectedCategory}  0.3s ease-in-out reverse;            
     }     

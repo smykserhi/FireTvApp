@@ -22,6 +22,7 @@ const CategorRow = styled.div`
     align-items: start;
     gap: 10px;
     font-size: 25px;
+    z-index: 1; 
 `
 const VideoElementNormal = styled.div`  
     margin: 10px;

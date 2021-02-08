@@ -41,8 +41,10 @@ let api = {
     },
     getCategoriContent: async(category:number, limit:number=20, offset:number=0 )=>{
         return await fetch(`${domain}/api/v2/categories/${category}?offset=${offset}&limit=${limit}`, fetchConfig).then((res)=> res.json())
+    },
+    searchContent: (qwery:string, limit:number=20, offset:number=0 )=>{
+        return fetch(`${domain}/api/v2/content_items/search?q=${qwery}&offset=${offset}&limit=${limit}`, fetchConfig).then((res)=> res.json())
     }
-
 
 }
 
