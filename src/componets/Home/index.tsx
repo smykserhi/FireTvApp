@@ -131,10 +131,7 @@ const Image = styled.img`
 
   /*transform: scale(1.4);*/
 `
-const LoadingComponent = styled.div`
-  width: 100vw;
-  height:100vh
-`
+
 export type ListProps = {
   sellIndex: number,
   categories: pageCategoriesType[],
@@ -199,7 +196,7 @@ interface Props extends RouteComponentProps<matchParamsType> {
   pageId: number
 }
 
-type sideMenuType = "home" | "search" | "settings" | null
+export type sideMenuType = "home" | "search" | "settings" | null
 
 const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
@@ -491,7 +488,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   return (
     <MainBox>
-      {loading ? <LoadingComponent><Loading /></LoadingComponent> :
+      {loading ? <Loading /> :
         <div>
           <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
           <MenuBox>

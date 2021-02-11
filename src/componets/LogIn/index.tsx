@@ -5,7 +5,7 @@ import api from "../../api"
 import { RouteComponentProps, withRouter } from 'react-router';
 import { PAGES, HOME } from "../../constants"
 import { useDispatch, useSelector } from 'react-redux';
-import { saveToken } from "../../store/actions"
+import { saveToken, saveUserName } from "../../store/actions"
 import { StorageType } from "../../store/types"
 
 const LogInBox = styled.div`
@@ -88,6 +88,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     //api.saveToken(res.data.token)
                     clearStates()
                     dispatch(saveToken(res.data.token))
+                    dispatch(saveUserName(email))
                     history.push(`${PAGES}/${HOME}`)
                 })
                 .catch((err) => {

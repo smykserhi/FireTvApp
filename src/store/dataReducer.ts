@@ -1,7 +1,7 @@
 import {AddDataActionsType,DataStateType} from "./types"
 
 const initialState: DataStateType ={
-    data: []
+    UserLogin: ""
 }
 
 
@@ -9,7 +9,7 @@ export const dataReducer = (state:DataStateType =initialState, action:AddDataAct
     switch(action.type){
         case "ADD_DATA":{
             console.log("add data")
-            return {...state, data: action.payload }
+            return {...state, UserLogin: action.payload }
         }        
         default: {
             return state

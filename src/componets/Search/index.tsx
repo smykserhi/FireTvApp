@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react"
 import styled, { keyframes } from 'styled-components';
 import { keyboard } from "../../constants"
-import { colors, VIDEO } from "../../constants"
+import { colors, VIDEO, LOGIN } from "../../constants"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
 import { videoDisListType } from "../Home"
 import {CarSport} from "@styled-icons/ionicons-outline/CarSport"
 import Logo from "../../images/main-logo.png"
+import {BackspaceOutline} from "@styled-icons/evaicons-outline/BackspaceOutline"
+import {SpaceBar} from "@styled-icons/material/SpaceBar"
+import {ArrowBack} from "@styled-icons/ionicons-sharp/ArrowBack"
+import { useSelector } from 'react-redux';
+import { StorageType } from "../../store/types"
 
 interface CharBoxProps {
     selected: boolean
@@ -14,11 +19,11 @@ interface CharBoxProps {
 const selectedCategory = keyframes`
     from{        
         transform: scale(1.1) translateY(-10px);
-        opacity: 1;
+        /*opacity: 1;*/
     }
     to{
-        transform: scale(0.8) translateY(0px)   ;   
-        opacity: 0;
+        transform: scale(1) translateY(0px)   ;   
+        /*opacity: 0;*/
     }    
 `
 
@@ -47,6 +52,7 @@ const MainBox = styled.div`
     display: flex;
     flex-direction: row;    
     margin: 20px;
+
 `
 const KeysBox = styled.div`
     width: 30vw;
@@ -61,15 +67,14 @@ const ResultBox = styled.div`
     width: 70vw;
 `
 const CharBox = styled.div<CharBoxProps>`
-    border: white 1px solid;
+    border: ${colors.textPrimary} 1px solid;
     display: flex;
     align-items: center;
     justify-content: center;    
     background: ${props => props.selected ? colors.primary : ""};
     transform: ${props => props.selected ? 'scale(1.1)' : 'scale(1)'}; 
     transition: all 0.3s ;
-    border-radius: 5px;
-    
+    border-radius: 5px;  
     
 `
 const SpaceBox = styled(CharBox)`
@@ -82,14 +87,10 @@ const BackBox = styled(CharBox)`
     grid-column: 1/7;
     grid-row: 8/9;
 `
-// const ChangeKeys = styled(CharBox)`
-//     grid-column: 1/2;
-//     grid-row: 8/9;
-// `
 
 const SearchResult = styled.div`
     min-height: 35px;
-    border: solid 1px white;
+    border: solid 1px ${colors.textPrimary};
     border-radius: 5px;
     display: flex;
     align-items: center;
@@ -141,21 +142,36 @@ const StyledLogo = styled.img`
     grid-column: 2;
     margin-top: 8rem;
 `
+const StyledBackspaceOutline = styled(BackspaceOutline)`
+  height: 60%;
+`
+const StyledSpaceBar = styled(SpaceBar)`
+  height: 60%;
+`
+const  StyledArrowBack = styled(ArrowBack)`
+  height: 60%;
+  margin-right: 10px;
+`
 
 const Search: React.FC<RouteComponentProps> = ({ history }) => {
+    const selectToken = (state: StorageType) => state.logIn.token
+    const Token = useSelector(selectToken) //token 
     const [search, setSearch] = useState<string>("")
     const [selectedKey, setSelectedKey] = useState<number>(0)
     const [selectedVideo, setSelectedVideo] = useState<number>(-1)
     const [searchResult, setSearchResult] = useState<videoDisListType[]>([])    
 
     useEffect(() => {
-        addListeners()
-        return () => {
-            //component will unmount
-            removeListeners()
+        if (!Token) history.push(LOGIN)
+        else{
+            addListeners()
+            return () => {
+                //component will unmount
+                removeListeners()
+            }
         }
-    })
-    
+       
+    })    
 
     useEffect(() => {
         if (search !== "") {
@@ -305,12 +321,12 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         <MainBox>
             <KeysBox>
                 {keyboard.map((el, index) => {
-                    if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> {el.toUpperCase()}</SpaceBox>)
-                    else if (el === "<") return (<BackspaceBox key={index} selected={selectedKey === index ? true : false}>{el.toUpperCase()}</BackspaceBox>)
+                    if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> <StyledSpaceBar/></SpaceBox>)
+                    else if (el === "<") return (<BackspaceBox key={index} selected={selectedKey === index ? true : false}><StyledBackspaceOutline/></BackspaceBox>)
                     else return (<CharBox key={index} selected={selectedKey === index ? true : false}> {el.toUpperCase()}</CharBox>)
                 })}
                 {/* <ChangeKeys selected={selectedKey === keyboard.length ? true : false}>QWE</ChangeKeys> */}
-                <BackBox selected={selectedKey === keyboard.length ? true : false}>Go Back</BackBox>
+                <BackBox selected={selectedKey === keyboard.length ? true : false}><StyledArrowBack/>Go Back</BackBox>
                 <StyledLogo src={Logo} alt="Logo"/>
             </KeysBox>
             <ResultBox>

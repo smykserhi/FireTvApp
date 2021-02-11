@@ -34,15 +34,16 @@ export interface ColorsType {
     borderPrimary: string,
     borderSecondary: string,
 }
+
 export const colors:ColorsType={
     primary: '#c02425', //#ff0000
     seconary: "#37c237", //#37c237
     atention: "#ffb400",//#ffa500
-    bgPrimary: "#101010",
+    bgPrimary: "#101010",//#101010
     bgSecondary: "#222",// #222222
     bgAtention: "#6c757d",
     bgSideMenu: "#101010",
-    textPrimary: "#faf7f7",
+    textPrimary: "#b2b2b2", // #b2b2b2 / #faf7f7
     textSecondary: "#ffffff",
     textFocus: "#37c237", 
     borderPrimary: "#c63333",

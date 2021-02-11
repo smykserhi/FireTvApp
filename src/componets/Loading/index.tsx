@@ -35,4 +35,8 @@ const Spin = styled.div`
     border-color: ${colors.textPrimary} transparent ${colors.textPrimary} transparent;
     animation: ${hourglass} 1.2s infinite;
 `
-export const Loading:React.FC = ()=>(<Spin ></Spin>)
+const LoadingComponent = styled.div`
+  width: 100vw;
+  height:100vh
+`
+export const Loading:React.FC = ()=>(<LoadingComponent><Spin ></Spin></LoadingComponent>)
