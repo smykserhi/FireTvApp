@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { StorageType } from "../../store/types"
+import {addVideo} from "../../store/actions"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
 import styled, { keyframes } from 'styled-components';
@@ -12,6 +13,7 @@ import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors , SEARCH, SETTINGS, 
 import { Loading } from "../Loading"
 import { SideMenu } from "../SideMenu"
 import moment from 'moment';
+//import { CSSTransitionGroup } from 'react-transition-group'
 var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
 const menuItem = keyframes`
@@ -183,6 +185,9 @@ interface facilityType {
   name: string,
   logo: string,
   slug: string
+  city: string
+  label: string 
+  state: string
 }
 interface producerType {
   logo: string
@@ -201,6 +206,7 @@ export type sideMenuType = "home" | "search" | "settings" | null
 const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
   const Token = useSelector(selectToken) //token 
+  const dispatch = useDispatch()
   //let myHistory = useHistory();
   const [loading, setLoading] = useState<boolean>(true) // main content loading
   const [categiryContentLoading, setCategiryContentLoading] = useState<boolean>(false) // categiry Content Loading
@@ -299,12 +305,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             const uniqCategory = Array.from(new Map(tempCategories.map((item: pageCategoriesType) => [item.id, item])).values());
             const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());
             const sortedContent = sortContent(uniqCategory, uniqContent)
-            setCategories(uniqCategory)
-            setCategoriesContent(sortedContent)
-            setCategoryesloading(false)
+            if(categories)setCategories(uniqCategory)
+            if(categoriesContent)setCategoriesContent(sortedContent)
+            if(categoryesloading)setCategoryesloading(false)
             console.log("add categories to page ", pageId)
           })
         })
+        .catch(error => console.log(error) );
     }
   }
   const uploadCategoiesContent = (category: pageCategoriesType) => {
@@ -317,10 +324,11 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       api.getCategoriContent(category.id, 10, offset).then(res => {
         let tempCategoriesContent = categoriesContent
         res.forEach((el: videoDisListType) => tempCategoriesContent[selectedRow].list.push(el))
-        setCategoriesContent(tempCategoriesContent)
-        setCategiryContentLoading(false)
+        if(categoriesContent) setCategoriesContent(tempCategoriesContent)
+        if(categiryContentLoading) setCategiryContentLoading(false)
         console.log(`Add data to category ${tempCategoriesContent[selectedRow].id}`)
       })
+      .catch(error => console.log(error) );
     }
   }
   const addListeners = () => {
@@ -375,8 +383,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
         setSideMenuItem(null)
         setExpandSideMenue(false)        
       } else if (sideMenuItem === "search")  history.push(`${SEARCH}`)
-      else if (sideMenuItem === "settings")  history.push(`${SETTINGS}`)
-      
+      else if (sideMenuItem === "settings")  history.push(`${SETTINGS}`)      
     } else {
       if (selectedRow === -1) {
         if (selectedCol <= topMenuLength - 1) {
@@ -388,7 +395,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           history.push(MYLIST)
         }
       } else {
-        console.log("Video", currentVideo())
+        //console.log("Video", currentVideo())
+        dispatch(addVideo(currentVideo()))
         history.push(`${VIDEO}/${currentVideo().id}`)
       }
     }

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
-import { videoDisType, sideMenuType } from "../Home"
-import { useSelector } from 'react-redux';
+import { videoDisType, sideMenuType, videoDisListType } from "../Home"
+import { useSelector, useDispatch } from 'react-redux';
 import { StorageType } from "../../store/types"
+import { addVideo } from "../../store/actions"
 import { Loading } from "../Loading"
 import Full from "../Home/Full"
 import { SideMenu } from "../SideMenu"
 import styled from 'styled-components';
-import { LOGIN, PAGES, VIDEO,  SEARCH, SETTINGS, HOME } from "../../constants"
+import { LOGIN, PAGES, VIDEO, SEARCH, SETTINGS, HOME } from "../../constants"
 
 const MainContainer = styled.div`
     
@@ -27,7 +28,8 @@ const ListTitle = styled.h1`
 const MyList: React.FC<RouteComponentProps> = ({ history }) => {
     const selectToken = (state: StorageType) => state.logIn.token
     const Token = useSelector(selectToken) //token 
-    const [myListContent, setMyListContent] = useState<videoDisType[]>([])
+    const dispatch = useDispatch()
+    const [myListContent, setMyListContent] = useState<videoDisType[]>([{ id: 9999, list: [] }])
     const [loading, setLoading] = useState<boolean>(true)
     const [selectedCol, setSelectedCol] = useState<number>(0)
     const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
@@ -43,9 +45,11 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
                     setLoading(false)
                     //console.log(fullType)
                 })
+                .catch(error => console.log(error) );
         }
 
     }, [loading, Token, history])
+
 
     useEffect(() => {
         addListeners()
@@ -54,7 +58,19 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             removeListeners()
         }
     })
-
+    const uploadNewItems = () => {
+        //console.log("myListContent[0].list.length",myListContent[0].list.length)
+        api.getMyList(Token, myListContent[0].list.length)
+            .then(res => {
+                let tmp = myListContent
+                res.forEach((element:videoDisListType) => {
+                   tmp[0].list.push(element) 
+                });
+                //console.log("new item uploded", tmp)
+                setMyListContent(tmp)
+            })
+            .catch(error => console.log(error) );
+    }
     const addListeners = () => {
         document.addEventListener("keydown", handleKeyDown, true);
         document.addEventListener("keyup", handleKeyUp, true);
@@ -108,6 +124,7 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             } else if (sideMenuItem === "search") history.push(`${SEARCH}`)
             else if (sideMenuItem === "settings") history.push(`${SETTINGS}`)
         } else {
+            dispatch(addVideo(myListContent[0].list[selectedCol])) // add to redux data
             history.push(`${VIDEO}/${myListContent[0].list[selectedCol].id}`)
         }
     }
@@ -116,7 +133,8 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             setExpandSideMenue(false)
             setSideMenuItem(null)
         } else {
-            if (selectedCol < myListContent[0].list.length - 1) {
+            if(selectedCol> myListContent[0].list.length -20) uploadNewItems()
+            if (selectedCol < myListContent[0].list.length - 1) {                               
                 setSelectedCol(selectedCol + 1)
             } else addListeners()
         }
@@ -156,6 +174,7 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             else if (sideMenuItem === "search") setSideMenuItem("settings")
             else addListeners()
         } else {
+            if(selectedCol> myListContent[0].list.length -20) uploadNewItems()      
             if (selectedCol < myListContent[0].list.length - 5) {
                 setSelectedCol(selectedCol + 5)
             } else addListeners()

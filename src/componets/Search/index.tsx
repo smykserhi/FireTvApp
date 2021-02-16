@@ -10,8 +10,9 @@ import Logo from "../../images/main-logo.png"
 import {BackspaceOutline} from "@styled-icons/evaicons-outline/BackspaceOutline"
 import {SpaceBar} from "@styled-icons/material/SpaceBar"
 import {ArrowBack} from "@styled-icons/ionicons-sharp/ArrowBack"
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { StorageType } from "../../store/types"
+import {addVideo} from "../../store/actions"
 
 interface CharBoxProps {
     selected: boolean
@@ -156,6 +157,7 @@ const  StyledArrowBack = styled(ArrowBack)`
 const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const selectToken = (state: StorageType) => state.logIn.token
     const Token = useSelector(selectToken) //token 
+    const dispatch = useDispatch()
     const [search, setSearch] = useState<string>("")
     const [selectedKey, setSelectedKey] = useState<number>(0)
     const [selectedVideo, setSelectedVideo] = useState<number>(-1)
@@ -180,6 +182,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     setSearchResult(res)
                     console.log("res", res)
                 })
+                .catch(error => console.log(error) );
         }
     }, [search])
 
@@ -235,6 +238,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             } else if (selectedKey === keyboard.length) history.goBack()
             else addListeners()
         } else { // on vodeo search
+            dispatch(addVideo(searchResult[selectedVideo])) // add video to redux
             history.push(`${VIDEO}/${searchResult[selectedVideo].id}`)
         }
 

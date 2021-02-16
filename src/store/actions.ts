@@ -1,6 +1,7 @@
 import {LogInActionsType, AddDataActionsType, UserActionsType} from "./types"
-//import {page} from "../componets/Home"
+import {videoDisListType} from "../componets/Home"
 
+//Login redicer
 export const saveToken=(note:string):LogInActionsType=>({
     type: "SET_LOG_IN",
     payload : note
@@ -10,7 +11,9 @@ export const saveUserName=(UserName:string):UserActionsType=>({
     payload : UserName
 })
 
-export const addData = (NewLogin:string):AddDataActionsType=>({
-    type:"ADD_DATA",
-    payload: NewLogin
+
+// Data reducer
+export const addVideo = (videoDetails:videoDisListType):AddDataActionsType=>({
+    type:"ADD_VIDEO",
+    payload: videoDetails
 })
