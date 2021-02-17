@@ -33,6 +33,7 @@ export interface ColorsType {
     textFocus: string,
     borderPrimary: string,
     borderSecondary: string,
+    counterColour: string
 }
 
 export const colors:ColorsType={
@@ -47,7 +48,8 @@ export const colors:ColorsType={
     textSecondary: "#ffffff",
     textFocus: "#37c237", 
     borderPrimary: "#c63333",
-    borderSecondary: "#37c237"
+    borderSecondary: "#37c237",
+    counterColour: "#0000ff"
 }
 
 
