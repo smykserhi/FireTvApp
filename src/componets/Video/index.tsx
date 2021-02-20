@@ -13,6 +13,7 @@ import { VideoCamera } from "@styled-icons/heroicons-solid/VideoCamera"
 import { LocationPin } from "@styled-icons/entypo/LocationPin"
 import { metadataType } from "../Home"
 import moment from 'moment';
+import VideoPlayer from "./VideoPlayer"
 
 
 interface MainProps {
@@ -180,6 +181,10 @@ const Span = styled.span`
     white-space: nowrap;
     text-overflow: ellipsis;
 `
+const VideoBox = styled.div`
+    width: 100vw;
+    height: 100vh;
+`
 
 interface matchParamsType {
     id: string
@@ -222,10 +227,13 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [loading, setLoading] = useState<boolean>(true)
     const [videoDis, setVideoDis] = useState<VideoDosType>()
     const [menuItem, setMenuItem] = useState<MenuItemType>("play")
-    const [timer, setTimer] = useState<Timer>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+    const [timer, setTimer] = useState<Timer>({ days: 365, hours: 59, minutes: 59, seconds: 59 })
     const [liveIn, setLiveIn] = useState<boolean>(false)
     const [showPlay, setShowPlay] = useState<boolean>(false)
     const [startUpdatingLoop, setSatrtUpdatingLoop] = useState<boolean>(false)
+    const [videoPlay, setVideoPlay] = useState<boolean>(false)
+
+    //animations 
     const [animateSec, setAnimateSec] = useState<number>(0)
     const [animateMin, setAnimateMin] = useState<number>(0)
     const [animateHour, setAnimateHour] = useState<number>(0)
@@ -238,6 +246,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     //keyboard  events
     useEffect(() => {
         addListeners()
+        if (timer.hours === 0) setSatrtUpdatingLoop(true)
         return () => {
             removeListeners()
         }
@@ -266,7 +275,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     useEffect(() => {
         if (startUpdatingLoop) var updateLoop = setInterval(function () { reloadData() }, 15000)
         return () => clearInterval(updateLoop)
-    }, [startUpdatingLoop])
+    }, [startUpdatingLoop,])
     //timer
     useEffect(() => {
         const countDownDate = moment(videoDisRedux?.metadata?.start_time)
@@ -289,17 +298,17 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
                 seconds: Math.floor((distance % (1000 * 60)) / 1000),
             }
-            if (time.hours === 0) setSatrtUpdatingLoop(true) //start updating every 10s
+            //if (time.hours === 0) setSatrtUpdatingLoop(true) //start updating every 15s
             if (distance < 0) {
                 clearInterval(timerLoop)
                 console.log("Stop Timer")
                 if (liveIn) setLiveIn(false)
+                setShowPlay(true)
             }
-
             setTimer(time)
         }, 1000)
         return () => clearInterval(timerLoop);
-    }, [liveIn, videoDisRedux.metadata.start_time, videoDis?.metadata.timezone])
+    }, [liveIn, videoDisRedux?.metadata?.start_time, videoDis?.metadata.timezone,showPlay])
 
     //main content loading
     useEffect(() => {
@@ -309,20 +318,20 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 .then(res => {
                     // res.supportMessage = "Support Message Test"
                     // res.message = "Test MEssage"
-                    //console.log(videoDisRedux, res)
+                    console.log(videoDisRedux, res)
                     setVideoDis({ ...videoDisRedux, ...res })
                     if (res.viewerState === "watch") {
                         //if starts in the future                    
                         if (((new Date(videoDisRedux.metadata.start_time).getTime()) - (new Date().getTime()) > 0) && (res.videoState === "scheduled" || res.videoState === "upcoming")) {
                             setLiveIn(true)
                             setMenuItem("list")
-                        }else if(res.videoState === "available") setShowPlay(true) // show play button
-                    } 
-                    if(res.videoState === "delist"){
-                        console.log("Go Back !!! videoState:",res.videoState)
-                        history.goBack()  
-                    }                                  
-                    if(loading)setLoading(false)
+                        } else if (res.videoState === "available") setShowPlay(true) // show play button
+                    }
+                    if (res.videoState === "delist") {
+                        console.log("Go Back !!! videoState:", res.videoState)
+                        history.goBack()
+                    }
+                    if (loading) setLoading(false)
                 })
                 .catch(error => console.log(error));
         }
@@ -330,15 +339,22 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
 
     //update data after add ar remove from myList
     const reloadData = () => {
-        console.log("Update data")
+        console.log("Updating data...")
         api.getVideoItem(Token, videoDisRedux.id)
             .then(res => {
+                console.log("new data: ", res)
                 if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
-                if (res.videoState === "live") { // show paly 
-                    //if (showPlay) setShowPlay(true)
-                    setLiveIn(false) // hide counter and show play mutton
-                    if (setMenuItem) setMenuItem("play")
+                if (res.viewerState === "watch"){
+                    if (res.videoState === "live") { // show paly 
+                        //if (showPlay) setShowPlay(true)
+                        if(liveIn)setLiveIn(false) // hide counter and show play mutton
+                        if(showPlay)setShowPlay(true)
+                        if (setMenuItem) setMenuItem("play")
+                    }
+                }else {
+                    if(showPlay)setShowPlay(false)
                 }
+                
             })
             .catch(error => console.log(error));
     }
@@ -395,6 +411,19 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const handleEnter = () => {
         if (menuItem === "play") {
             console.log("play")
+            api.getVideoItem(Token, videoDisRedux.id)
+                .then(res => {                   
+                    if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
+                    if (res.videoState === "live") { // show paly 
+                        //if (showPlay) setShowPlay(true)
+                        setLiveIn(false) // hide counter and show play mutton
+                        if (setMenuItem) setMenuItem("play")                        
+                    }
+                    setVideoPlay(true)// start playing
+                })
+
+                .catch(error => console.log(error));
+
         }
         else if (menuItem === "list") {
             if (videoDis?.saved) {
@@ -421,72 +450,84 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     return (
         <>
             {loading ? <Loading /> :
-                <MainBox bgImage={videoDisRedux.mediumImage}>
-                    <MenuBox>
-                        {!liveIn || showPlay ? <Buttons selected={menuItem === "play"} ><StyledPlay /> Play</Buttons> : ""}
-                        <Buttons selected={menuItem === "list"} > {videoDis?.saved ? <><StyledRemove />Remove from My List </> : <><StyledAdd /> Add to My List</>}</Buttons>
-                        <Buttons selected={menuItem === "location"}><StyledLocation /> <Span>{videoDis?.metadata.facility.name}</Span></Buttons>
-                        <Buttons selected={menuItem === "producer"}><StyledCameraMovie /> <Span>{videoDis?.metadata.producer.name}</Span></Buttons>
-                    </MenuBox>
-                    {videoDis?.supportMessage ?
-                        <SupportMessageBox>
-                            <h2>{videoDis.supportMessage}</h2>
-                        </SupportMessageBox>
-                        : ""}
-                    {videoDis?.message ?
-                        <MessageBox>
-                            <h2>{videoDis.message}</h2>
-                        </MessageBox>
-                        : ""}
-                    {liveIn
-                        ? <LiveBox>
-                            {videoDis?.metadata.live && <LiveH1>Live In</LiveH1>}
-                            <Counter>
-                                <NumberContainer>
-                                    <NumberBox>
-                                        {animateDays !== Math.floor(timer.days / 10) ? <NumbersElement >{Math.floor(timer.days / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.days / 10)}</AnimeNumber>}
-                                        {animateDaysS !== timer.days % 10 ? <NumbersElement >{timer.days % 10}</NumbersElement> : <AnimeNumber >{timer.days % 10}</AnimeNumber>}
-                                    </NumberBox>
-                                    <NumberText>Days</NumberText>
-                                </NumberContainer>
-                                <NumberContainer>
-                                    <NumberBox>
-                                        {animateHour !== Math.floor(timer.hours / 10) ? <NumbersElement >{Math.floor(timer.hours / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.hours / 10)}</AnimeNumber>}
-                                        {animateHourS !== timer.hours % 10 ? <NumbersElement >{timer.hours % 10}</NumbersElement> : <AnimeNumber >{timer.hours % 10}</AnimeNumber>}
+                <>
+                    {videoPlay
+                        ?
+                        <VideoBox>
+                            <VideoPlayer closeVideo={() => setVideoPlay(false)} url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4" />
+                        </VideoBox>
+                        :
+                        <MainBox bgImage={videoDisRedux.mediumImage}>
+                            <MenuBox>
+                                { showPlay ? <Buttons selected={menuItem === "play"} ><StyledPlay /> Play</Buttons> : ""}
+                                <Buttons selected={menuItem === "list"} > {videoDis?.saved ? <><StyledRemove />Remove from My List </> : <><StyledAdd /> Add to My List</>}</Buttons>
+                                <Buttons selected={menuItem === "location"}><StyledLocation /> <Span>{videoDis?.metadata.facility.name}</Span></Buttons>
+                                <Buttons selected={menuItem === "producer"}><StyledCameraMovie /> <Span>{videoDis?.metadata.producer.name}</Span></Buttons>
+                            </MenuBox>
+                            {videoDis?.supportMessage ?
+                                <SupportMessageBox>
+                                    <h2>{videoDis.supportMessage}</h2>
+                                </SupportMessageBox>
+                                : ""}
+                            {videoDis?.message ?
+                                <MessageBox>
+                                    <h2>{videoDis.message}</h2>
+                                </MessageBox>
+                                : ""}
+                            {liveIn
+                                ? <LiveBox>
+                                    {videoDis?.metadata.live && <LiveH1>Live In</LiveH1>}
+                                    <Counter>
+                                        <NumberContainer>
+                                            <NumberBox>
+                                                {animateDays !== Math.floor(timer.days / 100) ? <NumbersElement >{Math.floor(timer.days / 100)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.days / 100)}</AnimeNumber>}
+                                                {animateDays !== Math.floor(timer.days / 10) ? <NumbersElement >{Math.floor(timer.days / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.days / 10)}</AnimeNumber>}
+                                                {animateDaysS !== timer.days % 10 ? <NumbersElement >{timer.days % 10}</NumbersElement> : <AnimeNumber >{timer.days % 10}</AnimeNumber>}
+                                            </NumberBox>
+                                            <NumberText>Days</NumberText>
+                                        </NumberContainer>
+                                        <NumberContainer>
+                                            <NumberBox>
+                                                {animateHour !== Math.floor(timer.hours / 10) ? <NumbersElement >{Math.floor(timer.hours / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.hours / 10)}</AnimeNumber>}
+                                                {animateHourS !== timer.hours % 10 ? <NumbersElement >{timer.hours % 10}</NumbersElement> : <AnimeNumber >{timer.hours % 10}</AnimeNumber>}
 
-                                    </NumberBox>
-                                    <NumberText>Hours</NumberText>
-                                </NumberContainer>
-                                <NumberContainer>
-                                    <NumberBox>
-                                        {animateMin !== Math.floor(timer.minutes / 10) ? <NumbersElement >{Math.floor(timer.minutes / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.minutes / 10)}</AnimeNumber>}
-                                        {animateMinS !== timer.minutes % 10 ? <NumbersElement >{timer.minutes % 10}</NumbersElement> : <AnimeNumber >{timer.minutes % 10}</AnimeNumber>}
-                                    </NumberBox>
-                                    <NumberText>Minutes</NumberText>
-                                </NumberContainer>
-                                <NumberContainer>
-                                    <NumberBox>
-                                        {animateSec !== Math.floor(timer.seconds / 10) ? <NumbersElement >{Math.floor(timer.seconds / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.seconds / 10)}</AnimeNumber>}
-                                        {animateSecS !== timer.seconds % 10 ? <NumbersElement >{timer.seconds % 10}</NumbersElement> : <AnimeNumber >{timer.seconds % 10}</AnimeNumber>}
-                                    </NumberBox>
-                                    <NumberText>Seconds</NumberText>
-                                </NumberContainer>
-                            </Counter>
-                        </LiveBox> : ""}
-                    <DisBox>
-                        <TitleBox>
-                            <h2>{videoDis?.title}</h2>
-                            <DisTimeBox>
-                                <StyledTime>{moment(videoDis?.metadata.start_time).format("LT")} {videoDis?.metadata.timezone} </StyledTime>
-                                <h2>{moment(videoDis?.metadata.start_time).format("ll")}</h2>
-                            </DisTimeBox>
+                                            </NumberBox>
+                                            <NumberText>Hours</NumberText>
+                                        </NumberContainer>
+                                        <NumberContainer>
+                                            <NumberBox>
+                                                {animateMin !== Math.floor(timer.minutes / 10) ? <NumbersElement >{Math.floor(timer.minutes / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.minutes / 10)}</AnimeNumber>}
+                                                {animateMinS !== timer.minutes % 10 ? <NumbersElement >{timer.minutes % 10}</NumbersElement> : <AnimeNumber >{timer.minutes % 10}</AnimeNumber>}
+                                            </NumberBox>
+                                            <NumberText>Minutes</NumberText>
+                                        </NumberContainer>
+                                        <NumberContainer>
+                                            <NumberBox>
+                                                {animateSec !== Math.floor(timer.seconds / 10) ? <NumbersElement >{Math.floor(timer.seconds / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.seconds / 10)}</AnimeNumber>}
+                                                {animateSecS !== timer.seconds % 10 ? <NumbersElement >{timer.seconds % 10}</NumbersElement> : <AnimeNumber >{timer.seconds % 10}</AnimeNumber>}
+                                            </NumberBox>
+                                            <NumberText>Seconds</NumberText>
+                                        </NumberContainer>
+                                    </Counter>
+                                </LiveBox> : ""}
+                            <DisBox>
+                                <TitleBox>
+                                    <h2>{videoDis?.title}</h2>
+                                    <DisTimeBox>
+                                        <StyledTime>{moment(videoDis?.metadata.start_time).format("LT")} {videoDis?.metadata.timezone} </StyledTime>
+                                        <h2>{moment(videoDis?.metadata.start_time).format("ll")}</h2>
+                                    </DisTimeBox>
 
-                        </TitleBox>
-                        <Dis>
-                            <h2>{videoDis?.description}</h2>
-                        </Dis>
-                    </DisBox>
-                </MainBox>
+                                </TitleBox>
+                                <Dis>
+                                    <h2>{videoDis?.description}</h2>
+                                </Dis>
+                            </DisBox>
+                        </MainBox>
+                    }
+                </>
+
+
             }
         </>
     )

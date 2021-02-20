@@ -65,6 +65,10 @@ let api = {
         return fetch(`${domain}/api/v2/content_items/${id}`, fetchConfig(token))
             .then((res) => {if (!res.ok) {throw Error(res.statusText)} return res.json()})
     },
+    getVideoItemState: (token: string, id: string) => {
+        return fetch(`${domain}/api/v2/content_items/${id}/state`, fetchConfig(token))
+            .then((res) => {if (!res.ok) {throw Error(res.statusText)} return res.json()})
+    },
 
 
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route,Redirect } from "react-router-dom";
 //import Home from "./componets/Home"
 import LogIn from "./componets/LogIn"
 import Pages from "./componets/Pages"
@@ -21,7 +21,7 @@ const App: React.FC = () => {
   return (
     <AppBox>
       <Switch>
-        <Route exact path={ROUTIES.ROOT}> <LogIn /></Route>
+        <Redirect exact from={ROUTIES.ROOT} to={`${ROUTIES.PAGES}/${ROUTIES.HOME}`} />
         <Route path={`${ROUTIES.PAGES}/:id`}> <Pages /></Route>
         <Route path={ROUTIES.LOGIN}> <LogIn /></Route>
         <Route path={`${ROUTIES.VIDEO}/:id`}> < Video /></Route>

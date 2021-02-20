@@ -128,6 +128,7 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
             api.logout(Token)
             dispatch(saveToken(""))
             dispatch(saveUserName(""))
+            localStorage.clear()
             history.push(LOGIN)
         }
 

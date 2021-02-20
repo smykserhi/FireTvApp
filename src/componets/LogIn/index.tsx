@@ -67,7 +67,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     const selectToken = (state: StorageType) => state.logIn.token
     const LogIn = useSelector(selectToken)
     const dispatch = useDispatch()    
-
+    //localStorage.setItem('token', 'Tom');
     const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.name === "email") setEmail(e.target.value)
         else setPassword(e.target.value)
@@ -89,7 +89,8 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     clearStates()
                     dispatch(saveToken(res.data.token))
                     dispatch(saveUserName(email))
-                    history.push(`${PAGES}/${HOME}`)
+                    localStorage.setItem('token', res.data.token);     
+                    localStorage.setItem('user', email);                
                 })
                 .catch((err) => {
                     setError(err.response.data.error);
@@ -98,8 +99,19 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
         }
     }
 
-    useEffect(() => {
-        if (LogIn) history.push(`${PAGES}/${HOME}`) //if user already LogIn        
+    useEffect(() => { 
+        if (LogIn)  history.goBack() // history.push(`${PAGES}/${HOME}`) //if user already LogIn        
+        else{
+            if(localStorage.getItem('token')){
+                const token = localStorage.getItem('token')                
+                if(token) dispatch(saveToken(token))
+            }
+            if(localStorage.getItem('user')){
+                const user = localStorage.getItem('user')                
+                if(user) dispatch(saveUserName(user))
+            }
+
+        }
     })
 
     return (
