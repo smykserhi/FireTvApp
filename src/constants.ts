@@ -52,7 +52,13 @@ export const colors:ColorsType={
     counterColour: "#0000ff"
 }
 
-
+export const hexToRGBA=(hex:any, opacity:number)=> {
+    return 'rgba(' + (hex = hex.replace('#', ''))
+        .match(new RegExp('(.{' + hex.length/3 + '})', 'g'))
+        .map(function(l:any) { return parseInt(hex.length%2 ? l+l : l, 16) })
+        .concat(isFinite(opacity) ? opacity : 1)
+        .join(',') + ')';
+}
 
 
 /*

@@ -397,7 +397,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       } else {
         //console.log("Video", currentVideo())
         dispatch(addVideo(currentVideo()))
-        history.push(`${VIDEO}/${currentVideo().id}`)
+        history.push(`${VIDEO}/${currentVideo()?.id}`)
+        setLoading(true)
       }
     }
 
@@ -490,7 +491,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     if (selectedRow >= 0 && categoriesContent.length > 0) {
       return categoriesContent[selectedRow].list[selectedCol]
     } else {
-      return categoriesContent[0].list[0]
+      return  categoriesContent[0]?.list[0]
     }
   }
 

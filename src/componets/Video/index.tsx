@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { RouteComponentProps, withRouter } from 'react-router';
 import { useSelector } from 'react-redux';
 import { StorageType } from "../../store/types"
-import { LOGIN, colors } from "../../constants"
+import { LOGIN, colors, hexToRGBA } from "../../constants"
 import { Loading } from "../Loading"
 import api from "../../api"
 import styled, { keyframes } from 'styled-components';
@@ -14,6 +14,7 @@ import { LocationPin } from "@styled-icons/entypo/LocationPin"
 import { metadataType } from "../Home"
 import moment from 'moment';
 import VideoPlayer from "./VideoPlayer"
+import { ArrowBack } from "@styled-icons/ionicons-sharp/ArrowBack"
 
 
 interface MainProps {
@@ -59,7 +60,7 @@ const MenuBox = styled.div`
     padding-left: 4rem;
 `
 const DisBox = styled.div`
-    background-color: ${colors.bgPrimary}bd;
+    background-color: ${hexToRGBA(colors.bgPrimary, 0.7)};
     height: 30vh;
     position: absolute;
     top: 70%;
@@ -111,11 +112,15 @@ const StyledLocation = styled(LocationPin)`
     height: 80%;
     margin-right: 10px;
 `
+const StyledArrowBack = styled(ArrowBack)`
+    height: 80%;
+    margin-right: 10px;
+`
 const LiveBox = styled.div`
     position: absolute;
     left: 40%;
     top: 40%;
-    background-color: ${colors.bgPrimary}bd;
+    background-color: ${hexToRGBA(colors.bgPrimary, 0.7)};
     /*width: 20vw;*/
     /*height: 4rem;*/
     padding: 0 10px;
@@ -166,9 +171,9 @@ const AnimeNumber = styled(NumbersElement)`
 `
 
 const NumberText = styled.div`
-font-size: larger;
-font-weight: 700;
-margin-bottom: 2rem;
+    font-size: larger;
+    font-weight: 700;
+    margin-bottom: 2rem;
 `
 const MessageBox = styled(LiveBox)`
     top: 15%;   
@@ -210,7 +215,7 @@ interface VideoDosType {
     type: string,
 }
 
-type MenuItemType = "play" | "list" | "location" | "producer"
+type MenuItemType = "play" | "list" | "location" | "producer" | "back"
 interface Timer {
     days: number,
     hours: number,
@@ -232,6 +237,12 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [showPlay, setShowPlay] = useState<boolean>(false)
     const [startUpdatingLoop, setSatrtUpdatingLoop] = useState<boolean>(false)
     const [videoPlay, setVideoPlay] = useState<boolean>(false)
+    //buttons
+    const [play_pause, setPlay_pause] = useState<boolean>(false)
+    const [speedUp, setSpeedup] = useState<boolean>(true)
+    const [speedDown, setSpeedDown] = useState<boolean>(true)
+    const [plus10s, setPlus10s] = useState<boolean>(true)
+    const [minus10s, setMinus10s] = useState<boolean>(true)
 
     //animations 
     const [animateSec, setAnimateSec] = useState<number>(0)
@@ -243,6 +254,9 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [animateHourS, setAnimateHourS] = useState<number>(0)
     const [animateDaysS, setAnimateDaysS] = useState<number>(0)
     const videoId = match.params.id
+
+
+
     //keyboard  events
     useEffect(() => {
         addListeners()
@@ -308,7 +322,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
             setTimer(time)
         }, 1000)
         return () => clearInterval(timerLoop);
-    }, [liveIn, videoDisRedux?.metadata?.start_time, videoDis?.metadata.timezone,showPlay])
+    }, [liveIn, videoDisRedux?.metadata?.start_time, videoDis?.metadata.timezone, showPlay])
 
     //main content loading
     useEffect(() => {
@@ -344,28 +358,27 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
             .then(res => {
                 console.log("new data: ", res)
                 if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
-                if (res.viewerState === "watch"){
+                if (res.viewerState === "watch") {
                     if (res.videoState === "live") { // show paly 
                         //if (showPlay) setShowPlay(true)
-                        if(liveIn)setLiveIn(false) // hide counter and show play mutton
-                        if(showPlay)setShowPlay(true)
+                        if (liveIn) setLiveIn(false) // hide counter and show play mutton
+                        if (showPlay) setShowPlay(true)
                         if (setMenuItem) setMenuItem("play")
                     }
-                }else {
-                    if(showPlay)setShowPlay(false)
+                } else {
+                    if (showPlay) setShowPlay(false)
                 }
-                
             })
             .catch(error => console.log(error));
     }
 
     const addListeners = () => {
-        document.addEventListener("keydown", handleKeyDown, true);
+        //document.addEventListener("keydown", handleKeyUp, true);
         document.addEventListener("keyup", handleKeyUp, true);
     }
 
     const removeListeners = () => {
-        document.removeEventListener("keydown", handleKeyDown, true);
+        //document.removeEventListener("keydown", handleKeyUp, true);
         document.removeEventListener("keyup", handleKeyUp, true);
     }
 
@@ -375,76 +388,148 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
             case 'Enter':
                 handleEnter()
                 break;
-            default:
-                addListeners()
-        }
-        e.preventDefault();
-    }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-        removeListeners();
-        switch (e.key) {
             case 'ArrowUp':
                 handleArrowUp()
                 break;
             case 'ArrowDown':
                 handleArrowDown()
                 break;
+            case 'ArrowRight':
+                handleArrowRight()
+                break;
+            case 'ArrowLeft':
+                hendleArrowLeft()
+                break;
+            case 'MediaPlayPause':
+                hendMediaPlayPause()
+                break;
+            case 'MediaFastForward':
+                hendleMediaFastForward()
+                break;
+            case 'MediaRewind':
+                hendleMediaRewind()
+                break;
+            case 'GoBack':
+            case 'Backspace':
+                hendleBack()
+                break;
             default:
                 addListeners()
         }
         e.preventDefault();
     }
 
+    const hendleBack = () => {        
+        if (videoPlay) {
+            handleCloseVideo()
+        } else history.goBack()
+    }
+    const hendleMediaFastForward = () => {   
+        console.log("Hendled")
+        if (videoPlay) {
+            setSpeedup(!speedUp)
+        } else addListeners()
+    }
+    const hendleMediaRewind = () => {
+        if (videoPlay) {
+            setSpeedDown(!speedDown)
+        } else addListeners()
+    }
+
+    const handleCloseVideo = () => {
+        console.log("close")
+        setVideoPlay(false)
+    }
+    const hendMediaPlayPause = () => {
+        if (videoPlay) {
+            setPlay_pause(!play_pause)
+        } else addListeners()
+    }
+    const handleArrowRight = () => {
+        if (videoPlay) {
+            setPlus10s(!plus10s)
+        } else {
+            addListeners()
+        }
+
+    }
+
+    const hendleArrowLeft = () => {
+        if (videoPlay) {
+            setMinus10s(!minus10s)
+        } else {
+            addListeners()
+        }
+    }
     const handleArrowUp = () => {
-        if (menuItem === "producer") setMenuItem("location")
-        else if (menuItem === "location") setMenuItem("list")
-        else if (menuItem === "list" && (!liveIn || showPlay)) setMenuItem("play")
-        else addListeners()
+        if (videoPlay) {
+            addListeners()
+        } else {
+            if (menuItem === "back") setMenuItem("producer")
+            else if (menuItem === "producer") setMenuItem("location")
+            else if (menuItem === "location") setMenuItem("list")
+            else if (menuItem === "list" && (!liveIn || showPlay)) setMenuItem("play")
+            else addListeners()
+        }
+
     }
     const handleArrowDown = () => {
-        if (menuItem === "play") setMenuItem("list")
-        else if (menuItem === "list") setMenuItem("location")
-        else if (menuItem === "location") setMenuItem("producer")
-        else addListeners()
+        if (videoPlay) {
+            addListeners()
+        } else {
+            if (menuItem === "play") setMenuItem("list")
+            else if (menuItem === "list") setMenuItem("location")
+            else if (menuItem === "location") setMenuItem("producer")
+            else if (menuItem === "producer") setMenuItem("back")
+            else addListeners()
+        }
     }
     const handleEnter = () => {
-        if (menuItem === "play") {
-            console.log("play")
-            api.getVideoItem(Token, videoDisRedux.id)
-                .then(res => {                   
-                    if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
-                    if (res.videoState === "live") { // show paly 
-                        //if (showPlay) setShowPlay(true)
-                        setLiveIn(false) // hide counter and show play mutton
-                        if (setMenuItem) setMenuItem("play")                        
-                    }
-                    setVideoPlay(true)// start playing
-                })
+        if (videoPlay) { //playing video 
+            setPlay_pause(!play_pause)
 
-                .catch(error => console.log(error));
+        } else { //in details mode
+            if (menuItem === "play") {
+                console.log("play")
+                api.getVideoItem(Token, videoDisRedux.id)
+                    .then(res => {
+                        if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
+                        if (res.videoState === "live") { // show paly 
+                            //if (showPlay) setShowPlay(true)
+                            setLiveIn(false) // hide counter and show play mutton
+                            if (setMenuItem) setMenuItem("play")
+                        }
+                        setVideoPlay(true)// start playing
+                    })
 
-        }
-        else if (menuItem === "list") {
-            if (videoDis?.saved) {
-                //console.log("remove")
-                api.removeFromMyList(Token, videoId)
-                    .then(() => reloadData())
                     .catch(error => console.log(error));
+
             }
-            else {
-                api.addToMyList(Token, videoId)
-                    .then(() => reloadData())
-                    .catch(error => console.log(error));
+            else if (menuItem === "list") {
+                if (videoDis?.saved) {
+                    //console.log("remove")
+                    api.removeFromMyList(Token, videoId)
+                        .then(() => reloadData())
+                        .catch(error => console.log(error));
+                }
+                else {
+                    api.addToMyList(Token, videoId)
+                        .then(() => reloadData())
+                        .catch(error => console.log(error));
+                }
             }
+            else if (menuItem === "location") {
+                console.log("Location")
+            }
+            else if (menuItem === "producer") {
+                console.log("producer")
+            }
+            else if (menuItem === "back") {
+                hendleBack()
+            }
+            addListeners()
         }
-        else if (menuItem === "location") {
-            console.log("Location")
-        }
-        else if (menuItem === "producer") {
-            console.log("producer")
-        }
-        addListeners()
+
     }
 
     return (
@@ -454,15 +539,26 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                     {videoPlay
                         ?
                         <VideoBox>
-                            <VideoPlayer closeVideo={() => setVideoPlay(false)} url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4" />
+                            <VideoPlayer
+                                closeVideo={handleCloseVideo}
+                                // url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+                                url={videoDis ? videoDis.url : "https://media.w3.org/2010/05/sintel/trailer_hd.mp4"}
+                                play_pause={play_pause}
+                                speedUp={speedUp}
+                                speedDown={speedDown}
+                                plus10s={plus10s}
+                                minus10s={minus10s}
+
+                            />
                         </VideoBox>
                         :
                         <MainBox bgImage={videoDisRedux.mediumImage}>
                             <MenuBox>
-                                { showPlay ? <Buttons selected={menuItem === "play"} ><StyledPlay /> Play</Buttons> : ""}
+                                {showPlay ? <Buttons selected={menuItem === "play"} ><StyledPlay /> Play</Buttons> : ""}
                                 <Buttons selected={menuItem === "list"} > {videoDis?.saved ? <><StyledRemove />Remove from My List </> : <><StyledAdd /> Add to My List</>}</Buttons>
                                 <Buttons selected={menuItem === "location"}><StyledLocation /> <Span>{videoDis?.metadata.facility.name}</Span></Buttons>
                                 <Buttons selected={menuItem === "producer"}><StyledCameraMovie /> <Span>{videoDis?.metadata.producer.name}</Span></Buttons>
+                                <Buttons selected={menuItem === "back"}><StyledArrowBack /> Go Back</Buttons>
                             </MenuBox>
                             {videoDis?.supportMessage ?
                                 <SupportMessageBox>
@@ -480,7 +576,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                                     <Counter>
                                         <NumberContainer>
                                             <NumberBox>
-                                                {animateDays !== Math.floor(timer.days / 100) ? <NumbersElement >{Math.floor(timer.days / 100)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.days / 100)}</AnimeNumber>}
+                                                {Math.floor(timer.days / 100) > 0 ? animateDays !== Math.floor(timer.days / 100) ? <NumbersElement >{Math.floor(timer.days / 100)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.days / 100)}</AnimeNumber> : ""}
                                                 {animateDays !== Math.floor(timer.days / 10) ? <NumbersElement >{Math.floor(timer.days / 10)}</NumbersElement> : <AnimeNumber >{Math.floor(timer.days / 10)}</AnimeNumber>}
                                                 {animateDaysS !== timer.days % 10 ? <NumbersElement >{timer.days % 10}</NumbersElement> : <AnimeNumber >{timer.days % 10}</AnimeNumber>}
                                             </NumberBox>

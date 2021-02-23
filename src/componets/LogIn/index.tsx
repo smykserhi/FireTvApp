@@ -3,7 +3,6 @@ import Logo from "../../images/main-logo.png"
 import styled from 'styled-components';
 import api from "../../api"
 import { RouteComponentProps, withRouter } from 'react-router';
-import { PAGES, HOME } from "../../constants"
 import { useDispatch, useSelector } from 'react-redux';
 import { saveToken, saveUserName } from "../../store/actions"
 import { StorageType } from "../../store/types"
