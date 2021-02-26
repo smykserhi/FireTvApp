@@ -1,3 +1,5 @@
+export const version = 'FireTV 2.0.0';
+
 //Here all router path in one place
 export const ROOT = "/"
 export const PAGES = "/pages"

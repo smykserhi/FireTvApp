@@ -397,8 +397,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       } else {
         //console.log("Video", currentVideo())
         dispatch(addVideo(currentVideo()))
+        //setLoading(true)
         history.push(`${VIDEO}/${currentVideo()?.id}`)
-        setLoading(true)
+        
       }
     }
 

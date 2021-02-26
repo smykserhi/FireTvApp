@@ -37,6 +37,8 @@ const Spin = styled.div`
 `
 const LoadingComponent = styled.div`
   width: 100vw;
-  height:100vh
+  height:100vh;
+  position: absolute;
+  top:0;
 `
 export const Loading:React.FC = ()=>(<LoadingComponent><Spin ></Spin></LoadingComponent>)

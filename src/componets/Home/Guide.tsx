@@ -40,6 +40,9 @@ const selectedCategory = keyframes`
     }
     
 `
+const MainBox = styled.div`
+    z-index:1;
+`
 const CategorRow = styled.div`
     display: flex;
     color: ${colors.textPrimary};
@@ -169,7 +172,7 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
     }
     return (
         <CSSTransitionGroup        
-        component="div"
+        component={MainBox}
         transitionName="category"
         transitionEnterTimeout={200}
         transitionLeaveTimeout={200}>
