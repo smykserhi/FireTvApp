@@ -434,17 +434,8 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     }
     const fastForward = () => {
         console.log("Speed up")
-        if (!playing) {
-            video.current?.play()
-            setPlaying(true)
-            setMagpieCounter(Date.now())
-            setMagpieResset(!magpieResset)
-        } else {
-            // clearTimeout(magpieLoop)
-            // magpieApiReport()
-            // setMagpieResset(!magpieResset)
-        }
-
+        clearTimeout(magpieLoop)
+        magpieApiReport()
         if (video.current) {
             if (speed === 1) setSpeed(2)
             if (speed === 2) setSpeed(3)
@@ -455,8 +446,7 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     }
     const fastBack = () => {
         clearTimeout(magpieLoop)
-        magpieApiReport()
-        setMagpieResset(!magpieResset)
+        magpieApiReport()       
         if (video.current) {
             if (video.current) {
                 if (speed === 2) setSpeed(1)

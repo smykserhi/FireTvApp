@@ -13,7 +13,7 @@ import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors , SEARCH, SETTINGS, 
 import { Loading } from "../Loading"
 import { SideMenu } from "../SideMenu"
 import moment from 'moment';
-//import { CSSTransitionGroup } from 'react-transition-group'
+//import * as CSSTransitionGroup  from 'react-transition-group'
 var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
 const menuItem = keyframes`
