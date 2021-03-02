@@ -6,7 +6,7 @@ import { Forward2 } from "@styled-icons/icomoon/Forward2"
 import { Backward } from "@styled-icons/icomoon/Backward"
 import { PlayCircle } from "@styled-icons/fa-regular/PlayCircle"
 import { PauseCircle } from "@styled-icons/fa-regular/PauseCircle"
-import { colors, hexToRGBA } from "../../constants"
+import { colors, hexToRGBA, host } from "../../constants"
 import { CarSport } from "@styled-icons/ionicons-sharp/CarSport"
 import { Speedometer2 } from "@styled-icons/bootstrap/Speedometer2"
 import { Loading } from "../Loading"
@@ -184,7 +184,9 @@ type VideoProps = {
     up: boolean,
     down: boolean,
     userId: string,
-    videoId: string
+    videoId: string,
+    keyId: string,
+    magpieReportCall: boolean
 }
 
 type TimeType = {
@@ -201,7 +203,7 @@ type PrevSessionType = {
     version: string
 }
 
-const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedUp, speedDown, plus10s, minus10s, up, down, userId, videoId }) => {
+const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedUp, speedDown, plus10s, minus10s, up, down, userId, videoId, keyId, magpieReportCall }) => {
     const video = useRef<HTMLVideoElement>(null)
     //const progress = useRef<HTMLProgressElement>(null)
     const [playing, setPlaying] = useState<boolean>(true)
@@ -216,6 +218,10 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     const [loading, setLoading] = useState<boolean>(true)
     const [videoReady, setVideoReady] = useState<boolean>(false)
     const [hideMenue, setHideMenue] = useState<boolean>(true)
+    const [magpieResset, setMagpieResset] = useState<boolean>(false)
+    const [magpieCounter, setMagpieCounter] = useState<any>(Date.now())
+    let magpieLoop: any
+    //let magpieCounter = 
     // let prevSession = {
     //     user: userId,
     //     stream: videoId,
@@ -234,7 +240,16 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         return ref.current;
     }
 
-    const previousProps = usePrevious({ url, play_pause, speedUp, speedDown, plus10s, minus10s, closeVideo, up, down, userId, videoId })
+    const previousProps = usePrevious({ url, play_pause, speedUp, speedDown, plus10s, minus10s, closeVideo, up, down, userId, videoId, keyId, magpieReportCall })
+
+    //Magpie Loop
+    useEffect(() => {
+        magpieApiReport()
+        magpieLoop = setTimeout(() => { setMagpieResset(!magpieResset) }, 60000);
+        return () => clearTimeout(magpieLoop)
+    }, [magpieResset, magpieReportCall])
+
+
     //check which button ckicked
     useEffect(() => {
         if (!loading) {
@@ -250,7 +265,7 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         }
     }, [play_pause, speedUp, speedDown, plus10s, minus10s, loading])
 
-    //Timot session loop
+    //Timor session loop
     useEffect(() => {
         var timorSessionLoop = setInterval(() => {
             // const nowSeconds = new Date().getSeconds()
@@ -263,7 +278,7 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
                 volume: video.current ? video.current.volume * 100 : 0,
                 version: "FireTV 2.0.0"
             }
-            console.log("data to session", data,)
+            //console.log("data to session", data,)
             api.timorSession(userId, videoId, video.current ? Math.round(video.current.currentTime) : 0, 15, video.current ? video.current.volume * 100 : 0, "FireTV 2.0.0")
                 .catch((err) => console.log(err.message))
             // prevSession = data
@@ -341,8 +356,24 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
             setVideoReady(true)
         }
     }
+
+    const magpieApiReport = () => {
+        const report = {
+            key: keyId,
+            email: userId,
+            host: host,
+            video_id: videoId,
+            captured: new Date().toISOString(),
+            seconds: Math.floor((Date.now() - magpieCounter) / 1000)
+        }
+        setMagpieCounter(Date.now())
+        api.magpieReport(report).catch((err) => console.log(err.message))
+        console.log("magpieLoop", report)
+    }
+
     const videoEndedHandler = () => {
         console.log("videoEndedHandler")
+        magpieApiReport()
         closeVideo()
     }
     const errorHandler = (err: ErrorEvent) => {
@@ -385,22 +416,35 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     }
 
     const playPauseHandle = () => {
-        if (playing) {
+        clearTimeout(magpieLoop)
+        if (playing) { //pause
             video.current?.pause()
             setPlaying(false)
             setSpeed(1)
-
+            magpieApiReport()
             //setSpeed(1)
         }
-        else {
+        else { //play
             video.current?.play()
             setPlaying(true)
             setSpeed(1)
-
+            setMagpieCounter(Date.now())
+            setMagpieResset(!magpieResset)
         }
     }
     const fastForward = () => {
         console.log("Speed up")
+        if (!playing) {
+            video.current?.play()
+            setPlaying(true)
+            setMagpieCounter(Date.now())
+            setMagpieResset(!magpieResset)
+        } else {
+            // clearTimeout(magpieLoop)
+            // magpieApiReport()
+            // setMagpieResset(!magpieResset)
+        }
+
         if (video.current) {
             if (speed === 1) setSpeed(2)
             if (speed === 2) setSpeed(3)
@@ -410,6 +454,9 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
 
     }
     const fastBack = () => {
+        clearTimeout(magpieLoop)
+        magpieApiReport()
+        setMagpieResset(!magpieResset)
         if (video.current) {
             if (video.current) {
                 if (speed === 2) setSpeed(1)

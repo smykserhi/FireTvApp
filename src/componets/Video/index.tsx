@@ -246,6 +246,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [sec15LoopCounter, setSec15LoopCounter] = useState<number>(0)
     const [videoPlay, setVideoPlay] = useState<boolean>(false)
     const [eventWaitingMesage, setEwentWeatingMessage] = useState<string>("")
+    const [magpieReportCall, setMagpieReportCall] = useState<boolean>(false)
     let timeOut5min: any
     let timeOut15sec: any
 
@@ -296,7 +297,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
 
     //update data every 5 min
     useEffect(() => {
-        console.log("Start 5min loop", min5Loop)
+        //console.log("Start 5min loop", min5Loop)
         clearTimeout(timeOut5min)
         timeOut5min = setTimeout(function () {
             if (!min5Loop) {
@@ -312,7 +313,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }, [min5Loop, min5LoopCounter])
     //Update data every 15sec
     useEffect(() => {
-        console.log("Start 15s loop", sec15Loop,)
+        //console.log("Start 15s loop", sec15Loop,)
         clearTimeout(timeOut15sec)
         timeOut15sec = setTimeout(function () {
             if (!sec15Loop) {
@@ -357,7 +358,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 }
                 if (distance < 0) {
                     clearInterval(timerLoop)
-                    console.log("Stop Timer")
+                    //console.log("Stop Timer")
                     if (liveIn) setLiveIn(false)
                     setShowPlay(true)
                     setEwentWeatingMessage("Event will start soon")
@@ -377,7 +378,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 .then(res => {
                     // res.supportMessage = "Support Message Test"
                     // res.message = "Test MEssage"
-                    console.log(videoDisRedux, res)
+                    //console.log(videoDisRedux, res)
                     setVideoDis({ ...videoDisRedux, ...res })
                     if (res.viewerState === "watch") {
                         //if starts in the future                    
@@ -387,7 +388,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                         } else if (res.videoState === "available") setShowPlay(true) // show play button
                     }
                     if (res.videoState === "delist") {
-                        console.log("Go Back !!! videoState:", res.videoState)
+                        //console.log("Go Back !!! videoState:", res.videoState)
                         history.goBack()
                     }
                     if (loading) setLoading(false)
@@ -398,7 +399,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
 
     //update data after add ar remove from myList
     const reloadData = () => {
-        console.log("Updating data...", videoPlay)
+        //console.log("Updating data...", videoPlay)
         //change api depend on playing video or not
         const apiCall = videoPlay ? api.getVideoItemState(Token, videoDisRedux.id) : api.getVideoItemNoLock(Token, videoDisRedux.id)
         apiCall.then(res => {
@@ -468,6 +469,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
 
     const hendleBack = () => {
         if (videoPlay) {
+            setMagpieReportCall(!magpieReportCall)
             handleCloseVideo()
         } else history.goBack()
     }
@@ -600,6 +602,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                                 down={down}
                                 userId={userId}
                                 videoId={videoDis ? videoDis.videoID : "0"}
+                                keyId={videoDis ? videoDis.key : "0"}
+                                magpieReportCall = {magpieReportCall}
                             />
                         </VideoBox>
                         :

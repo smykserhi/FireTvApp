@@ -86,6 +86,11 @@ let api = {
     timorSession: (user: string, stream: string, position: number, watched: number, volume: number, version: string) => {
         return fetch(`https://timor.riivet.com/sessions`, TimotfetchConfig({ user, stream, position, watched, volume, version }))
             .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
+    },
+    //https://magpie.riivet.com/watch
+    magpieReport: (report: object) => {
+        return fetch(`https://magpie.riivet.com/watch`, TimotfetchConfig({ ...report }))
+            .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
     }
 
 
