@@ -22,7 +22,7 @@ const App: React.FC = () => {
     <AppBox>
       <Switch>
         <Redirect exact from={ROUTIES.ROOT} to={`${ROUTIES.PAGES}/${ROUTIES.HOME}`} />
-        <Route path={`${ROUTIES.PAGES}/:id`}> <Pages /></Route>
+        <Route path={`${ROUTIES.PAGES}/:id?`}> <Pages /></Route>
         <Route path={ROUTIES.LOGIN}> <LogIn /></Route>
         <Route path={`${ROUTIES.VIDEO}/:id`}> < Video /></Route>
         <Route path={ROUTIES.MYLIST}> <MyList /></Route>

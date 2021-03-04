@@ -73,6 +73,14 @@ const SelectedImage = styled.img`
     width: 100%;
     border-radius: 5px;
 `
+const VideoTitle = styled.div`
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;    
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+`
 
 const Showcase = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
     return (
@@ -90,14 +98,14 @@ const Showcase = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: Li
                                 return (
                                     <SelectedVideoElementShowcase key={colIndex} >
                                         <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
-                                        <div>{el.title}</div>
+                                        <VideoTitle>{el.title}</VideoTitle>
                                     </SelectedVideoElementShowcase>
                                 )
                             } else {
                                 return (
                                     <VideoElementShowcase key={colIndex} >
                                         <Image src={el.smallImage} alt="Imag"></Image>
-                                        <div>{el.title}</div>
+                                        <VideoTitle>{el.title}</VideoTitle>
                                     </VideoElementShowcase>
                                 )
                             }

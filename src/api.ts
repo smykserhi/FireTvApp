@@ -40,7 +40,7 @@ let api = {
         return await fetch(`${domain}/api/v2/pages`, fetchConfig())
             .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
     },
-    getPageContent: async (page: number, limit: number = 10, offset: number = 0) => {
+    getPageContent: async (page: string, limit: number = 10, offset: number = 0) => {
         return await fetch(`${domain}/api/v2/categories?page=${page}&offset=${offset}&limit=${limit}&`, fetchConfig())
             .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
     },

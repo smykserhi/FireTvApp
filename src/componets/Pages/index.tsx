@@ -12,7 +12,7 @@ interface matchParamsType {
   
 
 const Pages: React.FC<Props> = ({ match,})=> {
-    const pageId = parseInt(match.params.id )
+    const pageId = match.params.id
     return (<Route path={`${PAGES}/${pageId}`} render={() => <Home pageId={pageId} />} /> )
 }
 export default withRouter(Pages)

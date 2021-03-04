@@ -165,7 +165,7 @@ export interface pageCategoriesType {
 }
 export interface page {
   default: boolean,
-  id: number,
+  id: string,
   name: string,
 }
 
@@ -211,7 +211,7 @@ interface matchParamsType {
   id: string
 }
 interface Props extends RouteComponentProps<matchParamsType> {
-  pageId: number
+  pageId: string
 }
 
 export type sideMenuType = "home" | "search" | "settings" | null
@@ -249,13 +249,17 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   })
   //update all page or redirect to LOGIN page
   useEffect(() => {
-    //console.log("in loading")
+    console.log("in loading")
     if (!Token) history.push(LOGIN)
     else if (loading) {
+      console.log("loading")
       api.getPages()
         .then((res) => {
           let pagesData: page[] = res
-          api.getPageContent(pageId)
+          const defaultPage = res.filter((el:page)=> el.default === true)
+          const pageIdLoad = pageId === HOME ? defaultPage[0].id : pageId 
+          console.log(defaultPage )
+          api.getPageContent(pageIdLoad,pageIdLoad)
             .then((res) => {
               const categoriesContents: videoDisType[] = []
               const pageCategories: pageCategoriesType[] = res
@@ -287,8 +291,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     }
   }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
 
-  //console.log("match", match.params)
-  //console.log("pages", pages)
+  console.log("match", pageId)
+  //console.log("pages", pages.filter(el=> el.default))
   //console.log("categories", categories)
   //console.log("categoriesContent", categoriesContent)
   //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
@@ -508,7 +512,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       return  categoriesContent[0]?.list[0]
     }
   }
-
+console.log(currentVideo())
   return (
     <MainBox>
       {loading ? <Loading /> :
@@ -538,7 +542,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
               <DisH2>{currentVideo() ? currentVideo().title : ""}</DisH2>
               <TimeBox>
                 {currentVideo().metadata?.live ?
-                  moment(currentVideo().metadata.start_time).format("hh:mm A dddd MMMM D, YYYY") :
+                  `${moment(currentVideo().metadata.start_time).format("hh:mm A")} ${currentVideo().metadata.timezone} ${moment(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")} `:
                   moment(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")}
               </TimeBox>
               <DiscriptionBox>

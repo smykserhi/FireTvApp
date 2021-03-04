@@ -8,12 +8,22 @@ export const VIDEO = "/video"
 export const MYLIST = "/mylist"
 export const SEARCH = "/search"
 export const SETTINGS = "/settings"
-export const HOME = "45"
+export const HOME = "home"
 
 //Constants 
 
 export const host = 'speedsport.tv';
 export const domain = 'https://speedsport.tv';
+
+// export const domain ='https://test2.riivet.com'
+// export const host = 'test2.riivet.com';
+
+// export const domain ='https://dirttrackdigest.tv'
+// export const host = 'dirttrackdigest.tv';
+
+// export const domain ='https://pitrow.tv'
+// export const host = 'pitrow.tv';
+
 
 //How many items would be displayed in top menu + My List
 export const topMenuLength = 5
@@ -54,6 +64,8 @@ export const colors:ColorsType={
     counterColour: "#0000ff"
 }
 
+
+//function transform hex color to rgba with provided opacity
 export const hexToRGBA=(hex:any, opacity:number)=> {
     return 'rgba(' + (hex = hex.replace('#', ''))
         .match(new RegExp('(.{' + hex.length/3 + '})', 'g'))
@@ -63,21 +75,3 @@ export const hexToRGBA=(hex:any, opacity:number)=> {
 }
 
 
-/*
-export const apiBaseUrl = 'https://speedsport.tv/api/v2/';
-export const sessionsBaseUrl = 'https://speedsport.tv/api/';
-
-export const version = '1.4';
-
-// export const apiBaseUrl = 'https://test.riivet.com/api/v2/';
-
-// Paths
-export const sessions = 'sessions';
-export const categories = 'categories';
-export const search = 'content_items/search';
-export const contentItems = 'content_items';
-export const list = 'list';
-
-
-
-*/
