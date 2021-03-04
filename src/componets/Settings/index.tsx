@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux';
-import { saveToken, saveUserName } from "../../store/actions"
+import { logOut, clearData} from "../../store/actions"
 import { StorageType } from "../../store/types"
 import { RouteComponentProps, withRouter } from 'react-router';
 import styled from 'styled-components';
@@ -125,14 +125,16 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
         console.log("enter")
         if (goBackActive) history.goBack()
         else {
-            api.logout(Token)
-            dispatch(saveToken(""))
-            dispatch(saveUserName(""))
+            api.logout(Token)            
+            dispatch(logOut())
+            dispatch(clearData())
             localStorage.clear()
             history.push(LOGIN)
         }
 
     }
+
+    
     return (
         <MainBox>
             <LeftSide>

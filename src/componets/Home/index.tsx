@@ -13,8 +13,13 @@ import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors , SEARCH, SETTINGS, 
 import { Loading } from "../Loading"
 import { SideMenu } from "../SideMenu"
 import moment from 'moment';
+import {hexToRGBA}from "../../constants"
 //import * as CSSTransitionGroup  from 'react-transition-group'
 var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
+
+interface ImageProps{
+  url: any
+} 
 
 const menuItem = keyframes`
     from{        
@@ -59,16 +64,23 @@ const VideoDis = styled.div`
   width: 90%;
   display: contents;
 `
-const ImageDis = styled.div`
+const ImageDis = styled.div<ImageProps>`
   align-self: center;   
-  width: 50vw;
+  width: 35vw;
   position: absolute;
   top: -60px;
   right: -20px;
   z-index: 0;  
   /*box-shadow: 0px 0px 60px ${colors.borderPrimary};*/
   border-radius: 10px;  
-  mask-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 15%) ;
+  /*mask-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 15%) ;*/  
+
+  
+  /*background: right / contain no-repeat url(${props=>props.url}}) ;*/
+  background: linear-gradient(to left, rgba(255,255,255,0) 70%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%, linear-gradient(to bottom, rgba(255,255,255,0) 60%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%,url(${props=>props.url}})  right / contain no-repeat;
+  height: 100%;
+  transform: scale(1.3);
+  margin-top: 3rem;
   
 `
 const DisH2 = styled.h2`
@@ -126,6 +138,7 @@ const DiscriptionText = styled.div`
   
   
 `
+
 const Image = styled.img`
   width: 100%;
   border-radius: 10px;
@@ -538,8 +551,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 </DiscriptionText>
               </DiscriptionBox>
             </VideoDis>
-            <ImageDis>
-              <Image src={currentVideo().mediumImage} alt="Imag"></Image>
+            <ImageDis url={currentVideo().mediumImage}> 
+              {/* <Image src={currentVideo().mediumImage} alt="Imag"></Image> */}
             </ImageDis>
           </MainDis>
           <CSSTransitionGroup

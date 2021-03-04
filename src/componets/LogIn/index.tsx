@@ -6,6 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveToken, saveUserName } from "../../store/actions"
 import { StorageType } from "../../store/types"
+import { PAGES, HOME } from "../../constants"
 
 const LogInBox = styled.div`
     position: absolute;
@@ -65,7 +66,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     const [error, setError] = useState<string>("")
     const selectToken = (state: StorageType) => state.logIn.token
     const LogIn = useSelector(selectToken)
-    const dispatch = useDispatch()    
+    const dispatch = useDispatch()
     //localStorage.setItem('token', 'Tom');
     const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.name === "email") setEmail(e.target.value)
@@ -88,8 +89,9 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     clearStates()
                     dispatch(saveToken(res.data.token))
                     dispatch(saveUserName(email))
-                    localStorage.setItem('token', res.data.token);     
-                    localStorage.setItem('user', email);                
+                    localStorage.setItem('token', res.data.token);
+                    localStorage.setItem('user', email);
+                    history.push(`${PAGES}/${HOME}`)
                 })
                 .catch((err) => {
                     setError(err.response.data.error);
@@ -98,19 +100,16 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
         }
     }
 
-    useEffect(() => { 
-        if (LogIn)  history.goBack() // history.push(`${PAGES}/${HOME}`) //if user already LogIn        
-        else{
-            if(localStorage.getItem('token')){
-                const token = localStorage.getItem('token')                
-                if(token) dispatch(saveToken(token))
-            }
-            if(localStorage.getItem('user')){
-                const user = localStorage.getItem('user')                
-                if(user) dispatch(saveUserName(user))
-            }
-
+    useEffect(() => {
+        if (LogIn) history.push(`${PAGES}/${HOME}`) //if user already LogIn        
+        else if (localStorage.getItem('token') && localStorage.getItem('user')) {
+            const token = localStorage.getItem('token')
+            const user = localStorage.getItem('user')
+            if (user) dispatch(saveUserName(user))
+            if (token) dispatch(saveToken(token))
         }
+
+
     })
 
     return (

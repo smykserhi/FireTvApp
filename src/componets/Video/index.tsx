@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { RouteComponentProps, withRouter } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { logOut, clearData } from "../../store/actions"
 import { StorageType } from "../../store/types"
 import { LOGIN, colors, hexToRGBA } from "../../constants"
 import { Loading } from "../Loading"
@@ -231,6 +232,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const selectToken = (state: StorageType) => state.logIn.token
     const selectUserId = (state: StorageType) => state.logIn.userName
     const selectVideo = (state: StorageType) => state.data.videoDetails
+    const dispatch = useDispatch()
     const videoDisRedux = useSelector(selectVideo)
     const Token = useSelector(selectToken) //token 
     const userId = useSelector(selectUserId) // user Id 
@@ -350,8 +352,15 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                     minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
                     seconds: Math.floor((distance % (1000 * 60)) / 1000),
                 }
-                time.hours = 0
-                distance = -1
+                // time.hours = 0
+                // distance = -1
+                // const test = {
+                //     days: countDownDate.startOf('day').fromNow(),
+                //     hours: countDownDate.startOf('hour').fromNow(),
+                //     minutes: countDownDate.startOf('minute').fromNow(),
+                //     seconds: countDownDate.startOf('second').fromNow(),
+                // }
+                // console.log("distance", distance, "countDownDate.fromNow()",test )
                 if (time.hours === 0) {
                     setMin5Loop(false) //stop updating very 5min
                     setSec15Loop(true) //start updating every 15sec
@@ -397,13 +406,21 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
     }, [Token, history, loading, videoDisRedux])
 
+    const handleLogOut = () => {
+        api.logout(Token)
+        dispatch(logOut())
+        dispatch(clearData())
+        localStorage.clear()
+        history.push(LOGIN)
+    }
+
     //update data after add ar remove from myList
     const reloadData = () => {
         //console.log("Updating data...", videoPlay)
         //change api depend on playing video or not
         const apiCall = videoPlay ? api.getVideoItemState(Token, videoDisRedux.id) : api.getVideoItemNoLock(Token, videoDisRedux.id)
         apiCall.then(res => {
-            //console.log("new data: ", videoDis, res)
+            console.log("new data: ", videoDis, res)
             if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
             if (res.viewerState === "watch") {
                 if (res.videoState === "live") { // show paly 
@@ -412,6 +429,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                     if (showPlay) setShowPlay(true) //show play button
                     if (setMenuItem) setMenuItem("play") //select play button
                 }
+            } else if (res.viewerState === "logout") { //invalid token
+                handleLogOut()
             } else {
                 setVideoPlay(false) //close video 
                 if (showPlay) setShowPlay(false) //hide play button
@@ -545,11 +564,14 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 setSec15Loop(false) //stop updating every 15sec          
                 api.getVideoItem(Token, videoDisRedux.id)
                     .then(res => {
+                        console.log("Play res", res)
                         if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
                         if (res.videoState === "live") { // show paly                             
                             api.timorLogs(userId, videoId, "info", `${res.url}`).catch((err) => console.log(err.message))
                             setLiveIn(false) // hide counter and show play mutton
                             if (setMenuItem) setMenuItem("play")
+                        }else if (res.viewerState === "logout") { //invalid token
+                            handleLogOut()
                         }
                         setVideoPlay(true)// start playing  
                         setSec15Loop(true)  //start update every 15s
@@ -603,7 +625,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                                 userId={userId}
                                 videoId={videoDis ? videoDis.videoID : "0"}
                                 keyId={videoDis ? videoDis.key : "0"}
-                                magpieReportCall = {magpieReportCall}
+                                magpieReportCall={magpieReportCall}
                             />
                         </VideoBox>
                         :

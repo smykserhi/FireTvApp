@@ -11,9 +11,16 @@ export const saveUserName=(UserName:string):UserActionsType=>({
     payload : UserName
 })
 
+export const logOut = ()=>({
+    type: "LOG_OUT"
+})
 
 // Data reducer
 export const addVideo = (videoDetails:videoDisListType):AddDataActionsType=>({
     type:"ADD_VIDEO",
     payload: videoDetails
+})
+
+export const clearData = ()=>({
+    type: "CLEAR"
 })
