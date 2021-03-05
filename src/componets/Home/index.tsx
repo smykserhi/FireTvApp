@@ -226,7 +226,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [categoryesloading, setCategoryesloading] = useState<boolean>(false) // main content loading  
   const [pages, setPages] = useState<page[]>([])
   const [categories, setCategories] = useState<pageCategoriesType[]>([])
-  const [categoriesContent, setCategoriesContent] = useState<videoDisType[]>([])
+  const [categoriesContent, setCategoriesContent] = useState<videoDisType[] >([])
   const [selectedRow, setSelectedRow] = useState<number>(0)
   const [selectedCol, setSelectedCol] = useState<number>(0)
   const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
@@ -235,7 +235,10 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   //sort content by categories
   const sortContent = (categor: pageCategoriesType[], content: videoDisType[]) => {
-    return categor.map(el => content.filter(cont => cont.id === el.id)).flat()
+    return categor.map(el => {
+      const elemnt = content.filter(cont => cont.id === el.id).flat()
+      return elemnt[0]
+    })
   }
 
   //Functions
@@ -257,8 +260,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
         .then((res) => {
           let pagesData: page[] = res
           const defaultPage = res.filter((el:page)=> el.default === true)
-          const pageIdLoad = pageId === HOME ? defaultPage[0].id : pageId 
-          console.log(defaultPage )
+          const pageIdLoad = pageId === HOME ? defaultPage[0].id : pageId           
           api.getPageContent(pageIdLoad,pageIdLoad)
             .then((res) => {
               const categoriesContents: videoDisType[] = []
@@ -273,8 +275,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 )
                 return true
               })
-              Promise.all(list).then(() => {
+              Promise.all(list).then(() => {                
                 const sortedContent = sortContent(pageCategories, categoriesContents)
+                //console.log("sorted data", pageCategories, sortedContent)
                 setSelectedCol(0)
                 setSelectedRow(0)
                 //console.log("pagesData", pagesData, "pageId", pageId)
@@ -291,11 +294,11 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     }
   }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
 
-  console.log("match", pageId)
+  //console.log("match", pageId)
   //console.log("pages", pages.filter(el=> el.default))
-  //console.log("categories", categories)
-  //console.log("categoriesContent", categoriesContent)
-  //console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  console.log("categories", categories)
+  console.log("categoriesContent", categoriesContent)
+   console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)
@@ -321,6 +324,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             pageCategories.forEach(el => tempCategories.push(el))
             const uniqCategory = Array.from(new Map(tempCategories.map((item: pageCategoriesType) => [item.id, item])).values());
             const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());
+            console.log('unic',uniqCategory, uniqContent)
             const sortedContent = sortContent(uniqCategory, uniqContent)
             if(categories)setCategories(uniqCategory)
             if(categoriesContent)setCategoriesContent(sortedContent)
@@ -332,7 +336,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     }
   }
   const uploadCategoiesContent = (category: pageCategoriesType) => {
-    console.log("uploadCategoiesContent")
+    console.log("uploadCategoiesContent")    
     if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 20 && !categiryContentLoading) {
       console.log("offset uploadCategoiesContent")
       setCategiryContentLoading(true)
@@ -342,7 +346,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
         let tempCategoriesContent = categoriesContent
         res.forEach((el: videoDisListType) => tempCategoriesContent[selectedRow].list.push(el))
         if(categoriesContent) setCategoriesContent(tempCategoriesContent)
-        if(categiryContentLoading) setCategiryContentLoading(false)
+        setCategiryContentLoading(false)
         console.log(`Add data to category ${tempCategoriesContent[selectedRow].id}`)
       })
       .catch(error => console.log(error) );
@@ -455,7 +459,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       else if (sideMenuItem === "search") setSideMenuItem("settings")
       else addListeners()
     } else {
-      if (categories[selectedRow]?.type === "guide" && selectedCol < categoriesContent[selectedRow].list.length - 1) { //inside guide category
+      if (categories[selectedRow]?.type === "guide" ) { //inside guide category
         if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
         uploadCategoiesContent(categories[selectedRow])
       } else if (categories[selectedRow]?.type === "full" && selectedCol < categoriesContent[selectedRow].list.length - 5) { //inside full category
@@ -512,7 +516,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       return  categoriesContent[0]?.list[0]
     }
   }
-console.log(currentVideo())
+//console.log(currentVideo())
   return (
     <MainBox>
       {loading ? <Loading /> :
@@ -542,8 +546,8 @@ console.log(currentVideo())
               <DisH2>{currentVideo() ? currentVideo().title : ""}</DisH2>
               <TimeBox>
                 {currentVideo().metadata?.live ?
-                  `${moment(currentVideo().metadata.start_time).format("hh:mm A")} ${currentVideo().metadata.timezone} ${moment(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")} `:
-                  moment(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")}
+                  `${moment.parseZone(currentVideo().metadata.start_time).format("hh:mm A")} ${currentVideo().metadata.timezone} ${moment.parseZone(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")} `:
+                  moment.parseZone(currentVideo().metadata.start_time).format("dddd MMMM D, YYYY")}
               </TimeBox>
               <DiscriptionBox>
                 {currentVideo().metadata.live
@@ -567,9 +571,10 @@ console.log(currentVideo())
             {categories.map((catEl, sellIndex) => {
               if (sellIndex >= selectedRow) { //skip content after move
                 if (catEl.type === "showcase") {
+                  console.log("sellIndex",sellIndex)
                   return (
                     <Showcase
-                      key={catEl.id}
+                      key={sellIndex}
                       sellIndex={sellIndex}
                       categories={categories}
                       categoriesContent={categoriesContent}

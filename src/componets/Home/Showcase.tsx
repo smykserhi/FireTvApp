@@ -82,7 +82,7 @@ const VideoTitle = styled.div`
     -webkit-box-orient: vertical;
 `
 
-const Showcase = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
+const Showcase = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {    
     return (
         <MainContainer>
             <CSSTransitionGroup

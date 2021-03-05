@@ -147,7 +147,8 @@ const DisDiscription = styled.div`
 `
 
 const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
-    const CategoryData = (el: videoDisListType, anime: boolean) => {
+    console.log("gide",categoriesContent[sellIndex] )
+    const CategoryData = (el: videoDisListType, anime: boolean) => {        
         return (
             <>
                 <DateBox>
@@ -155,7 +156,7 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
                     <div>{moment(el.metadata.start_time).format("MMM")}</div>
                 </DateBox>
                 <TimeBox>
-                    <div>{moment(el.metadata.start_time).format("LT")}</div>
+                    <div>{moment.parseZone(el.metadata.start_time).format("hh:mm a")}</div>
                     <div>{el.metadata.timezone}</div>
                 </TimeBox>
                 <ImageBox><Image src={el.smallImage} alt="Imag"></Image></ImageBox>

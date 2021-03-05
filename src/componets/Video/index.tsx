@@ -333,18 +333,18 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         if (liveIn) {
             // const countDownDate = moment(videoDisRedux?.metadata?.start_time)
             const countDownDate = moment(videoDis?.startTime)
-            const locationTimeOfset = (): number => {
-                const daylySavingTime = moment().isDST() ? -60 : 0 //if DST subtract 60min
-                if (videoDis?.metadata.timezone === "Eastern") return -300 - daylySavingTime
-                else if (videoDis?.metadata.timezone === "Central") return -360 - daylySavingTime
-                else if (videoDis?.metadata.timezone === "Mountian") return -420 - daylySavingTime
-                else return -480 - daylySavingTime
-            }
-            const timeOfset = new Date().getTimezoneOffset() + locationTimeOfset()
+            // const locationTimeOfset = (): number => {
+            //     const daylySavingTime = moment().isDST() ? -60 : 0 //if DST subtract 60min
+            //     if (videoDis?.metadata.timezone === "Eastern") return -300 - daylySavingTime
+            //     else if (videoDis?.metadata.timezone === "Central") return -360 - daylySavingTime
+            //     else if (videoDis?.metadata.timezone === "Mountian") return -420 - daylySavingTime
+            //     else return -480 - daylySavingTime
+            // }
+            //const timeOfset = new Date().getTimezoneOffset() + locationTimeOfset()
             var timerLoop = setInterval(function () {
                 const now = moment()
                 // Find the distance between now and the count down date            
-                let distance = countDownDate.diff(now) - (timeOfset * 60000)
+                let distance = countDownDate.diff(now) //- (timeOfset * 60000)
                 // Time calculations for days, hours, minutes and seconds
                 const time = {
                     days: Math.floor(distance / (1000 * 60 * 60 * 24)),
@@ -379,6 +379,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         return () => clearInterval(timerLoop);
     }, [liveIn, videoDisRedux?.metadata?.start_time, videoDis?.metadata.timezone, showPlay])
 
+
+
     //main content loading
     useEffect(() => {
         if (!Token) history.push(LOGIN)
@@ -387,7 +389,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 .then(res => {
                     // res.supportMessage = "Support Message Test"
                     // res.message = "Test MEssage"
-                    //console.log(videoDisRedux, res)
+                    console.log(videoDisRedux, res)
                     setVideoDis({ ...videoDisRedux, ...res })
                     if (res.viewerState === "watch") {
                         //if starts in the future                    
@@ -691,7 +693,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                                 <TitleBox>
                                     <h2>{videoDis?.title}</h2>
                                     <DisTimeBox>
-                                        <StyledTime>{moment(videoDis?.startTime).format("LT")} </StyledTime>
+                                        <StyledTime>{moment.parseZone(videoDis?.metadata.start_time).format("hh:mm a")} {videoDis?.metadata.timezone}</StyledTime>
                                         <h2>{moment(videoDis?.startTime).format("ll")}</h2>
                                     </DisTimeBox>
                                 </TitleBox>
