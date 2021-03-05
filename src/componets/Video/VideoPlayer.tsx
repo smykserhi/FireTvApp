@@ -473,8 +473,8 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         <div>
             {!videoReady ? <StyledLoading /> : ""}
             <StyledVideo ref={video} autoPlay id="video">
-                {/* <source src={url} type="application/x-mpegURL" /> */}
-                <source src={url} type="video/mp4" />
+                <source src={url} type="application/x-mpegURL" />
+                {/* <source src={url} type="video/mp4" /> */}
             </StyledVideo>
             <MenueContainer show={hideMenue}>
                 <ProgressContainer>

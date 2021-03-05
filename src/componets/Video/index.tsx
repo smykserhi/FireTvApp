@@ -402,7 +402,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                         //console.log("Go Back !!! videoState:", res.videoState)
                         history.goBack()
                     }
-                    if (loading) setLoading(false)
+                    setLoading(false)
                 })
                 .catch(error => console.log(error));
         }
@@ -435,7 +435,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 handleLogOut()
             } else {
                 setVideoPlay(false) //close video 
-                if (showPlay) setShowPlay(false) //hide play button
+                setShowPlay(false) //hide play button
             }
         })
             .catch(error => console.log(error));
@@ -453,6 +453,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
 
     const handleKeyUp = (e: KeyboardEvent) => {
         removeListeners();
+        console.log("Listner")
         switch (e.key) {
             case 'Enter':
                 handleEnter()
@@ -478,6 +479,9 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
             case 'MediaRewind':
                 hendleMediaRewind()
                 break;
+            // case 'GoBack':
+            //     hendleBack()
+            //     break;
             case 'GoBack':
             case 'Backspace':
                 hendleBack()
@@ -487,12 +491,17 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
         e.preventDefault();
     }
-
+    console.log("videoPlay",videoPlay)
     const hendleBack = () => {
+        console.log("Video backHandler",videoPlay )
         if (videoPlay) {
-            setMagpieReportCall(!magpieReportCall)
+            console.log("Video back")
             handleCloseVideo()
-        } else history.goBack()
+            setMagpieReportCall(!magpieReportCall)            
+        } else {
+            console.log("History Back")
+            history.goBack()
+        }
     }
     const hendleMediaFastForward = () => {
         console.log("Hendled")
@@ -567,14 +576,16 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 api.getVideoItem(Token, videoDisRedux.id)
                     .then(res => {
                         console.log("Play res", res)
+                        api.timorLogs(userId, videoId, "info", `${res.url}`).catch((err) => console.log(err.message))
                         if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
                         if (res.videoState === "live") { // show paly                             
-                            api.timorLogs(userId, videoId, "info", `${res.url}`).catch((err) => console.log(err.message))
+                            
                             setLiveIn(false) // hide counter and show play mutton
                             if (setMenuItem) setMenuItem("play")
-                        }else if (res.viewerState === "logout") { //invalid token
+                        } else if (res.viewerState === "logout") { //invalid token
                             handleLogOut()
                         }
+                        removeListeners();
                         setVideoPlay(true)// start playing  
                         setSec15Loop(true)  //start update every 15s
 
@@ -615,8 +626,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                         <VideoBox>
                             <VideoPlayer
                                 closeVideo={handleCloseVideo}
-                                url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
-                                // url={videoDis ? videoDis.url : "https://media.w3.org/2010/05/sintel/trailer_hd.mp4"}
+                                // url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+                                url={videoDis ? videoDis.url : "httpsDisFacility://media.w3.org/2010/05/sintel/trailer_hd.mp4"}
                                 play_pause={play_pause}
                                 speedUp={speedUp}
                                 speedDown={speedDown}

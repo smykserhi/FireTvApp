@@ -45,7 +45,7 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
                     setLoading(false)
                     //console.log(fullType)
                 })
-                .catch(error => console.log(error) );
+                .catch(error => console.log(error));
         }
 
     }, [loading, Token, history])
@@ -63,13 +63,13 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
         api.getMyList(Token, myListContent[0].list.length)
             .then(res => {
                 let tmp = myListContent
-                res.forEach((element:videoDisListType) => {
-                   tmp[0].list.push(element) 
+                res.forEach((element: videoDisListType) => {
+                    tmp[0].list.push(element)
                 });
                 //console.log("new item uploded", tmp)
                 setMyListContent(tmp)
             })
-            .catch(error => console.log(error) );
+            .catch(error => console.log(error));
     }
     const addListeners = () => {
         document.addEventListener("keydown", handleKeyDown, true);
@@ -86,12 +86,19 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             case 'Enter':
                 handleEnter()
                 break;
+            case 'GoBack':
+            case 'Backspace':
+                hendleBack()
+                break;
             default:
                 addListeners()
         }
         e.preventDefault();
     }
-
+    const hendleBack = () => {   
+        history.push(`${PAGES}/${HOME}`)
+        setLoading(true)
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
         removeListeners();
         switch (e.key) {
@@ -133,8 +140,8 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             setExpandSideMenue(false)
             setSideMenuItem(null)
         } else {
-            if(selectedCol> myListContent[0].list.length -20) uploadNewItems()
-            if (selectedCol < myListContent[0].list.length - 1) {                               
+            if (selectedCol > myListContent[0].list.length - 20) uploadNewItems()
+            if (selectedCol < myListContent[0].list.length - 1) {
                 setSelectedCol(selectedCol + 1)
             } else addListeners()
         }
@@ -174,7 +181,7 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             else if (sideMenuItem === "search") setSideMenuItem("settings")
             else addListeners()
         } else {
-            if(selectedCol> myListContent[0].list.length -20) uploadNewItems()      
+            if (selectedCol > myListContent[0].list.length - 20) uploadNewItems()
             if (selectedCol < myListContent[0].list.length - 5) {
                 setSelectedCol(selectedCol + 5)
             } else addListeners()

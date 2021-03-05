@@ -2,7 +2,7 @@ import React from "react"
 import styled, { keyframes } from 'styled-components';
 import { videoDisListType, ListProps } from "./index"
 import moment from 'moment';
-import {colors} from "../../constants"
+import { colors } from "../../constants"
 var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
 const jelloHorizontal = keyframes`
@@ -58,10 +58,10 @@ const SelectedCategorRow = styled(CategorRow)`
     border: solid ${colors.borderPrimary} 2px;
     box-shadow: 0px 0px 50px 5px ${colors.borderPrimary};
     &.category-enter.category-enter-active {   
-        animation: ${selectedCategory}  0.3s ease-in-out reverse;            
+        animation: ${selectedCategory}  0.4s ease-in-out reverse;            
     }     
     &.category-leave.category-leave-active {   
-        animation: ${selectedCategory}  0.3s ease-in-out ;     
+        animation: ${selectedCategory}  0.4s ease-in-out ;     
     }
 `
 
@@ -137,7 +137,7 @@ const DisLifeAnime = styled(DisLife)`
 `
 
 const DisFacility = styled.div`
-    font-size: 1em;
+    font-size: 1.3rem;
     color: gray;
     margin: 10px 0;
 `
@@ -147,8 +147,7 @@ const DisDiscription = styled.div`
 `
 
 const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
-    console.log("gide",categoriesContent[sellIndex] )
-    const CategoryData = (el: videoDisListType, anime: boolean) => {        
+    const CategoryData = (el: videoDisListType, anime: boolean) => {
         return (
             <>
                 <DateBox>
@@ -172,11 +171,11 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
         )
     }
     return (
-        <CSSTransitionGroup        
-        component={MainBox}
-        transitionName="category"
-        transitionEnterTimeout={200}
-        transitionLeaveTimeout={200}>
+        <CSSTransitionGroup
+            component={MainBox}
+            transitionName="category"
+            transitionEnterTimeout={400}
+            transitionLeaveTimeout={400}>
             {categoriesContent[sellIndex].list.map((el, colIndex) => {
                 if (selectedRow === sellIndex) {
                     if (colIndex >= selectedCol) {
