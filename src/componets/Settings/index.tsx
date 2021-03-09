@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from 'react-redux';
-import { logOut, clearData} from "../../store/actions"
+import { logOut, clearData } from "../../store/actions"
 import { StorageType } from "../../store/types"
 import { RouteComponentProps, withRouter } from 'react-router';
 import styled from 'styled-components';
-import { colors, LOGIN, host } from "../../constants"
+import { colors, LOGIN, host, PAGES, HOME } from "../../constants"
 import { ArrowBack } from "@styled-icons/ionicons-sharp/ArrowBack"
 import { LogOut } from "@styled-icons/boxicons-regular/LogOut"
 import api from "../../api"
@@ -112,12 +112,19 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
             case 'ArrowLeft':
                 handleArrow()
                 break;
+            case 'GoBack':
+            case 'Backspace':
+                hendleBack()
+                break;
             default:
                 addListeners()
         }
         e.preventDefault();
     }
-
+    const hendleBack = () => {
+        history.push(`${PAGES}/${HOME}`)
+        //setLoading(true)
+    }
     const handleArrow = () => {
         setGoBackActive(!goBackActive)
     }
@@ -125,7 +132,7 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
         console.log("enter")
         if (goBackActive) history.goBack()
         else {
-            api.logout(Token)            
+            api.logout(Token)
             dispatch(logOut())
             dispatch(clearData())
             localStorage.clear()
@@ -134,7 +141,7 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
 
     }
 
-    
+
     return (
         <MainBox>
             <LeftSide>
@@ -155,8 +162,8 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
                 <ButtonsConteiner>
                     {goBackActive ? <SelectedButton><StyledArrowBack />Go back </SelectedButton>
                         : <Button><StyledArrowBack />Go back</Button>}
-                    {!goBackActive ? <SelectedButton><StyledLogOut/> Sing Out </SelectedButton>
-                        : <Button><StyledLogOut/> Sing Out</Button>}
+                    {!goBackActive ? <SelectedButton><StyledLogOut /> Sing Out </SelectedButton>
+                        : <Button><StyledLogOut /> Sing Out</Button>}
                 </ButtonsConteiner>
             </RightSide>
         </MainBox>

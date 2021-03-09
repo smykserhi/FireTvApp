@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react"
 import styled, { keyframes } from 'styled-components';
 import { keyboard } from "../../constants"
-import { colors, VIDEO, LOGIN } from "../../constants"
+import { colors, VIDEO, LOGIN, PAGES,HOME} from "../../constants"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
 import { videoDisListType } from "../Home"
-import {CarSport} from "@styled-icons/ionicons-outline/CarSport"
+import { CarSport } from "@styled-icons/ionicons-outline/CarSport"
 import Logo from "../../images/main-logo.png"
-import {BackspaceOutline} from "@styled-icons/evaicons-outline/BackspaceOutline"
-import {SpaceBar} from "@styled-icons/material/SpaceBar"
-import {ArrowBack} from "@styled-icons/ionicons-sharp/ArrowBack"
+import { BackspaceOutline } from "@styled-icons/evaicons-outline/BackspaceOutline"
+import { SpaceBar } from "@styled-icons/material/SpaceBar"
+import { ArrowBack } from "@styled-icons/ionicons-sharp/ArrowBack"
 import { useSelector, useDispatch } from 'react-redux';
 import { StorageType } from "../../store/types"
-import {addVideo} from "../../store/actions"
+import { addVideo } from "../../store/actions"
 
 interface CharBoxProps {
     selected: boolean
@@ -149,7 +149,7 @@ const StyledBackspaceOutline = styled(BackspaceOutline)`
 const StyledSpaceBar = styled(SpaceBar)`
   height: 60%;
 `
-const  StyledArrowBack = styled(ArrowBack)`
+const StyledArrowBack = styled(ArrowBack)`
   height: 60%;
   margin-right: 10px;
 `
@@ -161,19 +161,19 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const [search, setSearch] = useState<string>("")
     const [selectedKey, setSelectedKey] = useState<number>(0)
     const [selectedVideo, setSelectedVideo] = useState<number>(-1)
-    const [searchResult, setSearchResult] = useState<videoDisListType[]>([])    
+    const [searchResult, setSearchResult] = useState<videoDisListType[]>([])
 
     useEffect(() => {
         if (!Token) history.push(LOGIN)
-        else{
+        else {
             addListeners()
             return () => {
                 //component will unmount
                 removeListeners()
             }
         }
-       
-    })    
+
+    })
 
     useEffect(() => {
         if (search !== "") {
@@ -182,7 +182,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     setSearchResult(res)
                     console.log("res", res)
                 })
-                .catch(error => console.log(error) );
+                .catch(error => console.log(error));
         }
     }, [search])
 
@@ -222,17 +222,25 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             case 'ArrowDown':
                 handleArrowDown()
                 break;
+            case 'GoBack':
+            case 'Backspace':
+                hendleBack()
+                break;
             default:
                 addListeners()
         }
         e.preventDefault();
     }
+    const hendleBack = () => {
+        history.push(`${PAGES}/${HOME}`)
+        //setLoading(true)
+      }
     const handleEnter = () => {
         if (selectedVideo < 0) { // on keyboard
             console.log("Hit Enter")
             if (selectedKey >= 0 && selectedKey < keyboard.length) {
-                if (keyboard[selectedKey] === "<" && search.length > 0 ) setSearch(search.slice(0, -1))
-                else if (keyboard[selectedKey] === "<" && search.length === 0 ) addListeners()
+                if (keyboard[selectedKey] === "<" && search.length > 0) setSearch(search.slice(0, -1))
+                else if (keyboard[selectedKey] === "<" && search.length === 0) addListeners()
                 else if (keyboard[selectedKey] === "_") setSearch(search + " ")
                 else setSearch(search + keyboard[selectedKey])
             } else if (selectedKey === keyboard.length) history.goBack()
@@ -300,7 +308,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const handleArrowRight = () => {
         if (selectedVideo < 0) {// on keyboard
             if (selectedVideo < 0) { //if on keyboard
-                if (((selectedKey + 1) % 6 === 0 || selectedKey === keyboard.length - 1) && searchResult.length > 0 ) {
+                if (((selectedKey + 1) % 6 === 0 || selectedKey === keyboard.length - 1) && searchResult.length > 0) {
                     console.log("out")
                     setSelectedVideo(0) //move to search result 
                     setSelectedKey(-1)
@@ -325,13 +333,13 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         <MainBox>
             <KeysBox>
                 {keyboard.map((el, index) => {
-                    if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> <StyledSpaceBar/></SpaceBox>)
-                    else if (el === "<") return (<BackspaceBox key={index} selected={selectedKey === index ? true : false}><StyledBackspaceOutline/></BackspaceBox>)
+                    if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> <StyledSpaceBar /></SpaceBox>)
+                    else if (el === "<") return (<BackspaceBox key={index} selected={selectedKey === index ? true : false}><StyledBackspaceOutline /></BackspaceBox>)
                     else return (<CharBox key={index} selected={selectedKey === index ? true : false}> {el.toUpperCase()}</CharBox>)
                 })}
                 {/* <ChangeKeys selected={selectedKey === keyboard.length ? true : false}>QWE</ChangeKeys> */}
-                <BackBox selected={selectedKey === keyboard.length ? true : false}><StyledArrowBack/>Go Back</BackBox>
-                <StyledLogo src={Logo} alt="Logo"/>
+                <BackBox selected={selectedKey === keyboard.length ? true : false}><StyledArrowBack />Go Back</BackBox>
+                <StyledLogo src={Logo} alt="Logo" />
             </KeysBox>
             <ResultBox>
                 <SearchResult>
@@ -357,7 +365,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                             }
                         } return false
 
-                    }) : <NoResult><p>Try type something</p> <StyledCarSport/></NoResult>}
+                    }) : <NoResult><p>Try type something</p> <StyledCarSport /></NoResult>}
                 </ContentBox>
             </ResultBox>
         </MainBox>

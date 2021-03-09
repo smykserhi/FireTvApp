@@ -21,7 +21,7 @@ interface ImageProps {
   url: any
 }
 
-interface MenueElementProps{
+interface MenueElementProps {
   selected?: boolean
 }
 const menuItem = keyframes`
@@ -32,7 +32,20 @@ const menuItem = keyframes`
         opacity: 1;        
     }    
 `
-
+const moreList = keyframes`
+  0% {
+    transform: translateZ(0) rotateY(0);
+    opacity: 1;
+  }
+  54% {
+    transform: translateZ(-160px) rotateY(87deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateZ(-800px) rotateY(90deg);
+    opacity: 0;
+  }
+`
 const MainBox = styled.div`
   margin: 0 5rem;
   
@@ -52,7 +65,7 @@ const MenuElement = styled.div<MenueElementProps>`
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 15ch;
-  color: ${props=>props.selected? colors.primary: ""}
+  color: ${props => props.selected ? colors.primary : ""}
 `
 const SelectedMenuElement = styled(MenuElement)`  
   border-bottom: ${colors.primary} 5px solid;  
@@ -162,6 +175,21 @@ const Image = styled.img`
   /*transform: scale(1.4);*/
 `
 
+const MoreList = styled.div`
+  position: absolute;
+  top: 30%;
+  left: 30%;
+  background: red;
+  width: 30vw;
+  height: 40vh;
+  z-index: 5;
+  &.more-enter.more-enter-active {   
+    animation: ${moreList}  0.5s ease-in-out reverse;            
+  }     
+  &.more-leave.more-leave-active {   
+      animation: ${moreList}  0.6s ease-in-out ;     
+  }
+`
 export type ListProps = {
   sellIndex: number,
   categories: pageCategoriesType[],
@@ -229,7 +257,7 @@ interface Props extends RouteComponentProps<matchParamsType> {
   pageId: string
 }
 
-export type sideMenuType = "home" | "search" | "settings" | null
+export type sideMenuType = "home" | "search" | "settings" | "myList" | null
 
 const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
@@ -246,6 +274,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [selectedCol, setSelectedCol] = useState<number>(0)
   const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
   const [sideMenuItem, setSideMenuItem] = useState<sideMenuType>(null)
+  const [moreOpen, setMoreOpen] = useState<boolean>(false)
+  const [moreIndex, setMoreIndex] = useState<number>(0)
 
 
   //sort content by categories
@@ -370,13 +400,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const addListeners = () => {
     document.addEventListener("keydown", handleKeyDown, true);
     document.addEventListener("keyup", handleKeyUp, true);
-    
+
   }
 
   const removeListeners = () => {
     document.removeEventListener("keydown", handleKeyDown, true);
     document.removeEventListener("keyup", handleKeyUp, true);
-   
+
   }
   const handleKeyUp = (e: KeyboardEvent) => {
     removeListeners();
@@ -416,11 +446,11 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     }
     e.preventDefault();
   }
-  
-  const hendleBack = () => {   
+
+  const hendleBack = () => {
     history.push(`${PAGES}/${HOME}`)
     setLoading(true)
-}
+  }
   const handleEnter = () => {
     if (expandSideMenue) {
       if (sideMenuItem === "home") {
@@ -428,8 +458,10 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
         setLoading(true)
         setSideMenuItem(null)
         setExpandSideMenue(false)
-      } else if (sideMenuItem === "search") history.push(`${SEARCH}`)
-      else if (sideMenuItem === "settings") history.push(`${SETTINGS}`)
+      }
+      else if (sideMenuItem === "search") history.push(SEARCH)
+      else if (sideMenuItem === "settings") history.push(SETTINGS)
+      else if (sideMenuItem === "myList") history.push(MYLIST)
     } else {
       if (selectedRow === -1) {
         if (selectedCol <= topMenuLength - 1) {
@@ -438,7 +470,10 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
           history.push(`${PAGES}/${selectedPageId}`)
           setLoading(true)
         } else {
-          history.push(MYLIST)
+          console.log("More list")
+          setMoreOpen(!moreOpen)
+          //addListeners()
+          //history.push(MYLIST)
         }
       } else {
         //console.log("Video", currentVideo())
@@ -455,7 +490,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     if (expandSideMenue) {
       console.log("side up")
       if (sideMenuItem === "search") setSideMenuItem("home")
-      else if (sideMenuItem === "settings") setSideMenuItem("search")
+      else if (sideMenuItem === "myList") setSideMenuItem("search")
+      else if (sideMenuItem === "settings") setSideMenuItem("myList")
       else addListeners()
     } else {
       if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
@@ -481,7 +517,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     if (expandSideMenue) {
       console.log("side down")
       if (sideMenuItem === "home") setSideMenuItem("search")
-      else if (sideMenuItem === "search") setSideMenuItem("settings")
+      else if (sideMenuItem === "search") setSideMenuItem("myList")
+      else if (sideMenuItem === "myList") setSideMenuItem("settings")
       else addListeners()
     } else {
       if (categories[selectedRow]?.type === "guide") { //inside guide category
@@ -546,6 +583,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     <MainBox>
       {loading ? <Loading /> :
         <div>
+          <CSSTransitionGroup
+            transitionName="more"
+            transitionEnterTimeout={500}
+            transitionLeaveTimeout={500}>
+            {moreOpen ? <MoreList>List here</MoreList> : ""}
+          </CSSTransitionGroup>
+
           <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
@@ -554,16 +598,16 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                   return (<SelectedMenuElement key={topMenuIndex}>{el.name}</SelectedMenuElement>)
                 }
                 else {
-                  return (<MenuElement selected={el.id==pageId} key={topMenuIndex}>{el.name}</MenuElement>)
+                  return (<MenuElement selected={el.id == pageId} key={topMenuIndex}>{el.name}</MenuElement>)
                 }
               } else return false
             }
             )}
             {selectedRow === -1 && topMenuLength === selectedCol
               ?
-              <SelectedMenuElement>MyList</SelectedMenuElement>
+              <SelectedMenuElement>More...</SelectedMenuElement>
               :
-              <MenuElement >MyList</MenuElement>
+              <MenuElement >More...</MenuElement>
             }
           </MenuBox>
           <MainDis>

@@ -1,19 +1,20 @@
 import React from "react"
-import styled, {keyframes} from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { colors } from "../../constants"
 import { HomeAlt } from "@styled-icons/boxicons-regular/HomeAlt"
 import { SearchEye } from "@styled-icons/remix-fill/SearchEye"
 import { Settings } from "@styled-icons/material-twotone/Settings"
+import { ListCircle } from "@styled-icons/ionicons-outline/ListCircle"
 
 
 
 
-interface MenuProps{
-    expand: boolean, 
+interface MenuProps {
+    expand: boolean,
 }
-interface MenuElementProps {   
+interface MenuElementProps {
     selected: boolean,
-    
+
 }
 const menuItem = keyframes`
     from{        
@@ -53,7 +54,7 @@ const MenuElement = styled.div<MenuElementProps>`
     width: 100%;
     margin: 10px 0;    
     animation: ${menuItem}  0.3s ease-in-out ;  
-    color: ${props=>props.selected? colors.primary:""};
+    color: ${props => props.selected ? colors.primary : ""};
     opacity: 1;
 `
 
@@ -68,24 +69,28 @@ const SettingsIcon = styled(Settings)`
 `
 
 interface SideMenuProps {
-    expand: boolean, 
-    selected: "home"|"search"|"settings"|null ,
+    expand: boolean,
+    selected: "home" | "search" | "settings" | "myList" | null,
 }
 
-export const SideMenu: React.FC<SideMenuProps> = ({ expand,selected }) => {    
+export const SideMenu: React.FC<SideMenuProps> = ({ expand, selected }) => {
     return (<MenuBox expand={expand}>
-        <ItemContainer>
-            <MenuElement selected={selected==="home"? true:false}>
+        <ItemContainer>           
+            <MenuElement selected={selected === "home" ? true : false}>
                 <HomeIcon />
-                {expand?<div>Home</div>:""}
+                {expand ? <div>Home</div> : ""}
             </MenuElement>
-            <MenuElement selected={selected==="search"? true:false}>
+            <MenuElement selected={selected === "search" ? true : false}>
                 <SearchIcon />
-                {expand?<div>Search</div>:""}                
+                {expand ? <div>Search</div> : ""}
             </MenuElement>
-            <MenuElement selected={selected==="settings"? true:false}>
+            <MenuElement selected={selected === "myList" ? true : false}>
+                <ListCircle />
+                {expand ? <div>My List</div> : ""}
+            </MenuElement>
+            <MenuElement selected={selected === "settings" ? true : false}>
                 <SettingsIcon />
-                {expand?<div>Settings</div>:""}                
+                {expand ? <div>Settings</div> : ""}
             </MenuElement>
         </ItemContainer>
     </MenuBox>)
