@@ -69,7 +69,7 @@ const SelectedVideoElementNormal = styled(VideoElementNormal)`
       }
 `
 const Title = styled.div`
-    font-size: 1.5rem;
+    font-size: 2rem;
 `
 const Image = styled.img`    
     width: 100%;

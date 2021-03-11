@@ -49,10 +49,14 @@ const VideoElementShowcase = styled.div`
   margin: 10px;
   min-width: 450px;
   max-width: 450px;
+  filter: opacity(65%);
+
 `
 
 const SelectedVideoElementShowcase = styled(VideoElementShowcase)`     
   min-width: 500px;
+  font-size: 2rem;
+  filter: opacity(100%);
   &.list-enter.list-enter-active {   
     animation: ${selectItem}  0.3s ease-in-out reverse;            
   }     
@@ -69,11 +73,12 @@ const Image = styled.img`
 `
 const SelectedImage = styled.img`
     /*box-shadow: 0px 0px 40px ${colors.borderPrimary};*/
-    border: solid ${colors.borderPrimary} 2px;
+    border: solid ${colors.borderPrimary} 4px;
     width: 100%;
     border-radius: 5px;
 `
 const VideoTitle = styled.div`
+    
     word-break: break-word;
     overflow: hidden;
     text-overflow: ellipsis;

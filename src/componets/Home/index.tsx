@@ -9,6 +9,7 @@ import Showcase from "./Showcase";
 import Normal from "./Normal"
 import Guide from "./Guide"
 import Full from "./Full"
+import MorePages from "./More"
 import { LOGIN, PAGES, VIDEO, MYLIST, topMenuLength, colors, SEARCH, SETTINGS, HOME } from "../../constants"
 import { Loading } from "../Loading"
 import { SideMenu } from "../SideMenu"
@@ -32,27 +33,27 @@ const menuItem = keyframes`
         opacity: 1;        
     }    
 `
-const moreList = keyframes`
-  0% {
-    transform: translateZ(0) rotateY(0);
-    opacity: 1;
-  }
-  54% {
-    transform: translateZ(-160px) rotateY(87deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateZ(-800px) rotateY(90deg);
-    opacity: 0;
-  }
-`
+// const moreList = keyframes`
+//   0% {
+//     transform: translateZ(0) rotateY(0);
+//     opacity: 1;
+//   }
+//   54% {
+//     transform: translateZ(-160px) rotateY(87deg);
+//     opacity: 1;
+//   }
+//   100% {
+//     transform: translateZ(-800px) rotateY(90deg);
+//     opacity: 0;
+//   }
+// `
 const MainBox = styled.div`
   margin: 0 5rem;
   
 `
 const MenuBox = styled.div`
   display: flex;
-  height: 2.5rem;
+  height: 4rem;
    
 `
 const MenuElement = styled.div<MenueElementProps>`
@@ -106,7 +107,7 @@ const ImageDis = styled.div<ImageProps>`
   
 `
 const DisH2 = styled.h2`
-  font-size: 2.5em;
+  font-size: 2.5rem;
   margin-bottom: 20px;
   margin-top: 15px;
   /*width: 60%;*/
@@ -120,7 +121,13 @@ const TimeBox = styled.div`
 const DiscriptionBox = styled.div`
   white-space: normal;
   width: 55%;
-  font-size: 1.5em;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;    
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  /*font-size: 1.1em;*/
 `
 const LiveBox = styled.div`
   display: inline-block;
@@ -131,23 +138,26 @@ const LiveBox = styled.div`
   padding: 5px 10px 5px 10px;
   margin-right: 10px;
   margin-bottom: 10px;
-  text-shadow: 2px 2px #54462387;
+  /*text-shadow: 2px 2px #54462387;*/
+  float: left;
 `
 const ReplayBox = styled.div`
   display: inline-block;
   background-color: ${colors.atention};
-  color: ${colors.textPrimary};
+  color: ${colors.bgPrimary};
   font-weight: bold;
   border-radius: 5px;
   padding: 5px 10px 5px 10px;
   margin-right: 10px;
   margin-bottom: 10px;
-  text-shadow: 2px 2px #54462387;  
+  /*text-shadow: 2px 2px #54462387;  */
+  float: left;
 `
 
 const CategoryBox = styled.div`
   display: flex;  
   flex-direction: column;
+  margin-top: 3rem;
  
 `
 const DiscriptionText = styled.div`
@@ -156,13 +166,8 @@ const DiscriptionText = styled.div`
   display: inline;
   line-height: 1.4;
   letter-spacing: 1px;
-  font-size: 1.3em;
-  word-break: break-word;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;    
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
+  font-size: 2.5rem;
+  
   
   
 `
@@ -175,21 +180,21 @@ const Image = styled.img`
   /*transform: scale(1.4);*/
 `
 
-const MoreList = styled.div`
-  position: absolute;
-  top: 30%;
-  left: 30%;
-  background: red;
-  width: 30vw;
-  height: 40vh;
-  z-index: 5;
-  &.more-enter.more-enter-active {   
-    animation: ${moreList}  0.5s ease-in-out reverse;            
-  }     
-  &.more-leave.more-leave-active {   
-      animation: ${moreList}  0.6s ease-in-out ;     
-  }
-`
+// const MoreList = styled.div`
+//   position: absolute;
+//   top: 30%;
+//   left: 30%;
+//   background: red;
+//   width: 30vw;
+//   height: 40vh;
+//   z-index: 5;
+//   &.more-enter.more-enter-active {   
+//     animation: ${moreList}  0.5s ease-in-out reverse;            
+//   }     
+//   &.more-leave.more-leave-active {   
+//       animation: ${moreList}  0.6s ease-in-out ;     
+//   }
+// `
 export type ListProps = {
   sellIndex: number,
   categories: pageCategoriesType[],
@@ -275,7 +280,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
   const [sideMenuItem, setSideMenuItem] = useState<sideMenuType>(null)
   const [moreOpen, setMoreOpen] = useState<boolean>(false)
-  const [moreIndex, setMoreIndex] = useState<number>(0)
+  const [moreIndex, setMoreIndex] = useState<number>(topMenuLength)
 
 
   //sort content by categories
@@ -448,8 +453,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }
 
   const hendleBack = () => {
-    history.push(`${PAGES}/${HOME}`)
-    setLoading(true)
+    if (moreOpen) {
+      setMoreOpen(false)
+    } else {
+      history.push(`${PAGES}/${HOME}`)
+      setLoading(true)
+    }
+
   }
   const handleEnter = () => {
     if (expandSideMenue) {
@@ -462,6 +472,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       else if (sideMenuItem === "search") history.push(SEARCH)
       else if (sideMenuItem === "settings") history.push(SETTINGS)
       else if (sideMenuItem === "myList") history.push(MYLIST)
+    } else if (moreOpen) {
+      console.log("More Enter", pages[moreIndex])
+      history.push(`${PAGES}/${pages[moreIndex].id}`)
+      setMoreOpen(false)
+      setLoading(true)
+     
+
     } else {
       if (selectedRow === -1) {
         if (selectedCol <= topMenuLength - 1) {
@@ -493,6 +510,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       else if (sideMenuItem === "myList") setSideMenuItem("search")
       else if (sideMenuItem === "settings") setSideMenuItem("myList")
       else addListeners()
+    } else if (moreOpen) {
+      if (moreIndex > 0) setMoreIndex(moreIndex - 1)
+      else addListeners()
     } else {
       if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
         setSelectedCol(selectedCol - 1)
@@ -520,6 +540,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       else if (sideMenuItem === "search") setSideMenuItem("myList")
       else if (sideMenuItem === "myList") setSideMenuItem("settings")
       else addListeners()
+    } else if (moreOpen) {
+      if (moreIndex < pages.length - 1) setMoreIndex(moreIndex + 1)
+      else addListeners()
     } else {
       if (categories[selectedRow]?.type === "guide") { //inside guide category
         if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
@@ -539,7 +562,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   }
   const hendleArrowLeft = () => {
-    if (selectedCol > 0 && (categories[selectedRow]?.type !== "guide" || selectedRow === -1)) {
+    if (moreOpen) {
+      addListeners()
+    } else if (selectedCol > 0 && (categories[selectedRow]?.type !== "guide" || selectedRow === -1)) {
       setSelectedCol(selectedCol - 1)
     } else {
       console.log("left more 0 Open side menu")
@@ -555,6 +580,8 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     if (expandSideMenue) {
       setExpandSideMenue(false)
       setSideMenuItem(null)
+    } else if (moreOpen) {
+      addListeners()
     } else {
       //top menu selector topMenuLength
       if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + My List
@@ -587,7 +614,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             transitionName="more"
             transitionEnterTimeout={500}
             transitionLeaveTimeout={500}>
-            {moreOpen ? <MoreList>List here</MoreList> : ""}
+            {moreOpen ? <MorePages pages={pages} selected={moreIndex} /> : ""}
           </CSSTransitionGroup>
 
           <SideMenu expand={expandSideMenue} selected={sideMenuItem} />

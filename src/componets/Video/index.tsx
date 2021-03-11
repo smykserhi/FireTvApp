@@ -56,15 +56,15 @@ const MainBox = styled.div<MainProps>`
 `
 const MenuBox = styled.div`    
     position: absolute;
-    top: 40%;
+    top: 30%;
     width: 17vw;
     padding-left: 4rem;
 `
 const DisBox = styled.div`
-    background-color: ${hexToRGBA(colors.bgPrimary, 0.7)};
-    height: 30vh;
+    background-color: ${hexToRGBA(colors.bgPrimary, 0.9)};
+    height: 35vh;
     position: absolute;
-    top: 70%;
+    top: 65%;
     width: 100vw;  
     
 `
@@ -229,6 +229,7 @@ interface Timer {
 
 
 const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match }) => {
+    //redux
     const selectToken = (state: StorageType) => state.logIn.token
     const selectUserId = (state: StorageType) => state.logIn.userName
     const selectVideo = (state: StorageType) => state.data.videoDetails
@@ -236,6 +237,9 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const videoDisRedux = useSelector(selectVideo)
     const Token = useSelector(selectToken) //token 
     const userId = useSelector(selectUserId) // user Id 
+
+    //main variables
+    const videoId = match.params.id // video ID
     const [loading, setLoading] = useState<boolean>(true)
     const [videoDis, setVideoDis] = useState<VideoDosType>()
     const [menuItem, setMenuItem] = useState<MenuItemType>("play")
@@ -251,6 +255,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [magpieReportCall, setMagpieReportCall] = useState<boolean>(false)
     let timeOut5min: any
     let timeOut15sec: any
+    let menueInterval: any
 
     //buttons
     const [play_pause, setPlay_pause] = useState<boolean>(false)
@@ -258,8 +263,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [speedDown, setSpeedDown] = useState<boolean>(true)
     const [plus10s, setPlus10s] = useState<boolean>(true)
     const [minus10s, setMinus10s] = useState<boolean>(true)
-    const [up, setUp] = useState<boolean>(true)
-    const [down, setDown] = useState<boolean>(true)
+    const [showVideoMenue, setShowVideoMenue] = useState<boolean>(true)
 
     //animations 
     const [animateSec, setAnimateSec] = useState<number>(0)
@@ -270,7 +274,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [animateMinS, setAnimateMinS] = useState<number>(0)
     const [animateHourS, setAnimateHourS] = useState<number>(0)
     const [animateDaysS, setAnimateDaysS] = useState<number>(0)
-    const videoId = match.params.id
+    
 
 
 
@@ -440,6 +444,12 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         })
             .catch(error => console.log(error));
     }
+//show menue when video is playing and hide it in 10s
+    const setMenueHideInterwal = ()=>{
+        clearTimeout(menueInterval)
+        setShowVideoMenue(true)
+        menueInterval = setTimeout(()=>{setShowVideoMenue(false)},10000)
+    }
 
     const addListeners = () => {
         //document.addEventListener("keydown", handleKeyUp, true);
@@ -491,7 +501,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
         e.preventDefault();
     }
-    console.log("videoPlay",videoPlay)
+    //console.log("videoPlay",videoPlay)
     const hendleBack = () => {
         console.log("Video backHandler",videoPlay )
         if (videoPlay) {
@@ -504,13 +514,15 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
     }
     const hendleMediaFastForward = () => {
-        console.log("Hendled")
+        //console.log("Hendled")
         if (videoPlay) {
+            setMenueHideInterwal()
             setSpeedup(!speedUp)
         } else addListeners()
     }
     const hendleMediaRewind = () => {
         if (videoPlay) {
+            setMenueHideInterwal()
             setSpeedDown(!speedDown)
         } else addListeners()
     }
@@ -521,11 +533,13 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }
     const hendMediaPlayPause = () => {
         if (videoPlay) {
+            setMenueHideInterwal()
             setPlay_pause(!play_pause)
         } else addListeners()
     }
     const handleArrowRight = () => {
         if (videoPlay) {
+            setMenueHideInterwal()
             setPlus10s(!plus10s)
         } else {
             addListeners()
@@ -535,6 +549,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
 
     const hendleArrowLeft = () => {
         if (videoPlay) {
+            setMenueHideInterwal()
             setMinus10s(!minus10s)
         } else {
             addListeners()
@@ -542,7 +557,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }
     const handleArrowUp = () => {
         if (videoPlay) {
-            setUp(!up)
+            //console.log("up")
+            setMenueHideInterwal()
         } else {
             if (menuItem === "back") setMenuItem("producer")
             else if (menuItem === "producer") setMenuItem("location")
@@ -554,7 +570,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }
     const handleArrowDown = () => {
         if (videoPlay) {
-            setDown(!down)
+            //console.log("down")
+            setMenueHideInterwal()
         } else {
             if (menuItem === "play") setMenuItem("list")
             else if (menuItem === "list") setMenuItem("location")
@@ -564,7 +581,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
     }
     const handleEnter = () => {
-        if (videoPlay) { //playing video  
+        if (videoPlay) { //playing video 
+            setMenueHideInterwal() 
             setPlay_pause(!play_pause)
         } else { //in details mode
             if (menuItem === "play") {
@@ -588,6 +606,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                         removeListeners();
                         setVideoPlay(true)// start playing  
                         setSec15Loop(true)  //start update every 15s
+                        setMenueHideInterwal()// hide menue
 
                     })
                     .catch(error => console.log(error));
@@ -633,8 +652,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                                 speedDown={speedDown}
                                 plus10s={plus10s}
                                 minus10s={minus10s}
-                                up={up}
-                                down={down}
+                                showVideoMenue={showVideoMenue}
                                 userId={userId}
                                 videoId={videoDis ? videoDis.videoID : "0"}
                                 keyId={videoDis ? videoDis.key : "0"}

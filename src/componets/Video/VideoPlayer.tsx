@@ -11,7 +11,7 @@ import { CarSport } from "@styled-icons/ionicons-sharp/CarSport"
 import { Speedometer2 } from "@styled-icons/bootstrap/Speedometer2"
 import { Loading } from "../Loading"
 import api from "../../api";
-
+var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
 
 
 
@@ -39,6 +39,8 @@ const ButtonClickAnimation = keyframes`
         color:${colors.primary}
     }
 `
+
+
 const ButtonClickAnimation2 = keyframes`
     0% {
         transform: scale(1);
@@ -51,6 +53,16 @@ const ButtonClickAnimation2 = keyframes`
         filter: blur(5px);
        /* opacity: 0;*/
         color:${colors.primary}
+    }
+`
+const MenueAnimation = keyframes`
+    0% {
+        transform: translateY(150px);
+        
+    }
+    100% {
+        transform: translateY(0);
+        
     }
 `
 const StyledLoading = styled(Loading)`
@@ -91,7 +103,7 @@ const PauseCircleButton = styled(PauseCircle) <ButtonProps>`
     margin: 0 0.5rem;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
-const MenueContainer = styled.div<MenueProps>`
+const MenueContainer = styled.div`
     position: absolute;
     bottom: 0;
     left: 0;
@@ -102,7 +114,13 @@ const MenueContainer = styled.div<MenueProps>`
     align-items: center;
     height: 15vh;
     background-color:  ${hexToRGBA(colors.bgPrimary, 0.7)};
-    transform: translateY( ${props => !props.show ? 200 : 0}px);
+    &.category-enter.category-enter-active {   
+        animation: ${MenueAnimation}  0.4s ease-in-out ;            
+      }     
+      &.category-leave.category-leave-active {   
+          animation: ${MenueAnimation}  0.5s ease-in-out reverse;     
+      }
+    
 
 `
 const ProgressContainer = styled.div`
@@ -135,6 +153,7 @@ const TimeContainer = styled.div`
     width: 6rem;
     display: flex;
     flex-direction: row;
+    font-size: 2rem;
 `
 const CurrentTimeBox = styled.div`
     display: flex;
@@ -145,6 +164,7 @@ const SpeedBox = styled.div`
     position: absolute;
     left: 20%;
     top: 40%;
+    font-size: 2rem;
 `
 const ProgressBox = styled.div`   
     height: 100%
@@ -165,11 +185,13 @@ const ProgressElement = styled.div<ProgressProps>`
     
 `
 const StyledSpeedometer2 = styled(Speedometer2)`
-    width: 2rem;
-    color: ${colors.primary};
+    width: 2.5rem;
+    /*color: ${colors.primary};*/
     margin-left: 0.5rem;
     transform: translateY(-5px);
 `
+
+
 
 
 
@@ -181,8 +203,7 @@ type VideoProps = {
     speedDown: boolean,
     plus10s: boolean,
     minus10s: boolean,
-    up: boolean,
-    down: boolean,
+    showVideoMenue: boolean,
     userId: string,
     videoId: string,
     keyId: string,
@@ -203,7 +224,7 @@ type PrevSessionType = {
     version: string
 }
 
-const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedUp, speedDown, plus10s, minus10s, up, down, userId, videoId, keyId, magpieReportCall }) => {
+const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedUp, speedDown, plus10s, minus10s, showVideoMenue, userId, videoId, keyId, magpieReportCall }) => {
     const video = useRef<HTMLVideoElement>(null)
     //const progress = useRef<HTMLProgressElement>(null)
     const [playing, setPlaying] = useState<boolean>(true)
@@ -240,8 +261,8 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         return ref.current;
     }
 
-    const previousProps = usePrevious({ url, play_pause, speedUp, speedDown, plus10s, minus10s, closeVideo, up, down, userId, videoId, keyId, magpieReportCall })
-
+    const previousProps = usePrevious({ url, play_pause, speedUp, speedDown, plus10s, minus10s, closeVideo, showVideoMenue,  userId, videoId, keyId, magpieReportCall })
+    
     //Magpie Loop
     useEffect(() => {
         magpieApiReport()
@@ -258,8 +279,11 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
             if (previousProps?.speedDown !== speedDown) fastBack()
             if (previousProps?.plus10s !== plus10s) moveUp10Sec()
             if (previousProps?.minus10s !== minus10s) moveDown10Sec()
-            if (previousProps?.up !== up) setHideMenue(true)
-            if (previousProps?.down !== down) setHideMenue(false)
+            if (previousProps?.showVideoMenue !== showVideoMenue) {
+                console.log("showVideoMenue",showVideoMenue)
+                 //setHideMenue(!hideMenue)
+                }
+            //if (previousProps?.showVideoMenue !== showVideoMenue) setHideMenue(!hideMenue)
         } else {
             setLoading(false)
         }
@@ -446,7 +470,7 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     }
     const fastBack = () => {
         clearTimeout(magpieLoop)
-        magpieApiReport()       
+        magpieApiReport()
         if (video.current) {
             if (video.current) {
                 if (speed === 2) setSpeed(1)
@@ -476,46 +500,56 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
                 <source src={url} type="application/x-mpegURL" />
                 {/* <source src={url} type="video/mp4" /> */}
             </StyledVideo>
-            <MenueContainer show={hideMenue}>
-                <ProgressContainer>
-                    <ProgressBox>
-                        {/* <StyledFlagCheckered />
+            <CSSTransitionGroup
+                //component={AnimeBox}
+                transitionName="category"
+                transitionEnterTimeout={400}
+                transitionLeaveTimeout={400}>
+                {showVideoMenue
+                    ? <MenueContainer>
+                        <ProgressContainer>
+                            <ProgressBox>
+                                {/* <StyledFlagCheckered />
                         <StyledToriiGate/> */}
-                        <ProgressElement width={progress}> </ProgressElement><StyledCarSport width={progress} />
-                    </ProgressBox>
-                    {/* <Progress ref={progress} max="100" value="0" /> */}
-                </ProgressContainer>
-                <ButtonContainer>
-                    <SpeedBox>
-                        Speed:{Speed()}
-                    </SpeedBox>
-                    <CurrentTimeBox>
-                        <TimeContainer>
-                            {/* {Math.floor(currentTime / 60) > 0 ? `${Math.floor(currentTime / 60)}:` : ""}
+                                <ProgressElement width={progress}> </ProgressElement><StyledCarSport width={progress} />
+                            </ProgressBox>
+                            {/* <Progress ref={progress} max="100" value="0" /> */}
+                        </ProgressContainer>
+                        <ButtonContainer>
+                            <SpeedBox>
+                                Speed:{Speed()}
+                            </SpeedBox>
+                            <CurrentTimeBox>
+                                <TimeContainer>
+                                    {/* {Math.floor(currentTime / 60) > 0 ? `${Math.floor(currentTime / 60)}:` : ""}
                                 {currentTime - (Math.floor(currentTime / 60) * 60)} */}
-                            {currentTime?.hours > 0 ? `${currentTime?.hours}:` : ""}
-                            {currentTime?.minutes > 0 ? `${currentTime?.minutes}:` : ""}
-                            {currentTime?.seconds}s
+                                    {currentTime?.hours > 0 ? `${currentTime?.hours}:` : ""}
+                                    {currentTime?.minutes > 0 ? `${currentTime?.minutes}:` : ""}
+                                    {currentTime?.seconds}s
                             </TimeContainer>
-                    </CurrentTimeBox>
-                    <div>
-                        {backSpeed ? <BackwardButton clicked={true} onClick={fastBack} /> : <BackwardButton clicked={false} onClick={fastBack} />}
-                        {minus10Sec ? <Replay10Button clicked={true} onClick={moveDown10Sec} /> : <Replay10Button clicked={false} onClick={moveDown10Sec} />}
-                        {playing ? <PauseCircleButton clicked={play_pause} onClick={playPauseHandle} /> : <PlayCircleButton clicked={play_pause} onClick={playPauseHandle} />}
-                        {plus10Sec ? <Forward10Button clicked={true} onClick={moveUp10Sec} /> : <Forward10Button clicked={false} onClick={moveUp10Sec} />}
-                        {forwardSpeed ? <Forward2Button clicked={true} onClick={fastForward} /> : <Forward2Button clicked={false} onClick={fastForward} />}
-                    </div>
-                    <TimeContainer>
-                        {/* {Math.floor(Math.floor(videoDuration / 60) / 60) > 0 ? `${Math.floor(Math.floor(videoDuration / 60) / 60)}:` : ""}
+                            </CurrentTimeBox>
+                            <div>
+                                {backSpeed ? <BackwardButton clicked={true} onClick={fastBack} /> : <BackwardButton clicked={false} onClick={fastBack} />}
+                                {minus10Sec ? <Replay10Button clicked={true} onClick={moveDown10Sec} /> : <Replay10Button clicked={false} onClick={moveDown10Sec} />}
+                                {playing ? <PauseCircleButton clicked={play_pause} onClick={playPauseHandle} /> : <PlayCircleButton clicked={play_pause} onClick={playPauseHandle} />}
+                                {plus10Sec ? <Forward10Button clicked={true} onClick={moveUp10Sec} /> : <Forward10Button clicked={false} onClick={moveUp10Sec} />}
+                                {forwardSpeed ? <Forward2Button clicked={true} onClick={fastForward} /> : <Forward2Button clicked={false} onClick={fastForward} />}
+                            </div>
+                            <TimeContainer>
+                                {/* {Math.floor(Math.floor(videoDuration / 60) / 60) > 0 ? `${Math.floor(Math.floor(videoDuration / 60) / 60)}:` : ""}
                             {Math.floor(videoDuration / 60) > 0 ? `${Math.floor(videoDuration / 60) - Math.floor(Math.floor(videoDuration / 60) / 60) * 60}:` : ""}
                             {(videoDuration - (Math.floor(videoDuration / 60) * 60)).toFixed(0)} */}
-                        {videoDuration?.hours > 0 ? `${videoDuration?.hours}:` : ""}
-                        {videoDuration?.minutes > 0 ? `${videoDuration?.minutes}:` : ""}
-                        {videoDuration?.seconds}s
+                                {videoDuration?.hours > 0 ? `${videoDuration?.hours}:` : ""}
+                                {videoDuration?.minutes > 0 ? `${videoDuration?.minutes}:` : ""}
+                                {videoDuration?.seconds}s
 
                         </TimeContainer>
-                </ButtonContainer>
-            </MenueContainer>
+                        </ButtonContainer>
+                    </MenueContainer>
+                    : ""}
+            </CSSTransitionGroup>
+
+            
         </div>
     )
 }

@@ -29,7 +29,7 @@ const MenuBox = styled.div<MenuProps>`
     position: absolute;
     top: 0;
     left: 0;
-    width: ${props => props.expand ? 200 : 60}px;
+    width: ${props => props.expand ? 20 : 4}rem;
     height: 100vh;
     background-color: ${colors.bgSideMenu};
     z-index: 10;
@@ -49,8 +49,8 @@ const MenuElement = styled.div<MenuElementProps>`
     flex-direction: row;
     justify-content: space-around;
     overflow: hidden;
-    height: 4.5vh;
-    font-size: 2rem;
+    height: 4rem;
+    font-size: 3rem;
     width: 100%;
     margin: 10px 0;    
     animation: ${menuItem}  0.3s ease-in-out ;  
@@ -60,12 +60,19 @@ const MenuElement = styled.div<MenuElementProps>`
 
 const HomeIcon = styled(HomeAlt)`
     height: 100%;   
+    float: left;
 `
 const SearchIcon = styled(SearchEye)`
     height: 100%;    
 `
 const SettingsIcon = styled(Settings)`
     height: 100%;    
+`
+const MylistIcon = styled(ListCircle)`
+    height: 100%;
+`
+const ElementTitle = styled.div`
+    font-size: 3rem;
 `
 
 interface SideMenuProps {
@@ -78,19 +85,19 @@ export const SideMenu: React.FC<SideMenuProps> = ({ expand, selected }) => {
         <ItemContainer>           
             <MenuElement selected={selected === "home" ? true : false}>
                 <HomeIcon />
-                {expand ? <div>Home</div> : ""}
+                {expand ? <ElementTitle>Home</ElementTitle> : ""}
             </MenuElement>
             <MenuElement selected={selected === "search" ? true : false}>
                 <SearchIcon />
-                {expand ? <div>Search</div> : ""}
+                {expand ? <ElementTitle>Search</ElementTitle> : ""}
             </MenuElement>
             <MenuElement selected={selected === "myList" ? true : false}>
-                <ListCircle />
-                {expand ? <div>My List</div> : ""}
+                <MylistIcon />
+                {expand ? <ElementTitle>My List</ElementTitle> : ""}
             </MenuElement>
             <MenuElement selected={selected === "settings" ? true : false}>
                 <SettingsIcon />
-                {expand ? <div>Settings</div> : ""}
+                {expand ? <ElementTitle>Settings</ElementTitle> : ""}
             </MenuElement>
         </ItemContainer>
     </MenuBox>)

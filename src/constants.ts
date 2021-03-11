@@ -26,7 +26,7 @@ export const domain = 'https://speedsport.tv';
 
 
 //How many items would be displayed in top menu + My List
-export const topMenuLength = 5
+export const topMenuLength = 4
 
 //Search keyboard
 export const keyboard = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',"1","2","3","4","5","6","7","8",'9','0','_','<',]

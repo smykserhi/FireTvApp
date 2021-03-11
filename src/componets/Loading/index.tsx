@@ -17,8 +17,8 @@ const hourglass = keyframes`
   }
 `
 const Spin = styled.div`
-  top: 45%;
-  left:45%;
+  top: 40%;
+  left:40%;
   display: inline-block;
   position: relative;
   width: 150px;

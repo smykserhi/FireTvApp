@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Logo from "../../images/main-logo.png"
 import styled from 'styled-components';
 import api from "../../api"
@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveToken, saveUserName } from "../../store/actions"
 import { StorageType } from "../../store/types"
-import { PAGES, HOME } from "../../constants"
+import { PAGES, HOME, colors } from "../../constants"
 
 const LogInBox = styled.div`
     position: absolute;
@@ -14,8 +14,8 @@ const LogInBox = styled.div`
     left: 0;
     bottom: 0;
     right: 0;
-    width: 300px;
-    height: 300px;
+    width: 25vw;
+    height: 40vh;
     margin: auto;    
 `
 const LogoBox = styled.div`
@@ -47,15 +47,21 @@ const Input = styled.input`
     font-size: 1.5em;
     padding-left: 10px;
     padding-right: 10px;
+    &:focus{
+        border: solid 5px ${colors.primary}
+      }
 `
 const LogInButton = styled.button`
     height: 50px;
     font-size: 1.5em;
     background-color: darkred;
-    border: 1px solid black;
+    border: 1px solid ${colors.bgPrimary};
     /*width: 325px !important;*/
     color: white;    
     border-radius: 5px;
+    &:focus{
+        border: solid 5px ${colors.primary}
+      }
 
 `
 
@@ -64,10 +70,83 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [error, setError] = useState<string>("")
+    const emailRef = useRef<HTMLInputElement>(null)
+    const passwordlRef = useRef<HTMLInputElement>(null)
+    const submitRef = useRef<HTMLButtonElement>(null)
+    const [selected, setSelected] = useState<"email" | "password" | "submit">("email")
     const selectToken = (state: StorageType) => state.logIn.token
     const LogIn = useSelector(selectToken)
     const dispatch = useDispatch()
     //localStorage.setItem('token', 'Tom');
+
+
+
+    useEffect(() => {
+        addListeners()
+
+        return () => {
+            //component will unmount
+            removeListeners()
+        }
+    })
+    const addListeners = () => {
+        document.addEventListener("keyup", handleKeyUp, true);
+    }
+
+    const removeListeners = () => {
+        document.removeEventListener("keyup", handleKeyUp, true);
+    }
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+        removeListeners();
+        switch (e.key) {
+            case 'ArrowUp':
+                handleArrowUp()
+                break;
+            case 'ArrowDown':
+                handleArrowDown()
+                break;
+            case 'Enter':
+                handleOnSubmit()
+                break;
+            default:
+                addListeners()
+        }
+        e.preventDefault();
+    }
+
+    const handleArrowDown = () => {
+        switch (selected) {
+            case "email":
+                passwordlRef.current?.focus()
+                setSelected("password")
+                break;
+            case "password":
+                submitRef.current?.focus()
+                setSelected("submit")
+                break;
+            default:
+                addListeners()
+        }
+    }
+
+    const handleArrowUp = () => {
+        switch (selected) {
+            case "email":
+                addListeners()
+                break;
+            case "password":
+                emailRef.current?.focus()
+                setSelected("email")
+                break;
+            case "submit":
+                passwordlRef.current?.focus()
+                setSelected("password")
+                break
+            default:
+                addListeners()
+        }
+    }
     const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.name === "email") setEmail(e.target.value)
         else setPassword(e.target.value)
@@ -120,6 +199,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
             {error ? <ErrorBox className="error">{error}</ErrorBox> : ""}
             <FormControlsBox >
                 <Input
+                    ref={emailRef}
                     autoFocus
                     type="email"
                     name="email"
@@ -128,13 +208,14 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     onChange={onChageHandler}
                 />
                 <Input
+                    ref={passwordlRef}
                     type="password"
                     name="password"
                     placeholder="Password"
                     value={password}
                     onChange={onChageHandler}
                 />
-                <LogInButton type="submit" onClick={handleOnSubmit}>
+                <LogInButton ref={submitRef} type="submit" onClick={handleOnSubmit}>
                     Log In
                 </LogInButton>
             </FormControlsBox>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import styled, { keyframes } from 'styled-components';
 import { keyboard } from "../../constants"
-import { colors, VIDEO, LOGIN, PAGES,HOME} from "../../constants"
+import { colors, VIDEO, LOGIN, PAGES, HOME } from "../../constants"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
 import { videoDisListType } from "../Home"
@@ -13,6 +13,8 @@ import { ArrowBack } from "@styled-icons/ionicons-sharp/ArrowBack"
 import { useSelector, useDispatch } from 'react-redux';
 import { StorageType } from "../../store/types"
 import { addVideo } from "../../store/actions"
+import { SideMenu } from "../SideMenu"
+import {sideMenuType} from "../Home"
 
 interface CharBoxProps {
     selected: boolean
@@ -58,11 +60,13 @@ const MainBox = styled.div`
 const KeysBox = styled.div`
     width: 30vw;
     display: grid;
-    justify-content: center;
-    grid-template-columns: repeat(6, 50px);
-    grid-template-rows: repeat(8, 50px);
+    margin-right: 1rem;
+    justify-content: flex-end;
+    grid-template-columns: repeat(6, 70px);
+    grid-template-rows: repeat(8, 70px);
     gap: 6px 6px;
     margin-top: 4rem;
+
 `
 const ResultBox = styled.div`
     width: 70vw;
@@ -162,6 +166,9 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const [selectedKey, setSelectedKey] = useState<number>(0)
     const [selectedVideo, setSelectedVideo] = useState<number>(-1)
     const [searchResult, setSearchResult] = useState<videoDisListType[]>([])
+    const [loading, setLoading] = useState<boolean>(false)
+    const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
+    const [sideMenuItem, setSideMenuItem] = useState<sideMenuType>(null)
 
     useEffect(() => {
         if (!Token) history.push(LOGIN)
@@ -186,6 +193,23 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         }
     }, [search])
 
+    const getSearchContent = (search: string, offset = 0) => {
+        if (!loading) {
+            setLoading(true)
+            api.searchContent(search, 20, offset)
+                .then(res => {
+                    let tmpSearchResult = searchResult
+                    res.forEach((element: videoDisListType) => {
+                        tmpSearchResult.push(element)
+                    });
+                    setSearchResult(tmpSearchResult)
+                    console.log("res", tmpSearchResult)
+                    setLoading(false)
+                })
+                .catch(error => console.log(error));
+        }
+
+    }
     const addListeners = () => {
         document.addEventListener("keydown", handleKeyDown, true);
         document.addEventListener("keyup", handleKeyUp, true);
@@ -234,7 +258,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const hendleBack = () => {
         history.push(`${PAGES}/${HOME}`)
         //setLoading(true)
-      }
+    }
     const handleEnter = () => {
         if (selectedVideo < 0) { // on keyboard
             console.log("Hit Enter")
@@ -285,6 +309,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             }
         } else { // on vodeo search
             console.log("Down on search field ")
+            if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
             if (selectedVideo < searchResult.length - 4) {
                 setSelectedVideo(selectedVideo + 4)
             } else addListeners()
@@ -321,6 +346,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             }
         } else { // on vodeo search
             console.log("Right on search field ")
+            if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
             if (selectedVideo < searchResult.length - 1) {
                 setSelectedVideo(selectedVideo + 1)
             } else addListeners()
@@ -331,6 +357,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
 
     return (
         <MainBox>
+            <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
             <KeysBox>
                 {keyboard.map((el, index) => {
                     if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> <StyledSpaceBar /></SpaceBox>)
