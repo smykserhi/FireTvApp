@@ -58,14 +58,15 @@ const MenuBox = styled.div`
     position: absolute;
     top: 30%;
     width: 17vw;
-    padding-left: 4rem;
+    padding-left: 10rem;
 `
 const DisBox = styled.div`
     background-color: ${hexToRGBA(colors.bgPrimary, 0.9)};
     height: 35vh;
     position: absolute;
     top: 65%;
-    width: 100vw;  
+    /*width: 100vw;  */
+    padding: 0 4vh;
     
 `
 const TitleBox = styled.div`
@@ -182,9 +183,9 @@ const MessageBox = styled(LiveBox)`
 const SupportMessageBox = styled(MessageBox)`
     top: 15%;
 `
-const WeatingMessageBox = styled(LiveBox)`
-    top:40%   
-`
+// const WeatingMessageBox = styled(LiveBox)`
+//     top:40%   
+// `
 const Span = styled.span`
     overflow: hidden;
     white-space: nowrap;

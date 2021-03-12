@@ -49,11 +49,12 @@ const menuItem = keyframes`
 // `
 const MainBox = styled.div`
   margin: 0 0 0 5rem;
+  padding: 4vh 0vw 0vh 6vw;
   
 `
 const MenuBox = styled.div`
   display: flex;
-  height: 4rem;
+  height: 5rem;
    
 `
 const MenuElement = styled.div<MenueElementProps>`
@@ -91,7 +92,7 @@ const ImageDis = styled.div<ImageProps>`
   align-self: center;   
   width: 35vw;
   position: absolute;
-  top: -15%;
+  top: -20%;
   right: 10%;
   z-index: -1;  
   /*box-shadow: 0px 0px 60px ${colors.borderPrimary};*/
@@ -172,13 +173,13 @@ const DiscriptionText = styled.div`
   
 `
 
-const Image = styled.img`
-  width: 100%;
-  border-radius: 10px;
-  mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 25%) ;
+// const Image = styled.img`
+//   width: 100%;
+//   border-radius: 10px;
+//   mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 25%) ;
 
-  /*transform: scale(1.4);*/
-`
+//   /*transform: scale(1.4);*/
+// `
 
 // const MoreList = styled.div`
 //   position: absolute;

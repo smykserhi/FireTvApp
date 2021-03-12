@@ -16,7 +16,7 @@ const MainContainer = styled.div`
     
 `
 const MainBox = styled.div`
-    margin: 40px 0 0 6rem ; 
+    margin: 3rem 15rem;
     width: 75%; 
    
      

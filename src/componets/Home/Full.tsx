@@ -17,6 +17,7 @@ const selectedCategory = keyframes`
 
 const CategorRow = styled.div`
     display: grid;
+    padding-right: 4vw;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     justify-items: center;
     align-items: start;
@@ -26,8 +27,8 @@ const CategorRow = styled.div`
 `
 const VideoElementNormal = styled.div`  
     margin: 10px;
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 14vw;
+    /*max-width: 300px;*/
 `
 
 const SelectedVideoElementNormal = styled(VideoElementNormal)`    

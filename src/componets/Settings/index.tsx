@@ -12,6 +12,7 @@ import api from "../../api"
 const MainBox = styled.div`
     display: flex;
     flex-direction: row;
+    margin: 0rem 4rem;
 
 `
 const LeftSide = styled.div`

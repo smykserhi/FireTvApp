@@ -28,7 +28,7 @@ const menuItem = keyframes`
 const MenuBox = styled.div<MenuProps>`
     position: absolute;
     top: 0;
-    left: 5%;
+    left: 3.5%;
     width: ${props => props.expand ? 20 : 4}rem;
     height: 100vh;
     background-color: ${colors.bgSideMenu};
@@ -45,14 +45,14 @@ const ItemContainer = styled.div`
 width: 100%;    
 `
 const MenuElement = styled.div<MenuElementProps>`
-    display: flex;
+    display: flex;   
     flex-direction: row;
     justify-content: space-around;
     overflow: hidden;
-    height: 3rem;
+    height: 4rem;
     font-size: 2.5rem;
     width: 100%;
-    margin: 10px 0;    
+    margin: 3rem 0;    
     animation: ${menuItem}  0.3s ease-in-out ;  
     color: ${props => props.selected ? colors.primary : ""};
     opacity: 1;
