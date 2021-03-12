@@ -120,7 +120,7 @@ const StyledArrowBack = styled(ArrowBack)`
 const LiveBox = styled.div`
     position: absolute;
     left: 40%;
-    top: 40%;
+    top: 30%;
     background-color: ${hexToRGBA(colors.bgPrimary, 0.7)};
     /*width: 20vw;*/
     /*height: 4rem;*/
@@ -177,10 +177,10 @@ const NumberText = styled.div`
     margin-bottom: 2rem;
 `
 const MessageBox = styled(LiveBox)`
-    top: 15%;   
+    top: 5%;   
 `
 const SupportMessageBox = styled(MessageBox)`
-    top: 25%;
+    top: 15%;
 `
 const WeatingMessageBox = styled(LiveBox)`
     top:40%   

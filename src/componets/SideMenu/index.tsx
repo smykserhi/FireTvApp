@@ -28,7 +28,7 @@ const menuItem = keyframes`
 const MenuBox = styled.div<MenuProps>`
     position: absolute;
     top: 0;
-    left: 0;
+    left: 5%;
     width: ${props => props.expand ? 20 : 4}rem;
     height: 100vh;
     background-color: ${colors.bgSideMenu};
@@ -49,8 +49,8 @@ const MenuElement = styled.div<MenuElementProps>`
     flex-direction: row;
     justify-content: space-around;
     overflow: hidden;
-    height: 4rem;
-    font-size: 3rem;
+    height: 3rem;
+    font-size: 2.5rem;
     width: 100%;
     margin: 10px 0;    
     animation: ${menuItem}  0.3s ease-in-out ;  
@@ -72,7 +72,7 @@ const MylistIcon = styled(ListCircle)`
     height: 100%;
 `
 const ElementTitle = styled.div`
-    font-size: 3rem;
+    /*font-size: 3rem;*/
 `
 
 interface SideMenuProps {

@@ -39,7 +39,7 @@ justify-content: space-between;
 margin-top: 2rem;
 `
 const Button = styled.div`
-    width: 8rem;
+    width: 10rem;
     background-color: ${colors.textPrimary};
     color: black;
     height: 2.5rem;

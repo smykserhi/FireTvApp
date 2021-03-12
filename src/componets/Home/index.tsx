@@ -48,7 +48,7 @@ const menuItem = keyframes`
 //   }
 // `
 const MainBox = styled.div`
-  margin: 0 5rem;
+  margin: 0 0 0 5rem;
   
 `
 const MenuBox = styled.div`
@@ -91,8 +91,8 @@ const ImageDis = styled.div<ImageProps>`
   align-self: center;   
   width: 35vw;
   position: absolute;
-  top: -60px;
-  right: -20px;
+  top: -15%;
+  right: 10%;
   z-index: -1;  
   /*box-shadow: 0px 0px 60px ${colors.borderPrimary};*/
   border-radius: 10px;  
@@ -102,7 +102,7 @@ const ImageDis = styled.div<ImageProps>`
   /*background: right / contain no-repeat url(${props => props.url}}) ;*/
   background: linear-gradient(to left, rgba(255,255,255,0) 70%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%, linear-gradient(to bottom, rgba(255,255,255,0) 60%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%,url(${props => props.url}})  right / contain no-repeat;
   height: 100%;
-  transform: scale(1.3);
+  transform: scale(1.5);
   margin-top: 3rem;
   
 `
@@ -345,10 +345,10 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
   }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
 
   //console.log("match", pageId)
-  console.log("pages", pages)
-  console.log("categories", categories)
-  console.log("categoriesContent", categoriesContent)
-  console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  // console.log("pages", pages)
+  // console.log("categories", categories)
+  // console.log("categoriesContent", categoriesContent)
+  // console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)

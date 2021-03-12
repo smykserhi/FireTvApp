@@ -20,7 +20,7 @@ const CategorRow = styled.div`
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     justify-items: center;
     align-items: start;
-    gap: 10px;
+    gap: 5px;
     font-size: 25px;
     z-index: 1; 
 `
@@ -44,7 +44,7 @@ const SelectedImage = styled.img`
   /*box-shadow: 0px 0px 40px ${colors.borderPrimary};*/
   border: solid ${colors.borderPrimary} 2px;
   width: 100%;
-  border-radius: 5px;
+  border-radius: 5px; 
   transform: scale(1.3) translateY(-20px);
   animation: ${selectedCategory}  0.3s ease-in-out  reverse; 
 `

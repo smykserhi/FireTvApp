@@ -12,10 +12,13 @@ import styled from 'styled-components';
 import { LOGIN, PAGES, VIDEO, SEARCH, SETTINGS, HOME } from "../../constants"
 
 const MainContainer = styled.div`
+  
     
 `
 const MainBox = styled.div`
-    margin: 40px 100px;  
+    margin: 40px 0 0 6rem ; 
+    width: 75%; 
+   
      
 `
 
@@ -130,6 +133,10 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
                 setExpandSideMenue(false)
             } else if (sideMenuItem === "search") history.push(`${SEARCH}`)
             else if (sideMenuItem === "settings") history.push(`${SETTINGS}`)
+            else {
+                setSideMenuItem(null)
+                setExpandSideMenue(false)
+            }
         } else {
             dispatch(addVideo(myListContent[0].list[selectedCol])) // add to redux data
             history.push(`${VIDEO}/${myListContent[0].list[selectedCol].id}`)
@@ -164,9 +171,19 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
     const handleArrowUp = () => {
         //console.log("handleArrowUp")
         if (expandSideMenue) {
-            if (sideMenuItem === "settings") setSideMenuItem("search")
-            else if (sideMenuItem === "search") setSideMenuItem("home")
-            else addListeners()
+            switch (sideMenuItem) {
+                case "settings":
+                    setSideMenuItem("myList")
+                    break
+                case "myList":
+                    setSideMenuItem("search")
+                    break
+                case "search":
+                    setSideMenuItem("home")
+                    break
+                default:
+                    addListeners()
+            }
         } else {
             if (selectedCol > 4) { //at list on second row
                 setSelectedCol(selectedCol - 5)
@@ -177,9 +194,19 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
     const handleArrowDown = () => {
         console.log("handleArrowDown")
         if (expandSideMenue) {
-            if (sideMenuItem === "home") setSideMenuItem("search")
-            else if (sideMenuItem === "search") setSideMenuItem("settings")
-            else addListeners()
+            switch (sideMenuItem) {
+                case "home":
+                    setSideMenuItem("search")
+                    break
+                case "search":
+                    setSideMenuItem("myList")
+                    break
+                case "myList":
+                    setSideMenuItem("settings")
+                    break
+                default:
+                    addListeners()
+            }
         } else {
             if (selectedCol > myListContent[0].list.length - 20) uploadNewItems()
             if (selectedCol < myListContent[0].list.length - 5) {

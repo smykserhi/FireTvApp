@@ -1,4 +1,4 @@
-import {LogInActionsType, AddDataActionsType, UserActionsType} from "./types"
+import {LogInActionsType, AddDataActionsType, UserActionsType,AddSearchType, ClerSearchType, ClearDataType} from "./types"
 import {videoDisListType} from "../componets/Home"
 
 //Login redicer
@@ -21,6 +21,14 @@ export const addVideo = (videoDetails:videoDisListType):AddDataActionsType=>({
     payload: videoDetails
 })
 
-export const clearData = ()=>({
-    type: "CLEAR"
+export const clearData = ():ClearDataType=>({
+    type: "CLEAR_VIDEO_DIS"
+})
+
+export const addSearch = (search: string):AddSearchType=>({
+    type: "ADD_SEARCH",
+    payload: search
+})
+export const clearSearch = ():ClerSearchType=>({
+    type:"CLEAR_SEARCH"
 })

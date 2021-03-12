@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import styled, { keyframes } from 'styled-components';
 import { keyboard } from "../../constants"
-import { colors, VIDEO, LOGIN, PAGES, HOME } from "../../constants"
+import { colors, VIDEO, LOGIN, PAGES, HOME, MYLIST, SETTINGS } from "../../constants"
 import { RouteComponentProps, withRouter } from 'react-router';
 import api from "../../api"
 import { videoDisListType } from "../Home"
@@ -12,9 +12,9 @@ import { SpaceBar } from "@styled-icons/material/SpaceBar"
 import { ArrowBack } from "@styled-icons/ionicons-sharp/ArrowBack"
 import { useSelector, useDispatch } from 'react-redux';
 import { StorageType } from "../../store/types"
-import { addVideo } from "../../store/actions"
+import { addVideo, addSearch, clearSearch } from "../../store/actions"
 import { SideMenu } from "../SideMenu"
-import {sideMenuType} from "../Home"
+import { sideMenuType } from "../Home"
 
 interface CharBoxProps {
     selected: boolean
@@ -35,16 +35,16 @@ const CarMoveAnime = keyframes`
     transform: translate(0);
   }
   20% {
-    transform: translate(-2px, 2px);
+    transform: translate(-5px, 5px);
   }
   40% {
-    transform: translate(-2px, -2px);
+    transform: translate(-5px, -5px);
   }
   60% {
-    transform: translate(2px, 2px);
+    transform: translate(5px, 5px);
   }
   80% {
-    transform: translate(2px, -2px);
+    transform: translate(5px, -5px);
   }
   100% {
     transform: translate(0);
@@ -94,12 +94,14 @@ const BackBox = styled(CharBox)`
 `
 
 const SearchResult = styled.div`
-    min-height: 35px;
+    min-height: 3rem;
+    font-size: 2rem;
     border: solid 1px ${colors.textPrimary};
     border-radius: 5px;
     display: flex;
     align-items: center;
     padding: 0 15px;
+    width: 80%;
 
 `
 const ContentBox = styled.div`
@@ -134,13 +136,14 @@ const SearchQwery = styled.div`
     margin-left: 5px;
 `
 const StyledCarSport = styled(CarSport)`
-    width: 50px;
+    width: 5rem;
     animation: ${CarMoveAnime} 2s infinite;
 `
 const NoResult = styled.div`
     margin-top: 6rem;
     grid-column: 1/5;
     text-align: center;
+    font-size: 3rem;
 `
 const StyledLogo = styled.img`
     width: 15rem;
@@ -160,20 +163,22 @@ const StyledArrowBack = styled(ArrowBack)`
 
 const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const selectToken = (state: StorageType) => state.logIn.token
+    const selectSearch = (state:StorageType)=>state.data.search
     const Token = useSelector(selectToken) //token 
+    const reduxSearch = useSelector(selectSearch)
     const dispatch = useDispatch()
-    const [search, setSearch] = useState<string>("")
+    const [search, setSearch] = useState<string>(reduxSearch)
     const [selectedKey, setSelectedKey] = useState<number>(0)
     const [selectedVideo, setSelectedVideo] = useState<number>(-1)
     const [searchResult, setSearchResult] = useState<videoDisListType[]>([])
-    const [loading, setLoading] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false) //loading new results
     const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
     const [sideMenuItem, setSideMenuItem] = useState<sideMenuType>(null)
 
     useEffect(() => {
         if (!Token) history.push(LOGIN)
         else {
-            addListeners()
+            addListeners()            
             return () => {
                 //component will unmount
                 removeListeners()
@@ -260,67 +265,129 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         //setLoading(true)
     }
     const handleEnter = () => {
-        if (selectedVideo < 0) { // on keyboard
-            console.log("Hit Enter")
-            if (selectedKey >= 0 && selectedKey < keyboard.length) {
-                if (keyboard[selectedKey] === "<" && search.length > 0) setSearch(search.slice(0, -1))
-                else if (keyboard[selectedKey] === "<" && search.length === 0) addListeners()
-                else if (keyboard[selectedKey] === "_") setSearch(search + " ")
-                else setSearch(search + keyboard[selectedKey])
-            } else if (selectedKey === keyboard.length) history.goBack()
-            else addListeners()
-        } else { // on vodeo search
-            dispatch(addVideo(searchResult[selectedVideo])) // add video to redux
-            history.push(`${VIDEO}/${searchResult[selectedVideo].id}`)
+        if (expandSideMenue) {
+            switch (sideMenuItem) {
+                case "home":
+                    history.push(`${PAGES}/${HOME}`)
+                    break
+                case "myList":
+                    history.push(MYLIST)
+                    break
+                case "settings":
+                    history.push(SETTINGS)
+                    break
+                default:
+                    closeSideMenue()
+            }
+        } else {
+            if (selectedVideo < 0) { // on keyboard
+                console.log("Hit Enter")
+                if (selectedKey >= 0 && selectedKey < keyboard.length) {
+                    if (keyboard[selectedKey] === "<" && search.length > 0) setSearch(search.slice(0, -1))
+                    else if (keyboard[selectedKey] === "<" && search.length === 0) addListeners()
+                    else if (keyboard[selectedKey] === "_") setSearch(search + " ")
+                    else setSearch(search + keyboard[selectedKey])
+                } else if (selectedKey === keyboard.length){ 
+                    dispatch(clearSearch()) // clear search from Redux
+                    setSearch("")
+                    history.goBack()
+                }
+                else addListeners()
+            } else { // on vodeo search
+                dispatch(addVideo(searchResult[selectedVideo])) // add video to redux
+                dispatch(addSearch(search))
+                history.push(`${VIDEO}/${searchResult[selectedVideo].id}`)
+            }
         }
+
 
     }
 
     const handleArrowUp = () => {
-        if (selectedVideo < 0) { // on keyboard
-            if (selectedKey > 5) { //if not first line
-                setSelectedKey(selectedKey - 6)
-                if (selectedKey === keyboard.length) setSelectedKey(keyboard.length - 2) // if "Go Beck"
-                else if (keyboard[selectedKey] === "<") setSelectedKey(keyboard.length - 3)
-                else if (keyboard[selectedKey] === "_") setSelectedKey(keyboard.length - 8)
-            } else {
-                addListeners()
+        if (expandSideMenue) {
+            switch (sideMenuItem) {
+                case "settings":
+                    setSideMenuItem("myList")
+                    break
+                case "myList":
+                    setSideMenuItem("search")
+                    break
+                case "search":
+                    setSideMenuItem("home")
+                    break
+                default:
+                    addListeners()
             }
-        } else { // on vodeo search
-            if (selectedVideo > 3) {
-                setSelectedVideo(selectedVideo - 4)
-            } else addListeners()
-            console.log("Up on search field")
+        } else {
+            if (selectedVideo < 0) { // on keyboard
+                if (selectedKey > 5) { //if not first line
+                    setSelectedKey(selectedKey - 6)
+                    if (selectedKey === keyboard.length) setSelectedKey(keyboard.length - 2) // if "Go Beck"
+                    else if (keyboard[selectedKey] === "<") setSelectedKey(keyboard.length - 3)
+                    else if (keyboard[selectedKey] === "_") setSelectedKey(keyboard.length - 8)
+                } else {
+                    addListeners()
+                }
+            } else { // on vodeo search
+                if (selectedVideo > 3) {
+                    setSelectedVideo(selectedVideo - 4)
+                } else addListeners()
+                console.log("Up on search field")
 
+            }
         }
+
 
     }
     const handleArrowDown = () => {
-        if (selectedVideo < 0) { // on keyboard
-            if (selectedKey < keyboard.length) {
-                if (selectedKey > keyboard.length - 9 && selectedKey < keyboard.length - 5) setSelectedKey(keyboard.length - 2)
-                else if (selectedKey >= keyboard.length - 5 && selectedKey < keyboard.length - 2) setSelectedKey(keyboard.length - 1)
-                else if (selectedKey >= keyboard.length - 2 && selectedKey < keyboard.length) setSelectedKey(keyboard.length)
-                else setSelectedKey(selectedKey + 6)
-            } else {
-                if (selectedKey !== keyboard.length) setSelectedKey(keyboard.length)
-                else addListeners()
-                console.log("out of board")
+        if (expandSideMenue) {
+            switch (sideMenuItem) {
+                case "home":
+                    setSideMenuItem("search")
+                    break
+                case "search":
+                    setSideMenuItem("myList")
+                    break
+                case "myList":
+                    setSideMenuItem("settings")
+                    break
+                default:
+                    addListeners()
             }
-        } else { // on vodeo search
-            console.log("Down on search field ")
-            if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
-            if (selectedVideo < searchResult.length - 4) {
-                setSelectedVideo(selectedVideo + 4)
-            } else addListeners()
+        } else {
+            if (selectedVideo < 0) { // on keyboard
+                if (selectedKey < keyboard.length) {
+                    if (selectedKey > keyboard.length - 9 && selectedKey < keyboard.length - 5) setSelectedKey(keyboard.length - 2)
+                    else if (selectedKey >= keyboard.length - 5 && selectedKey < keyboard.length - 2) setSelectedKey(keyboard.length - 1)
+                    else if (selectedKey >= keyboard.length - 2 && selectedKey < keyboard.length) setSelectedKey(keyboard.length)
+                    else setSelectedKey(selectedKey + 6)
+                } else {
+                    if (selectedKey !== keyboard.length) setSelectedKey(keyboard.length)
+                    else addListeners()
+                    console.log("out of board")
+                }
+            } else { // on vodeo search
+                console.log("Down on search field ")
+                if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
+                if (selectedVideo < searchResult.length - 4) {
+                    setSelectedVideo(selectedVideo + 4)
+                } else addListeners()
 
-            //addListeners()
+                //addListeners()
+            }
         }
+
     }
+    //console.log("selectedVideo", selectedVideo)
     const hendleArrowLeft = () => {
         if (selectedVideo < 0) {// on keyboard
-            if (selectedKey > 0) setSelectedKey(selectedKey - 1)
-            else addListeners()
+            // if (selectedKey > 0) {
+            if (selectedKey % 6 === 0 || selectedKey === 0 || selectedKey === keyboard.length) { //open side menue
+                setExpandSideMenue(true)
+                setSelectedKey(-1)
+                setSideMenuItem("home")
+            } else setSelectedKey(selectedKey - 1)
+            // } else addListeners()
         } else { // on vodeo search
             if (selectedVideo === 0 || (selectedVideo % 4) === 0) { //return to keyboard
                 setSelectedVideo(-1)
@@ -331,29 +398,38 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
 
     }
     const handleArrowRight = () => {
-        if (selectedVideo < 0) {// on keyboard
-            if (selectedVideo < 0) { //if on keyboard
-                if (((selectedKey + 1) % 6 === 0 || selectedKey === keyboard.length - 1) && searchResult.length > 0) {
-                    console.log("out")
-                    setSelectedVideo(0) //move to search result 
-                    setSelectedKey(-1)
-                } else if (selectedKey < keyboard.length) setSelectedKey(selectedKey + 1)
-                else {
+        if (expandSideMenue) {
+            closeSideMenue()
+        } else {
+            if (selectedVideo < 0) {// on keyboard
+                if (selectedVideo < 0) { //if on keyboard
+                    if (((selectedKey + 1) % 6 === 0 || selectedKey === keyboard.length - 1) && searchResult.length > 0) {
+                        console.log("out")
+                        setSelectedVideo(0) //move to search result 
+                        setSelectedKey(-1)
+                    } else if (selectedKey < keyboard.length) setSelectedKey(selectedKey + 1)
+                    else {
+                        addListeners()
+                    }
+                } else {
                     addListeners()
                 }
-            } else {
-                addListeners()
+            } else { // on vodeo search
+                console.log("Right on search field ")
+                if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
+                if (selectedVideo < searchResult.length - 1) {
+                    setSelectedVideo(selectedVideo + 1)
+                } else addListeners()
             }
-        } else { // on vodeo search
-            console.log("Right on search field ")
-            if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
-            if (selectedVideo < searchResult.length - 1) {
-                setSelectedVideo(selectedVideo + 1)
-            } else addListeners()
         }
+
     }
-
-
+    //close side menue
+    const closeSideMenue = () => {
+        setExpandSideMenue(false)
+        setSelectedKey(0)
+        setSideMenuItem(null)
+    }
 
     return (
         <MainBox>
