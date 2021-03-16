@@ -11,15 +11,9 @@ import { SideMenu } from "../SideMenu"
 import styled from 'styled-components';
 import { LOGIN, PAGES, VIDEO, SEARCH, SETTINGS, HOME } from "../../constants"
 
-const MainContainer = styled.div`
-  
-    
-`
 const MainBox = styled.div`
     margin: 3rem 15rem;
     width: 75%; 
-   
-     
 `
 
 const ListTitle = styled.h1`
@@ -53,7 +47,7 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
 
     }, [loading, Token, history])
 
-
+    
     useEffect(() => {
         addListeners()
         return () => {
@@ -61,15 +55,14 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
             removeListeners()
         }
     })
-    const uploadNewItems = () => {
-        //console.log("myListContent[0].list.length",myListContent[0].list.length)
+
+    const uploadNewItems = () => {       
         api.getMyList(Token, myListContent[0].list.length)
             .then(res => {
                 let tmp = myListContent
                 res.forEach((element: videoDisListType) => {
                     tmp[0].list.push(element)
-                });
-                //console.log("new item uploded", tmp)
+                });                
                 setMyListContent(tmp)
             })
             .catch(error => console.log(error));
@@ -152,13 +145,9 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
                 setSelectedCol(selectedCol + 1)
             } else addListeners()
         }
-
-        //console.log("handleArrowRight")
-
     }
-    const hendleArrowLeft = () => {
-        //console.log("hendleArrowLeft")
-        if (selectedCol % 5 !== 0) {
+    const hendleArrowLeft = () => {        
+        if (selectedCol % 5 !== 0) { //not first element in a line
             setSelectedCol(selectedCol - 1)
         } else {
             if (!expandSideMenue) {
@@ -219,14 +208,13 @@ const MyList: React.FC<RouteComponentProps> = ({ history }) => {
         <>
             {loading ? <Loading />
                 :
-                <MainContainer>
+                <>
                     <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
                     <MainBox>
                         <ListTitle>My list:</ListTitle>
                         <Full categories={[]} sellIndex={0} categoriesContent={myListContent} selectedCol={selectedCol} selectedRow={0} />
                     </MainBox>
-
-                </MainContainer>
+                </>
             }
 
 

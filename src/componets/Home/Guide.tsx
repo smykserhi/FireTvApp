@@ -1,4 +1,3 @@
-import React from "react"
 import styled, { keyframes } from 'styled-components';
 import { videoDisListType, ListProps } from "./index"
 import moment from 'moment';
@@ -37,11 +36,11 @@ const selectedCategory = keyframes`
         transform: scale(0.4) ; 
         margin-top: -170px;
         opacity: 0;
-    }
-    
+    }    
 `
 const MainBox = styled.div`
     z-index:1;
+    width: 90%;
 `
 const CategorRow = styled.div`
     display: flex;
@@ -65,16 +64,13 @@ const SelectedCategorRow = styled(CategorRow)`
     }
 `
 
-
 const DateBox = styled.div`    
     flex-grow: 1;
     font-size: 2em;
     background-color: ${colors.primary};
     /*color: ${colors.textSecondary};*/
     flex-basis: 15%;
-    min-width: 150px;
-    /*padding-left: 10px;*/
-    /*padding-right: 10px;*/
+    min-width: 150px;    
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -96,8 +92,7 @@ const ImageBox = styled.div`
     flex-grow: 1;
     flex-basis: 15%;
     min-width: 150px;    
-    height : 100%;
-    
+    height : 100%;    
 `
 const DiscriptionBox = styled.div`    
     flex-grow: 4;
@@ -109,8 +104,7 @@ const DiscriptionBox = styled.div`
 const Image = styled.img`    
     width: 100%;
     height: 100%;
-    border-radius: 5px;
-    
+    border-radius: 5px;    
 `
 const DisTitleBox = styled.div`
     display: flex;
@@ -190,9 +184,7 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
             })}
 
         </CSSTransitionGroup>
-
     )
 }
-
 
 export default Guide

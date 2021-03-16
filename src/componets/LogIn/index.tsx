@@ -31,14 +31,12 @@ const ErrorBox = styled.div`
     font-size: 1.3em;
     padding-bottom: 20px;
     text-align: center;
-    transition: all 1s;
-    
+    transition: all 1s;    
 `
 const FormControlsBox = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
-
 `
 const Input = styled.input`    
     height: 50px;
@@ -55,14 +53,12 @@ const LogInButton = styled.button`
     height: 50px;
     font-size: 1.5em;
     background-color: darkred;
-    border: 1px solid ${colors.bgPrimary};
-    /*width: 325px !important;*/
+    border: 1px solid ${colors.bgPrimary};    
     color: white;    
     border-radius: 5px;
     &:focus{
         border: solid 5px ${colors.primary}
       }
-
 `
 
 
@@ -77,18 +73,16 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     const selectToken = (state: StorageType) => state.logIn.token
     const LogIn = useSelector(selectToken)
     const dispatch = useDispatch()
-    //localStorage.setItem('token', 'Tom');
 
-
-
+    //add and remove listners every re rendering 
     useEffect(() => {
         addListeners()
-
         return () => {
             //component will unmount
             removeListeners()
         }
     })
+
     const addListeners = () => {
         document.addEventListener("keyup", handleKeyUp, true);
     }
@@ -151,6 +145,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
         if (e.target.name === "email") setEmail(e.target.value)
         else setPassword(e.target.value)
     }
+
     const clearStates = (): void => {
         setEmail("")
         setPassword("")
@@ -162,12 +157,10 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
         }
         else {
             api.login(email, password)
-                .then((res) => {
-                    //console.log("LogIn Succses", res.data.token)
-                    //api.saveToken(res.data.token)
-                    clearStates()
-                    dispatch(saveToken(res.data.token))
-                    dispatch(saveUserName(email))
+                .then((res) => {    // Login success   
+                    dispatch(saveToken(res.data.token)) // save token  to redux
+                    dispatch(saveUserName(email)) // save user name to redux
+                    //clearStates() // clear fields
                     localStorage.setItem('token', res.data.token);
                     localStorage.setItem('user', email);
                     history.push(`${PAGES}/${HOME}`)
@@ -180,15 +173,15 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
     }
 
     useEffect(() => {
-        if (LogIn) history.push(`${PAGES}/${HOME}`) //if user already LogIn        
+        if (LogIn) history.push(`${PAGES}/${HOME}`) //Token exist in redux       
         else if (localStorage.getItem('token') && localStorage.getItem('user')) {
             const token = localStorage.getItem('token')
             const user = localStorage.getItem('user')
-            if (user) dispatch(saveUserName(user))
-            if (token) dispatch(saveToken(token))
+            if (user && token) { // save in redux
+                dispatch(saveUserName(user))
+                dispatch(saveToken(token))
+            }
         }
-
-
     })
 
     return (

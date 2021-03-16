@@ -1,4 +1,3 @@
-import React from "react"
 import styled, { keyframes } from 'styled-components';
 import { ListProps } from "./index"
 import { colors } from "../../constants"
@@ -12,8 +11,7 @@ const selectItem = keyframes`
     to{
         margin-left: -370px;
         opacity: 0;
-    }
-    
+    }    
 `
 const selectedCategory = keyframes`
     from{
@@ -24,8 +22,7 @@ const selectedCategory = keyframes`
         transform: scale(0.5) ; 
         margin-top: -170px;
         opacity: 0;
-    }
-    
+    }    
 `
 const MainContainer = styled.div`
     z-index: 1; 
@@ -37,48 +34,43 @@ const MainContainer = styled.div`
     }
 `
 const CategorRow = styled.div`
-  display: flex;  
-  flex-direction: row;
-  margin-bottom: 20px;
-  overflow: hidden;  
-  align-items: flex-start;
-  font-size: 25px;
+    display: flex;  
+    flex-direction: row;
+    margin-bottom: 20px;
+    overflow: hidden;  
+    align-items: flex-start;
+    font-size: 25px;
 `
 
 const VideoElementShowcase = styled.div`  
-  margin: 10px;
-  min-width: 450px;
-  max-width: 450px;
-  filter: opacity(65%);
+    margin: 10px;
+    min-width: 450px;
+    max-width: 450px;
+    filter: opacity(65%);
 
 `
 
 const SelectedVideoElementShowcase = styled(VideoElementShowcase)`     
-  min-width: 500px;
-  font-size: 2rem;
-  filter: opacity(100%);
-  &.list-enter.list-enter-active {   
-    animation: ${selectItem}  0.3s ease-in-out reverse;            
-  }     
-    &.list-leave.list-leave-active {   
-    animation: ${selectItem}  0.3s ease-in-out ;     
-  }
-  
-  
+    min-width: 500px;
+    font-size: 2rem;
+    filter: opacity(100%);
+    &.list-enter.list-enter-active {   
+        animation: ${selectItem}  0.3s ease-in-out reverse;            
+    }     
+        &.list-leave.list-leave-active {   
+        animation: ${selectItem}  0.3s ease-in-out ;     
+    } 
   `
 const Image = styled.img`
-  width: 100%;
-  border-radius: 5px;
-
+    width: 100%;
+    border-radius: 5px;
 `
-const SelectedImage = styled.img`
-    /*box-shadow: 0px 0px 40px ${colors.borderPrimary};*/
+const SelectedImage = styled.img`    
     border: solid ${colors.borderPrimary} 4px;
     width: 100%;
     border-radius: 5px;
 `
-const VideoTitle = styled.div`
-    
+const VideoTitle = styled.div`    
     word-break: break-word;
     overflow: hidden;
     text-overflow: ellipsis;

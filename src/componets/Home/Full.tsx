@@ -1,4 +1,3 @@
-import React from "react"
 import styled, { keyframes } from 'styled-components';
 import { ListProps } from "./index"
 import { colors } from "../../constants"
@@ -11,8 +10,7 @@ const selectedCategory = keyframes`
     to{
         transform: scale(1) translateY(0px)   ;   
         opacity: 0;
-    }
-    
+    }    
 `
 
 const CategorRow = styled.div`
@@ -21,35 +19,32 @@ const CategorRow = styled.div`
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     justify-items: center;
     align-items: start;
-    gap: 5px;
+    gap: 15px;
     font-size: 25px;
     z-index: 1; 
+    width: 93%;
 `
-const VideoElementNormal = styled.div`  
-    margin: 10px;
-    min-width: 14vw;
-    /*max-width: 300px;*/
+const VideoElementNormal = styled.div`     
+    min-width: 14vw;   
 `
 
-const SelectedVideoElementNormal = styled(VideoElementNormal)`    
-    /*border: ${colors.primary} 3px solid;*/ 
-        /*min-width: 450px;  */
-    
-`
 const Image = styled.img`    
     width: 100%;
-    border-radius: 5px;
-    
+    border-radius: 5px;    
 `
 const SelectedImage = styled.img`
-  /*box-shadow: 0px 0px 40px ${colors.borderPrimary};*/
   border: solid ${colors.borderPrimary} 2px;
   width: 100%;
   border-radius: 5px; 
   transform: scale(1.3) translateY(-20px);
   animation: ${selectedCategory}  0.3s ease-in-out  reverse; 
 `
-
+const SearchResultTitle = styled.div`
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+`
 
 const Full = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListProps) => {
     return (
@@ -59,16 +54,16 @@ const Full = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListPr
                     if (colIndex >= Math.floor(selectedCol / 5) * 5 ) {//show only selected row                        
                         if (sellIndex === selectedRow && colIndex === selectedCol) {
                             return (
-                                <SelectedVideoElementNormal key={colIndex} >
+                                <VideoElementNormal key={colIndex} >
                                     <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
-                                    <div>{el.title}</div>
-                                </SelectedVideoElementNormal>
+                                    <SearchResultTitle>{el.title}</SearchResultTitle>
+                                </VideoElementNormal>
                             )
                         } else {
                             return (
                                 <VideoElementNormal key={colIndex} >
                                     <Image src={el.smallImage} alt="Imag"></Image>
-                                    <div>{el.title}</div>
+                                    <SearchResultTitle>{el.title}</SearchResultTitle>
                                 </VideoElementNormal>
                             )
                         }
@@ -76,10 +71,9 @@ const Full = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListPr
                 }else return (
                     <VideoElementNormal key={colIndex} >
                         <Image src={el.smallImage} alt="Imag"></Image>
-                        <div>{el.title}</div>
+                        <SearchResultTitle>{el.title}</SearchResultTitle>
                     </VideoElementNormal>
                 )       
-
             })}
         </CategorRow>
     )

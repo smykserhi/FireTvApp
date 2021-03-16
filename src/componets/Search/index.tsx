@@ -58,21 +58,22 @@ const MainBox = styled.div`
 
 `
 const KeysBox = styled.div`
-    width: 30vw;
+    width: 33vw;
     display: grid;
-    margin-right: 1rem;
+    margin: 4rem 1rem 0 2rem;
     justify-content: flex-end;
     grid-template-columns: repeat(6, 70px);
     grid-template-rows: repeat(8, 70px);
-    gap: 6px 6px;
-    margin-top: 4rem;
+    gap: 6px 6px;   
 
 `
 const ResultBox = styled.div`
     width: 70vw;
+    margin: 4rem 0 0 1rem;
 `
 const CharBox = styled.div<CharBoxProps>`
     border: ${colors.textPrimary} 1px solid;
+    font-size: xx-large;
     display: flex;
     align-items: center;
     justify-content: center;    
@@ -102,7 +103,12 @@ const SearchResult = styled.div`
     align-items: center;
     padding: 0 15px;
     width: 80%;
-
+`
+const SearchResultTitle = styled.div`
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 `
 const ContentBox = styled.div`
     display: grid;
@@ -113,11 +119,12 @@ const ContentBox = styled.div`
     font-size: 25px;
     z-index: 1; 
     margin-top: 20px;
+    width: 80%;
 `
 const VideoElementNormal = styled.div`  
     margin: 10px;
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 12vw;
+    
 `
 const Image = styled.img`    
     width: 100%;
@@ -125,14 +132,13 @@ const Image = styled.img`
     
 `
 const SelectedImage = styled.img`  
-  border: solid ${colors.borderPrimary} 2px;
-  width: 100%;
-  border-radius: 5px;
-  transform: scale(1.1) translateY(-10px);
-  animation: ${selectedCategory}  0.3s ease-in-out  reverse; 
+    border: solid ${colors.borderPrimary} 2px;
+    width: 100%;
+    border-radius: 5px;
+    transform: scale(1.1) translateY(-10px);
+    animation: ${selectedCategory}  0.3s ease-in-out  reverse; 
 `
-const SearchQwery = styled.div`
-    /*color: ${colors.primary};*/
+const SearchQwery = styled.div`    
     margin-left: 5px;
 `
 const StyledCarSport = styled(CarSport)`
@@ -191,8 +197,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         if (search !== "") {
             api.searchContent(search)
                 .then(res => {
-                    setSearchResult(res)
-                    console.log("res", res)
+                    setSearchResult(res)                    
                 })
                 .catch(error => console.log(error));
         }
@@ -207,8 +212,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     res.forEach((element: videoDisListType) => {
                         tmpSearchResult.push(element)
                     });
-                    setSearchResult(tmpSearchResult)
-                    console.log("res", tmpSearchResult)
+                    setSearchResult(tmpSearchResult)                    
                     setLoading(false)
                 })
                 .catch(error => console.log(error));
@@ -261,8 +265,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         e.preventDefault();
     }
     const hendleBack = () => {
-        history.push(`${PAGES}/${HOME}`)
-        //setLoading(true)
+        history.push(`${PAGES}/${HOME}`)        
     }
     const handleEnter = () => {
         if (expandSideMenue) {
@@ -289,7 +292,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     else setSearch(search + keyboard[selectedKey])
                 } else if (selectedKey === keyboard.length){ 
                     dispatch(clearSearch()) // clear search from Redux
-                    setSearch("")
+                    //setSearch("")
                     history.goBack()
                 }
                 else addListeners()
@@ -331,13 +334,9 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             } else { // on vodeo search
                 if (selectedVideo > 3) {
                     setSelectedVideo(selectedVideo - 4)
-                } else addListeners()
-                console.log("Up on search field")
-
+                } else addListeners()  
             }
         }
-
-
     }
     const handleArrowDown = () => {
         if (expandSideMenue) {
@@ -363,42 +362,34 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     else setSelectedKey(selectedKey + 6)
                 } else {
                     if (selectedKey !== keyboard.length) setSelectedKey(keyboard.length)
-                    else addListeners()
-                    console.log("out of board")
+                    else addListeners()                    
                 }
-            } else { // on vodeo search
-                console.log("Down on search field ")
+            } else { // on vodeo search                
                 if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
                 if (selectedVideo < searchResult.length - 4) {
                     setSelectedVideo(selectedVideo + 4)
-                } else addListeners()
-
-                //addListeners()
+                } else addListeners()               
             }
         }
-
-    }
-    //console.log("selectedVideo", selectedVideo)
+    }    
     const hendleArrowLeft = () => {
-        if (selectedVideo < 0) {// on keyboard
-            // if (selectedKey > 0) {
+        if (expandSideMenue) { 
+            closeSideMenue()
+        }else if (selectedVideo < 0) {// on keyboard            
             if (selectedKey % 6 === 0 || selectedKey === 0 || selectedKey === keyboard.length) { //open side menue
                 setExpandSideMenue(true)
                 setSelectedKey(-1)
                 setSideMenuItem("home")
-            } else setSelectedKey(selectedKey - 1)
-            // } else addListeners()
+            } else setSelectedKey(selectedKey - 1)            
         } else { // on vodeo search
             if (selectedVideo === 0 || (selectedVideo % 4) === 0) { //return to keyboard
                 setSelectedVideo(-1)
                 setSelectedKey(5)
             } else setSelectedVideo(selectedVideo - 1)
         }
-
-
     }
     const handleArrowRight = () => {
-        if (expandSideMenue) {
+        if (expandSideMenue) { 
             closeSideMenue()
         } else {
             if (selectedVideo < 0) {// on keyboard
@@ -439,8 +430,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> <StyledSpaceBar /></SpaceBox>)
                     else if (el === "<") return (<BackspaceBox key={index} selected={selectedKey === index ? true : false}><StyledBackspaceOutline /></BackspaceBox>)
                     else return (<CharBox key={index} selected={selectedKey === index ? true : false}> {el.toUpperCase()}</CharBox>)
-                })}
-                {/* <ChangeKeys selected={selectedKey === keyboard.length ? true : false}>QWE</ChangeKeys> */}
+                })}               
                 <BackBox selected={selectedKey === keyboard.length ? true : false}><StyledArrowBack />Go Back</BackBox>
                 <StyledLogo src={Logo} alt="Logo" />
             </KeysBox>
@@ -455,19 +445,18 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                                 return (
                                     <VideoElementNormal key={index} >
                                         <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
-                                        <div>{el.title}</div>
+                                        <SearchResultTitle>{el.title}</SearchResultTitle>
                                     </VideoElementNormal>
                                 )
                             } else {
                                 return (
                                     <VideoElementNormal key={index} >
                                         <Image src={el.smallImage} alt="Imag"></Image>
-                                        <div>{el.title}</div>
+                                        <SearchResultTitle>{el.title}</SearchResultTitle>
                                     </VideoElementNormal>
                                 )
                             }
                         } return false
-
                     }) : <NoResult><p>Try type something</p> <StyledCarSport /></NoResult>}
                 </ContentBox>
             </ResultBox>

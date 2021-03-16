@@ -16,10 +16,10 @@ const MainBox = styled.div`
 
 `
 const LeftSide = styled.div`
-display: flex;
-flex-direction: column;
-width: 30vw;
-padding: 60px
+    display: flex;
+    flex-direction: column;
+    width: 30vw;
+    padding: 60px
 `
 const RightSide = styled.div`
     display: flex;
@@ -28,8 +28,7 @@ const RightSide = styled.div`
     justify-content: center;
 `
 const StyledLeftContent = styled.div`
-/*width: 30%;*/
-margin: 50px 0
+    margin: 50px 0;
 `
 const StyledRightContent = styled.div`
 
@@ -123,14 +122,12 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
         e.preventDefault();
     }
     const hendleBack = () => {
-        history.push(`${PAGES}/${HOME}`)
-        //setLoading(true)
+        history.push(`${PAGES}/${HOME}`)        
     }
     const handleArrow = () => {
         setGoBackActive(!goBackActive)
     }
-    const handleEnter = () => {
-        console.log("enter")
+    const handleEnter = () => {        
         if (goBackActive) history.goBack()
         else {
             api.logout(Token)
@@ -139,9 +136,7 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
             localStorage.clear()
             history.push(LOGIN)
         }
-
     }
-
 
     return (
         <MainBox>
@@ -168,8 +163,6 @@ const Settings: React.FC<RouteComponentProps> = ({ history }) => {
                 </ButtonsConteiner>
             </RightSide>
         </MainBox>
-
-
     )
 }
 export default withRouter(Settings)

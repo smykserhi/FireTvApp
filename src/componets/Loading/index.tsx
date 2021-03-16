@@ -4,21 +4,21 @@ import {colors} from "../../constants"
 
 
 const hourglass = keyframes`
-  0% {
-    transform: rotate(0);
-    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-  }
-  50% {
-    transform: rotate(900deg);
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-  }
-  100% {
-    transform: rotate(1800deg);
-  }
+    0% {
+      transform: rotate(0);
+      animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+    }
+    50% {
+      transform: rotate(900deg);
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    100% {
+      transform: rotate(1800deg);
+    }
 `
 const Spin = styled.div`
   top: 40%;
-  left:40%;
+  left: 45%;
   display: inline-block;
   position: relative;
   width: 150px;
@@ -39,6 +39,7 @@ const LoadingComponent = styled.div`
   width: 100vw;
   height:100vh;
   position: absolute;
-  top:0;
+  top:0%;
+  left:0%
 `
 export const Loading:React.FC = ()=>(<LoadingComponent><Spin ></Spin></LoadingComponent>)

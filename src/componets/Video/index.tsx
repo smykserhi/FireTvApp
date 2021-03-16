@@ -30,7 +30,6 @@ interface NumberProps {
 }
 
 const ShowItemAnime = keyframes`
-
     0% {
       transform: rotateX(0deg);
       background: ${colors.counterColour};
@@ -45,10 +44,8 @@ const ShowItemAnime = keyframes`
     }  
 `
 const MainBox = styled.div<MainProps>`
-    background: url("${props => props.bgImage}") no-repeat ;    
-    /*mask-image: linear-gradient(90deg, rgba(255,255,255,0) 10%, ${colors.bgPrimary} 25%) ;    */
-    background-size: 100% 100%;
-    background-position: 100%;    
+    background: url("${props => props.bgImage}") no-repeat center center fixed ;        
+    background-size: cover;    
     width: 100%;
     height: 100vh;
     overflow: hidden;
@@ -62,22 +59,22 @@ const MenuBox = styled.div`
 `
 const DisBox = styled.div`
     background-color: ${hexToRGBA(colors.bgPrimary, 0.9)};
-    height: 35vh;
+    height: 35%;
     position: absolute;
     top: 65%;
-    /*width: 100vw;  */
-    padding: 0 4vh;
-    
+    width: 100vw;      
 `
 const TitleBox = styled.div`
     display: flex;
     justify-content: space-between;
-    margin: 0 4rem;
+    margin: 0 10rem;
     opacity: 1;
+    width: 85%;
 `
 const Dis = styled.div`
-    margin: 0 4rem;
+    margin: 0 10rem;
     opacity: 1;
+    width: 85%;
 `
 const Buttons = styled.div<ButtonProps>`
     width: 100%;
@@ -91,12 +88,10 @@ const Buttons = styled.div<ButtonProps>`
     align-items: center;
     padding-left: 0.5rem;
     font-weight: 700;
-    /*animation: ${ShowItemAnime} 0.4s cubic-bezier(0.455, 0.030, 0.515, 0.955) both;    */
 `
 const StyledAdd = styled(AddCircleOutline)`
     height: 80%;
     margin-right: 10px;
-
 `
 const StyledRemove = styled(RemoveCircleOutline)`
     height: 80%;
@@ -122,9 +117,7 @@ const LiveBox = styled.div`
     position: absolute;
     left: 40%;
     top: 30%;
-    background-color: ${hexToRGBA(colors.bgPrimary, 0.7)};
-    /*width: 20vw;*/
-    /*height: 4rem;*/
+    background-color: ${hexToRGBA(colors.bgPrimary, 0.7)};    
     padding: 0 10px;
     border-radius: 10px;
     text-align: center;
@@ -178,14 +171,12 @@ const NumberText = styled.div`
     margin-bottom: 2rem;
 `
 const MessageBox = styled(LiveBox)`
-    top: 5%;   
+    top: 3%;   
 `
 const SupportMessageBox = styled(MessageBox)`
     top: 15%;
 `
-// const WeatingMessageBox = styled(LiveBox)`
-//     top:40%   
-// `
+
 const Span = styled.span`
     overflow: hidden;
     white-space: nowrap;
@@ -244,7 +235,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const [loading, setLoading] = useState<boolean>(true)
     const [videoDis, setVideoDis] = useState<VideoDosType>()
     const [menuItem, setMenuItem] = useState<MenuItemType>("play")
-    const [timer, setTimer] = useState<Timer>({ days: 365, hours: 59, minutes: 59, seconds: 59 })
+    const [timer, setTimer] = useState<Timer>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
     const [liveIn, setLiveIn] = useState<boolean>(false)
     const [showPlay, setShowPlay] = useState<boolean>(false)
     const [min5Loop, setMin5Loop] = useState<boolean>(true)
@@ -303,8 +294,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }, [timer, animateDays, animateDaysS, animateHour, animateHourS, animateMin, animateMinS, animateSec, animateSecS])
 
     //update data every 5 min
-    useEffect(() => {
-        //console.log("Start 5min loop", min5Loop)
+    useEffect(() => {        
         clearTimeout(timeOut5min)
         timeOut5min = setTimeout(function () {
             if (!min5Loop) {
@@ -313,14 +303,12 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 reloadData()
                 setmin5LoopCounter(min5LoopCounter + 1)
             }
-
-
         }, 300000)
         return () => clearTimeout(timeOut5min)
     }, [min5Loop, min5LoopCounter])
+
     //Update data every 15sec
-    useEffect(() => {
-        //console.log("Start 15s loop", sec15Loop,)
+    useEffect(() => {        
         clearTimeout(timeOut15sec)
         timeOut15sec = setTimeout(function () {
             if (!sec15Loop) {
@@ -329,23 +317,14 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 reloadData()
                 setSec15LoopCounter(sec15LoopCounter + 1)
             }
-
         }, 15000)
         return () => clearTimeout(timeOut15sec)
     }, [sec15Loop, sec15LoopCounter])
+
     //timer
     useEffect(() => {
-        if (liveIn) {
-            // const countDownDate = moment(videoDisRedux?.metadata?.start_time)
-            const countDownDate = moment(videoDis?.startTime)
-            // const locationTimeOfset = (): number => {
-            //     const daylySavingTime = moment().isDST() ? -60 : 0 //if DST subtract 60min
-            //     if (videoDis?.metadata.timezone === "Eastern") return -300 - daylySavingTime
-            //     else if (videoDis?.metadata.timezone === "Central") return -360 - daylySavingTime
-            //     else if (videoDis?.metadata.timezone === "Mountian") return -420 - daylySavingTime
-            //     else return -480 - daylySavingTime
-            // }
-            //const timeOfset = new Date().getTimezoneOffset() + locationTimeOfset()
+        if (liveIn) {            
+            const countDownDate = moment(videoDis?.startTime)            
             var timerLoop = setInterval(function () {
                 const now = moment()
                 // Find the distance between now and the count down date            
@@ -356,23 +335,13 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                     hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
                     minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
                     seconds: Math.floor((distance % (1000 * 60)) / 1000),
-                }
-                // time.hours = 0
-                // distance = -1
-                // const test = {
-                //     days: countDownDate.startOf('day').fromNow(),
-                //     hours: countDownDate.startOf('hour').fromNow(),
-                //     minutes: countDownDate.startOf('minute').fromNow(),
-                //     seconds: countDownDate.startOf('second').fromNow(),
-                // }
-                // console.log("distance", distance, "countDownDate.fromNow()",test )
+                }               
                 if (time.hours === 0) {
                     setMin5Loop(false) //stop updating very 5min
                     setSec15Loop(true) //start updating every 15sec
                 }
                 if (distance < 0) {
-                    clearInterval(timerLoop)
-                    //console.log("Stop Timer")
+                    clearInterval(timerLoop)                    
                     if (liveIn) setLiveIn(false)
                     setShowPlay(true)
                     setEwentWeatingMessage("Event will start soon")
@@ -392,8 +361,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         else if (loading) {
             api.getVideoItemNoLock(Token, videoDisRedux.id)
                 .then(res => {
-                    // res.supportMessage = "Support Message Test"
-                    // res.message = "Test MEssage"
+                    //  res.supportMessage = "Support Message Test"
+                    //  res.message = "Message Test "
                     console.log(videoDisRedux, res)
                     setVideoDis({ ...videoDisRedux, ...res })
                     if (res.viewerState === "watch") {
@@ -403,8 +372,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                             setMenuItem("list") //selevt list item in menue
                         } else if (res.videoState === "available") setShowPlay(true) // show play button
                     }
-                    if (res.videoState === "delist") {
-                        //console.log("Go Back !!! videoState:", res.videoState)
+                    if (res.videoState === "delist") {                        
                         history.goBack()
                     }
                     setLoading(false)
@@ -421,17 +389,13 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         history.push(LOGIN)
     }
 
-    //update data after add ar remove from myList
-    const reloadData = () => {
-        //console.log("Updating data...", videoPlay)
-        //change api depend on playing video or not
+    //update data after add or remove from myList
+    const reloadData = () => {        
         const apiCall = videoPlay ? api.getVideoItemState(Token, videoDisRedux.id) : api.getVideoItemNoLock(Token, videoDisRedux.id)
-        apiCall.then(res => {
-            console.log("new data: ", videoDis, res)
+        apiCall.then(res => {            
             if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
             if (res.viewerState === "watch") {
-                if (res.videoState === "live") { // show paly 
-                    //if (showPlay) setShowPlay(true)
+                if (res.videoState === "live") { // show paly                     
                     if (liveIn) setLiveIn(false) // hide counter and show play mutton
                     if (showPlay) setShowPlay(true) //show play button
                     if (setMenuItem) setMenuItem("play") //select play button
@@ -449,7 +413,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     const setMenueHideInterwal = ()=>{
         clearTimeout(menueInterval)
         setShowVideoMenue(true)
-        menueInterval = setTimeout(()=>{setShowVideoMenue(false)},10000)
+        menueInterval = setTimeout(()=>{setShowVideoMenue(false)},15000)
     }
 
     const addListeners = () => {
@@ -463,8 +427,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }
 
     const handleKeyUp = (e: KeyboardEvent) => {
-        removeListeners();
-        console.log("Listner")
+        removeListeners();        
         switch (e.key) {
             case 'Enter':
                 handleEnter()
@@ -489,10 +452,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 break;
             case 'MediaRewind':
                 hendleMediaRewind()
-                break;
-            // case 'GoBack':
-            //     hendleBack()
-            //     break;
+                break;            
             case 'GoBack':
             case 'Backspace':
                 hendleBack()
@@ -502,20 +462,16 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
         e.preventDefault();
     }
-    //console.log("videoPlay",videoPlay)
-    const hendleBack = () => {
-        console.log("Video backHandler",videoPlay )
-        if (videoPlay) {
-            console.log("Video back")
+
+    const hendleBack = () => {        
+        if (videoPlay) {            
             handleCloseVideo()
             setMagpieReportCall(!magpieReportCall)            
-        } else {
-            console.log("History Back")
+        } else {            
             history.goBack()
         }
     }
-    const hendleMediaFastForward = () => {
-        //console.log("Hendled")
+    const hendleMediaFastForward = () => {        
         if (videoPlay) {
             setMenueHideInterwal()
             setSpeedup(!speedUp)
@@ -528,8 +484,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         } else addListeners()
     }
 
-    const handleCloseVideo = () => {
-        console.log("close")
+    const handleCloseVideo = () => {        
         setVideoPlay(false)
     }
     const hendMediaPlayPause = () => {
@@ -557,8 +512,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
         }
     }
     const handleArrowUp = () => {
-        if (videoPlay) {
-            //console.log("up")
+        if (videoPlay) {            
             setMenueHideInterwal()
         } else {
             if (menuItem === "back") setMenuItem("producer")
@@ -571,7 +525,6 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
     }
     const handleArrowDown = () => {
         if (videoPlay) {
-            //console.log("down")
             setMenueHideInterwal()
         } else {
             if (menuItem === "play") setMenuItem("list")
@@ -586,19 +539,16 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
             setMenueHideInterwal() 
             setPlay_pause(!play_pause)
         } else { //in details mode
-            if (menuItem === "play") {
-                console.log("play")
+            if (menuItem === "play") {               
                 clearTimeout(timeOut5min)
                 clearTimeout(timeOut15sec)
                 setMin5Loop(false) //stop updating very 5min
                 setSec15Loop(false) //stop updating every 15sec          
                 api.getVideoItem(Token, videoDisRedux.id)
-                    .then(res => {
-                        console.log("Play res", res)
+                    .then(res => {                        
                         api.timorLogs(userId, videoId, "info", `${res.url}`).catch((err) => console.log(err.message))
                         if (videoDis) setVideoDis({ ...videoDisRedux, ...res })
-                        if (res.videoState === "live") { // show paly                             
-                            
+                        if (res.videoState === "live") { // show palay  
                             setLiveIn(false) // hide counter and show play mutton
                             if (setMenuItem) setMenuItem("play")
                         } else if (res.viewerState === "logout") { //invalid token
@@ -608,13 +558,11 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                         setVideoPlay(true)// start playing  
                         setSec15Loop(true)  //start update every 15s
                         setMenueHideInterwal()// hide menue
-
                     })
                     .catch(error => console.log(error));
             }
             else if (menuItem === "list") {
-                if (videoDis?.saved) {
-                    //console.log("remove")
+                if (videoDis?.saved) {                   
                     api.removeFromMyList(Token, videoId)
                         .then(() => reloadData())
                         .catch(error => console.log(error));
@@ -626,10 +574,10 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                 }
             }
             else if (menuItem === "location") {
-                console.log("Location")
+                console.log("Need add Location api call") // Need Add API CALL Ti show Locations
             }
             else if (menuItem === "producer") {
-                console.log("producer")
+                console.log("Need add producer api call") // Need add API CALL with prodisers
             }
             else if (menuItem === "back") {
                 hendleBack()
@@ -647,7 +595,7 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                             <VideoPlayer
                                 closeVideo={handleCloseVideo}
                                 // url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
-                                url={videoDis ? videoDis.url : "httpsDisFacility://media.w3.org/2010/05/sintel/trailer_hd.mp4"}
+                                url={videoDis ? videoDis.url : ""}
                                 play_pause={play_pause}
                                 speedUp={speedUp}
                                 speedDown={speedDown}

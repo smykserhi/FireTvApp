@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react"
 import styled, { keyframes } from 'styled-components';
 import { page } from "./index"
 import { colors, hexToRGBA } from "../../constants"
@@ -28,7 +27,6 @@ const SelentedItem = keyframes`
         opacity: 1;
     }
 `
-
 
 const MoreList = styled.div`
     position: absolute;
@@ -96,22 +94,17 @@ interface MorePagesProps {
     selected: number
 }
 const MorePages = ({ pages, selected }: MorePagesProps) => {
-    // console.log("Pages",pages)
-
     return (
         <MoreList>
             <StyledH2><ArrowUp/>Select page<ArrowDown/></StyledH2>
             <ElementsContainer>
-                {pages.map((page, pagesIndex) => {
-                    //console.log("PageNAme", page.name)
+                {pages.map((page, pagesIndex) => {                    
                     if (pagesIndex > selected - 3 && pagesIndex < selected + 3) {
                         if (pagesIndex === selected) return <SelectedPagesElement>{page.name}</SelectedPagesElement>
                         else return <PagesElement>{page.name}</PagesElement>
-                    }
-
+                    }else return false
                 })}
             </ElementsContainer>
-
         </MoreList>
     )
 }

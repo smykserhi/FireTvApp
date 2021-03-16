@@ -7,8 +7,6 @@ import { Settings } from "@styled-icons/material-twotone/Settings"
 import { ListCircle } from "@styled-icons/ionicons-outline/ListCircle"
 
 
-
-
 interface MenuProps {
     expand: boolean,
 }
@@ -42,7 +40,7 @@ const MenuBox = styled.div<MenuProps>`
     transition: width 0.4s 
 `
 const ItemContainer = styled.div`
-width: 100%;    
+    width: 100%;    
 `
 const MenuElement = styled.div<MenuElementProps>`
     display: flex;   
@@ -72,7 +70,7 @@ const MylistIcon = styled(ListCircle)`
     height: 100%;
 `
 const ElementTitle = styled.div`
-    /*font-size: 3rem;*/
+   
 `
 
 interface SideMenuProps {

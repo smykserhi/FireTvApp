@@ -22,9 +22,6 @@ interface ProgressProps {
     width: number
 }
 
-interface MenueProps {
-    show: boolean
-}
 const ButtonClickAnimation = keyframes`
     0% {
         transform: scale(1);
@@ -34,8 +31,7 @@ const ButtonClickAnimation = keyframes`
     }
     100% {
         transform: scale(0.8);
-        filter: blur(4px);
-       /* opacity: 0;*/
+        filter: blur(4px);       
         color:${colors.primary}
     }
 `
@@ -50,57 +46,57 @@ const ButtonClickAnimation2 = keyframes`
     }
     100% {
         transform: scale(0.8);
-        filter: blur(5px);
-       /* opacity: 0;*/
+        filter: blur(5px);       
         color:${colors.primary}
     }
 `
 const MenueAnimation = keyframes`
     0% {
-        transform: translateY(150px);
-        
+        transform: translateY(150px);        
     }
     100% {
-        transform: translateY(0);
-        
+        transform: translateY(0);        
     }
 `
-const StyledLoading = styled(Loading)`
-    // 
-    
-`
+
 
 
 const Forward10Button = styled(Forward10) <ButtonProps>`
     width: 3rem;
     margin: 0 0.5rem;
+    outline: 0;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
 const Replay10Button = styled(Replay10) <ButtonProps>`
     width: 3rem;
     margin: 0 0.5rem;
+    outline: 0;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
 
 const Forward2Button = styled(Forward2) <ButtonProps>`
     width: 3rem;
     margin: 0 0.5rem;
+    outline: 0;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
 const BackwardButton = styled(Backward) <ButtonProps>`
     width: 3rem;
     margin: 0 0.5rem;
+    outline: 0;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
 
 const PlayCircleButton = styled(PlayCircle) <ButtonProps>`
     width: 5rem;
     margin: 0 0.5rem;
+    outline: 0;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
 const PauseCircleButton = styled(PauseCircle) <ButtonProps>`
     width: 5rem;
     margin: 0 0.5rem;
+    outline: 0;
     animation: ${props => props.clicked ? ButtonClickAnimation : ButtonClickAnimation2} 0.1s cubic-bezier(0.165, 0.840, 0.440, 1.000) both reverse;
 `
 const MenueContainer = styled.div`
@@ -112,7 +108,7 @@ const MenueContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 15vh;
+    height: 20vh;
     background-color:  ${hexToRGBA(colors.bgPrimary, 0.7)};
     &.category-enter.category-enter-active {   
         animation: ${MenueAnimation}  0.4s ease-in-out ;            
@@ -120,8 +116,6 @@ const MenueContainer = styled.div`
       &.category-leave.category-leave-active {   
           animation: ${MenueAnimation}  0.5s ease-in-out reverse;     
       }
-    
-
 `
 const ProgressContainer = styled.div`
     width: 90%;
@@ -174,25 +168,19 @@ const ProgressBox = styled.div`
     margin-top:1rem;
     height:1rem;
     position: relative;
-
 `
 const ProgressElement = styled.div<ProgressProps>`
     height:100%;
     width: ${props => props.width}%;
     background-color: ${colors.primary};
     border-radius: 10px 0px 0px 10px;
-    text-align: right;
-    
+    text-align: right;    
 `
 const StyledSpeedometer2 = styled(Speedometer2)`
-    width: 2.5rem;
-    /*color: ${colors.primary};*/
+    width: 2.5rem;    
     margin-left: 0.5rem;
     transform: translateY(-5px);
 `
-
-
-
 
 
 type VideoProps = {
@@ -215,18 +203,10 @@ type TimeType = {
     minutes: number
     seconds: number
 }
-type PrevSessionType = {
-    user: string,
-    stream: string,
-    position: number,
-    watched: number,
-    volume: number,
-    version: string
-}
+
 
 const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedUp, speedDown, plus10s, minus10s, showVideoMenue, userId, videoId, keyId, magpieReportCall }) => {
     const video = useRef<HTMLVideoElement>(null)
-    //const progress = useRef<HTMLProgressElement>(null)
     const [playing, setPlaying] = useState<boolean>(true)
     const [backSpeed, setBackSpeed] = useState<boolean>(true)
     const [forwardSpeed, setForwardSpeed] = useState<boolean>(true)
@@ -238,20 +218,9 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     const [progress, setProgress] = useState<number>(0)
     const [loading, setLoading] = useState<boolean>(true)
     const [videoReady, setVideoReady] = useState<boolean>(false)
-    const [hideMenue, setHideMenue] = useState<boolean>(true)
     const [magpieResset, setMagpieResset] = useState<boolean>(false)
     const [magpieCounter, setMagpieCounter] = useState<any>(Date.now())
     let magpieLoop: any
-    //let magpieCounter = 
-    // let prevSession = {
-    //     user: userId,
-    //     stream: videoId,
-    //     position: video.current ? video.current?.currentTime:0,
-    //     watched: new Date().getSeconds(),
-    //     volume: video.current ? video.current.volume * 100 : 0,
-    //     version: "FireTV 2.0.0"
-    // }
-
 
     const usePrevious = (value: VideoProps) => {
         const ref = useRef<VideoProps>();
@@ -261,8 +230,8 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         return ref.current;
     }
 
-    const previousProps = usePrevious({ url, play_pause, speedUp, speedDown, plus10s, minus10s, closeVideo, showVideoMenue,  userId, videoId, keyId, magpieReportCall })
-    
+    const previousProps = usePrevious({ url, play_pause, speedUp, speedDown, plus10s, minus10s, closeVideo, showVideoMenue, userId, videoId, keyId, magpieReportCall })
+
     //Magpie Loop
     useEffect(() => {
         magpieApiReport()
@@ -276,14 +245,9 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         if (!loading) {
             if (previousProps?.play_pause !== play_pause) playPauseHandle()
             if (previousProps?.speedUp !== speedUp) fastForward()
-            if (previousProps?.speedDown !== speedDown) fastBack()
+            if (previousProps?.speedDown !== speedDown) {fastBack()}
             if (previousProps?.plus10s !== plus10s) moveUp10Sec()
             if (previousProps?.minus10s !== minus10s) moveDown10Sec()
-            if (previousProps?.showVideoMenue !== showVideoMenue) {
-                console.log("showVideoMenue",showVideoMenue)
-                 //setHideMenue(!hideMenue)
-                }
-            //if (previousProps?.showVideoMenue !== showVideoMenue) setHideMenue(!hideMenue)
         } else {
             setLoading(false)
         }
@@ -292,20 +256,8 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
     //Timor session loop
     useEffect(() => {
         var timorSessionLoop = setInterval(() => {
-            // const nowSeconds = new Date().getSeconds()
-            // const time = nowSeconds < prevSession.watched ? (nowSeconds+60)-prevSession.watched : nowSeconds-prevSession.watched
-            const data = {
-                user: userId,
-                stream: videoId,
-                position: video.current ? Math.round(video.current.currentTime) : 0,
-                watched: 15,
-                volume: video.current ? video.current.volume * 100 : 0,
-                version: "FireTV 2.0.0"
-            }
-            //console.log("data to session", data,)
             api.timorSession(userId, videoId, video.current ? Math.round(video.current.currentTime) : 0, 15, video.current ? video.current.volume * 100 : 0, "FireTV 2.0.0")
                 .catch((err) => console.log(err.message))
-            // prevSession = data
         }, 15000)
         return () => clearInterval(timorSessionLoop)
     }, [])
@@ -313,34 +265,31 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
 
     //Events 
     useEffect(() => {
-        video.current?.addEventListener("canplay", canPlayHandler) //1
-        video.current?.addEventListener("ended", videoEndedHandler)//9
+        video.current?.addEventListener("canplay", canPlayHandler)
+        video.current?.addEventListener("ended", videoEndedHandler)
         video.current?.addEventListener("error", (e) => errorHandler(e))
-        video.current?.addEventListener("pause", pauseEventHandler); //5/8
-        video.current?.addEventListener("play", playEventHandler);//2/6
-        video.current?.addEventListener("timeupdate", timeUpdateHandler)//4 ........
+        video.current?.addEventListener("pause", pauseEventHandler);
+        video.current?.addEventListener("play", playEventHandler);
+        // video.current?.addEventListener("timeupdate", timeUpdateHandler)
         video.current?.addEventListener("waiting", waitingEventHandler)
         video.current?.addEventListener("stalled", stalledHandler)
-        // video.current?.addEventListener("playing", playingHandler)//3/7
         return () => {
             video.current?.removeEventListener("canplay", canPlayHandler)
             video.current?.removeEventListener("ended", videoEndedHandler)
             video.current?.removeEventListener("error", errorHandler)
             video.current?.removeEventListener("pause", pauseEventHandler);
             video.current?.removeEventListener("play", playEventHandler);
-            video.current?.removeEventListener("timeupdate", timeUpdateHandler)
+            // video.current?.removeEventListener("timeupdate", timeUpdateHandler)
             video.current?.removeEventListener("waiting", waitingEventHandler)
             video.current?.removeEventListener("stalled", stalledHandler)
-            // video.current?.removeEventListener("playing", playingHandler)
         }
     })
 
-    //progress loop
+    //progress loop update
     useEffect(() => {
         let intervalLoop = setInterval(() => {
             let prog
             if (video.current) {
-                //setVideoDuration(video.current?.duration)
                 prog = Math.round((video.current?.currentTime / video.current?.duration) * 100)
                 setProgress(prog)
                 const time: TimeType = {
@@ -348,17 +297,16 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
                     minutes: Math.floor(video.current?.currentTime / 60) - Math.floor(Math.floor(video.current?.currentTime / 60) / 60) * 60,
                     seconds: Math.round(video.current?.currentTime - (Math.floor(video.current?.currentTime / 60) * 60))
                 }
-                // setCurrentTime(Math.round(video.current?.currentTime))
                 setCurrentTime(time)
                 if (prog === 100) setPlaying(false)
             }
         }, 100)
         return () => clearInterval(intervalLoop)
     })
+
     //Speed loop
     useEffect(() => {
         let speedLoop = setInterval(() => {
-            console.log("Speed ", speed)
             if (speed === 1) clearInterval(speedLoop)
             if (speed === 2) if (video.current) video.current.currentTime += 10.0
             if (speed === 3) if (video.current) video.current.currentTime += 60.0
@@ -369,7 +317,6 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
 
     //Event handlers
     const canPlayHandler = () => {
-        console.log("canPlayHandler")
         if (video.current) {
             const time: TimeType = {
                 hours: Math.floor(Math.floor(video.current?.duration / 60) / 60),
@@ -392,43 +339,32 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         }
         setMagpieCounter(Date.now())
         api.magpieReport(report).catch((err) => console.log(err.message))
-        console.log("magpieLoop", report)
     }
 
     const videoEndedHandler = () => {
-        console.log("videoEndedHandler")
         magpieApiReport()
         closeVideo()
     }
     const errorHandler = (err: ErrorEvent) => {
-        console.log("errorHandler")
         api.timorLogs(userId, videoId, "error", err.message).catch((err) => console.log(err.message))
     }
     const pauseEventHandler = () => {
-        console.log("pauseEventHandler",)
         api.timorLogs(userId, videoId, "control", "Video paused").catch((err) => console.log(err.message))
     }
     const playEventHandler = () => {
-        console.log("playEventHandler")
         api.timorLogs(userId, videoId, "control", "Video start playing").catch((err) => console.log(err.message))
     }
-    const timeUpdateHandler = () => {
-        //loop 15s //session api
-        console.log("timeUpdateHandler")
-    }
+    // const timeUpdateHandler = () => {
+    //     //loop 15s //session api
+    //     console.log("timeUpdateHandler")
+    // }
     const waitingEventHandler = () => {
-        //buffering +""
-        console.log("waitingEventHandler")
         api.timorLogs(userId, videoId, "buffering", "").catch((err) => console.log(err.message))
     }
     const stalledHandler = () => {
-        console.log("stalledHandler")
         api.timorLogs(userId, videoId, "info", "Video stall").catch((err) => console.log(err.message))
     }
-    // const playingHandler = () => {
-    //     //clear it
-    //     console.log("playingHandler")
-    // }
+
 
     //Speed icons
     const Speed = () => {
@@ -446,7 +382,6 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
             setPlaying(false)
             setSpeed(1)
             magpieApiReport()
-            //setSpeed(1)
         }
         else { //play
             video.current?.play()
@@ -457,7 +392,6 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         }
     }
     const fastForward = () => {
-        console.log("Speed up")
         clearTimeout(magpieLoop)
         magpieApiReport()
         if (video.current) {
@@ -466,7 +400,6 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
             if (speed === 3) setSpeed(4)
             setForwardSpeed(!forwardSpeed)
         }
-
     }
     const fastBack = () => {
         clearTimeout(magpieLoop)
@@ -489,19 +422,14 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         setMinus10Sec(!minus10Sec)
     }
 
-    //return progress
-
-    //progressLoop()
-
     return (
         <div>
-            {!videoReady ? <StyledLoading /> : ""}
+            {!videoReady ? <Loading /> : ""}
             <StyledVideo ref={video} autoPlay id="video">
                 <source src={url} type="application/x-mpegURL" />
                 {/* <source src={url} type="video/mp4" /> */}
             </StyledVideo>
             <CSSTransitionGroup
-                //component={AnimeBox}
                 transitionName="category"
                 transitionEnterTimeout={400}
                 transitionLeaveTimeout={400}>
@@ -509,22 +437,17 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
                     ? <MenueContainer>
                         <ProgressContainer>
                             <ProgressBox>
-                                {/* <StyledFlagCheckered />
-                        <StyledToriiGate/> */}
                                 <ProgressElement width={progress}> </ProgressElement><StyledCarSport width={progress} />
                             </ProgressBox>
-                            {/* <Progress ref={progress} max="100" value="0" /> */}
                         </ProgressContainer>
                         <ButtonContainer>
                             <SpeedBox>
                                 Speed:{Speed()}
                             </SpeedBox>
                             <CurrentTimeBox>
-                                <TimeContainer>
-                                    {/* {Math.floor(currentTime / 60) > 0 ? `${Math.floor(currentTime / 60)}:` : ""}
-                                {currentTime - (Math.floor(currentTime / 60) * 60)} */}
-                                    {currentTime?.hours > 0 ? `${currentTime?.hours}:` : ""}
-                                    {currentTime?.minutes > 0 ? `${currentTime?.minutes}:` : ""}
+                                <TimeContainer>                                    
+                                    {currentTime?.hours > 0 ? `${currentTime?.hours}h:` : ""}
+                                    {currentTime?.minutes > 0 ? `${currentTime?.minutes}m:` : ""}
                                     {currentTime?.seconds}s
                             </TimeContainer>
                             </CurrentTimeBox>
@@ -535,21 +458,15 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
                                 {plus10Sec ? <Forward10Button clicked={true} onClick={moveUp10Sec} /> : <Forward10Button clicked={false} onClick={moveUp10Sec} />}
                                 {forwardSpeed ? <Forward2Button clicked={true} onClick={fastForward} /> : <Forward2Button clicked={false} onClick={fastForward} />}
                             </div>
-                            <TimeContainer>
-                                {/* {Math.floor(Math.floor(videoDuration / 60) / 60) > 0 ? `${Math.floor(Math.floor(videoDuration / 60) / 60)}:` : ""}
-                            {Math.floor(videoDuration / 60) > 0 ? `${Math.floor(videoDuration / 60) - Math.floor(Math.floor(videoDuration / 60) / 60) * 60}:` : ""}
-                            {(videoDuration - (Math.floor(videoDuration / 60) * 60)).toFixed(0)} */}
-                                {videoDuration?.hours > 0 ? `${videoDuration?.hours}:` : ""}
-                                {videoDuration?.minutes > 0 ? `${videoDuration?.minutes}:` : ""}
+                            <TimeContainer>                                
+                                {videoDuration?.hours > 0 ? `${videoDuration?.hours}h:` : ""}
+                                {videoDuration?.minutes > 0 ? `${videoDuration?.minutes}m:` : ""}
                                 {videoDuration?.seconds}s
-
                         </TimeContainer>
                         </ButtonContainer>
                     </MenueContainer>
                     : ""}
             </CSSTransitionGroup>
-
-            
         </div>
     )
 }

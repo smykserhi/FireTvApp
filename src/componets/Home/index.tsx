@@ -33,29 +33,14 @@ const menuItem = keyframes`
         opacity: 1;        
     }    
 `
-// const moreList = keyframes`
-//   0% {
-//     transform: translateZ(0) rotateY(0);
-//     opacity: 1;
-//   }
-//   54% {
-//     transform: translateZ(-160px) rotateY(87deg);
-//     opacity: 1;
-//   }
-//   100% {
-//     transform: translateZ(-800px) rotateY(90deg);
-//     opacity: 0;
-//   }
-// `
+
 const MainBox = styled.div`
   margin: 0 0 0 5rem;
-  padding: 4vh 0vw 0vh 6vw;
-  
+  padding: 4vh 0vw 0vh 6vw;  
 `
 const MenuBox = styled.div`
   display: flex;
-  height: 5rem;
-   
+  height: 5rem;   
 `
 const MenuElement = styled.div<MenueElementProps>`
   margin-right: 20px;
@@ -95,23 +80,16 @@ const ImageDis = styled.div<ImageProps>`
   top: -20%;
   right: 10%;
   z-index: -1;  
-  /*box-shadow: 0px 0px 60px ${colors.borderPrimary};*/
   border-radius: 10px;  
-  /*mask-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 15%) ;*/  
-
-  
-  /*background: right / contain no-repeat url(${props => props.url}}) ;*/
-  background: linear-gradient(to left, rgba(255,255,255,0) 70%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%, linear-gradient(to bottom, rgba(255,255,255,0) 60%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%,url(${props => props.url}})  right / contain no-repeat;
+  background: linear-gradient(to left, rgba(255,255,255,0) 70%, ${hexToRGBA(colors.bgPrimary, 1)}) 95%, linear-gradient(to bottom, rgba(255,255,255,0) 60%, ${hexToRGBA(colors.bgPrimary, 1)}) 90%,url(${props => props.url}})  right / contain no-repeat;
   height: 100%;
   transform: scale(1.5);
-  margin-top: 3rem;
-  
+  margin-top: 3rem;  
 `
 const DisH2 = styled.h2`
   font-size: 2.5rem;
   margin-bottom: 20px;
   margin-top: 15px;
-  /*width: 60%;*/
 `
 const TimeBox = styled.div`
   font-size: 2em;
@@ -128,7 +106,6 @@ const DiscriptionBox = styled.div`
   display: -webkit-box;    
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
-  /*font-size: 1.1em;*/
 `
 const LiveBox = styled.div`
   display: inline-block;
@@ -139,7 +116,6 @@ const LiveBox = styled.div`
   padding: 5px 10px 5px 10px;
   margin-right: 10px;
   margin-bottom: 10px;
-  /*text-shadow: 2px 2px #54462387;*/
   float: left;
 `
 const ReplayBox = styled.div`
@@ -151,58 +127,28 @@ const ReplayBox = styled.div`
   padding: 5px 10px 5px 10px;
   margin-right: 10px;
   margin-bottom: 10px;
-  /*text-shadow: 2px 2px #54462387;  */
   float: left;
 `
 
 const CategoryBox = styled.div`
   display: flex;  
   flex-direction: column;
-  margin-top: 3rem;
- 
+  margin-top: 3rem; 
 `
 const DiscriptionText = styled.div`
   white-space: normal;
-  /*width: 70%;*/
   display: inline;
   line-height: 1.4;
   letter-spacing: 1px;
   font-size: 2.5rem;
-  
-  
-  
 `
 
-// const Image = styled.img`
-//   width: 100%;
-//   border-radius: 10px;
-//   mask-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, ${colors.bgPrimary} 25%) ;
-
-//   /*transform: scale(1.4);*/
-// `
-
-// const MoreList = styled.div`
-//   position: absolute;
-//   top: 30%;
-//   left: 30%;
-//   background: red;
-//   width: 30vw;
-//   height: 40vh;
-//   z-index: 5;
-//   &.more-enter.more-enter-active {   
-//     animation: ${moreList}  0.5s ease-in-out reverse;            
-//   }     
-//   &.more-leave.more-leave-active {   
-//       animation: ${moreList}  0.6s ease-in-out ;     
-//   }
-// `
 export type ListProps = {
   sellIndex: number,
   categories: pageCategoriesType[],
   categoriesContent: videoDisType[],
   selectedCol: number,
   selectedRow: number
-
 }
 
 export interface pageCategoriesType {
@@ -265,11 +211,10 @@ interface Props extends RouteComponentProps<matchParamsType> {
 
 export type sideMenuType = "home" | "search" | "settings" | "myList" | null
 
-const Home: React.FC<Props> = ({ history, match, pageId }) => {
+const Home: React.FC<Props> = ({ history, pageId }) => {
   const selectToken = (state: StorageType) => state.logIn.token
   const Token = useSelector(selectToken) //token 
   const dispatch = useDispatch()
-  //let myHistory = useHistory();
   const [loading, setLoading] = useState<boolean>(true) // main content loading
   const [categiryContentLoading, setCategiryContentLoading] = useState<boolean>(false) // categiry Content Loading
   const [categoryesloading, setCategoryesloading] = useState<boolean>(false) // main content loading  
@@ -301,12 +246,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       removeListeners()
     }
   })
+
   //update all page or redirect to LOGIN page
   useEffect(() => {
-    console.log("in loading")
+    //console.log("in loading")
     if (!Token) history.push(LOGIN)
     else if (loading) {
-      console.log("loading")
+      //console.log("loading")
       api.getPages()
         .then((res) => {
           let pagesData: page[] = res
@@ -327,11 +273,9 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                 return true
               })
               Promise.all(list).then(() => {
-                const sortedContent = sortContent(pageCategories, categoriesContents)
-                //console.log("sorted data", pageCategories, sortedContent)
+                const sortedContent = sortContent(pageCategories, categoriesContents)                
                 setSelectedCol(0)
-                setSelectedRow(0)
-                //console.log("pagesData", pagesData, "pageId", pageId)
+                setSelectedRow(0)               
                 setPages(pagesData.filter((el: page) => el.id !== pageId))//skip current page from list
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
@@ -344,17 +288,13 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
         });
     }
   }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
-
-  //console.log("match", pageId)
-  // console.log("pages", pages)
-  // console.log("categories", categories)
-  // console.log("categoriesContent", categoriesContent)
-  // console.log("selectedRow ", selectedRow, " selectedCol", selectedCol)
+  
+  //Update Categoties
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)
       const offset = categories.length
-      console.log("Categories offset", offset)
+      //console.log("Categories offset", offset)
       api.getPageContent(pageId, 20, offset)
         .then((newCategiry) => {
           const categoriesContents: videoDisType[] = []
@@ -374,46 +314,45 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             categoriesContents.forEach(el => tempCategoriesContent.push(el))
             pageCategories.forEach(el => tempCategories.push(el))
             const uniqCategory = Array.from(new Map(tempCategories.map((item: pageCategoriesType) => [item.id, item])).values());
-            const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());
-            console.log('unic', uniqCategory, uniqContent)
+            const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());            
             const sortedContent = sortContent(uniqCategory, uniqContent)
             if (categories) setCategories(uniqCategory)
             if (categoriesContent) setCategoriesContent(sortedContent)
             setCategoryesloading(false)
-            console.log("add categories to page ", pageId)
+            //console.log("add categories to page ", pageId)
           })
         })
         .catch(error => console.log(error));
     }
   }
+
   const uploadCategoiesContent = (category: pageCategoriesType) => {
-    console.log("uploadCategoiesContent")
-    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 20 && !categiryContentLoading) {
-      console.log("offset uploadCategoiesContent")
+    //console.log("uploadCategoiesContent")
+    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 20 && !categiryContentLoading) {      
       setCategiryContentLoading(true)
       const offset = categoriesContent[selectedRow].list.length
-      console.log("offset uploadCategoiesContent", offset)
+      //console.log("offset uploadCategoiesContent", offset)
       api.getCategoriContent(category.id, 10, offset).then(res => {
         let tempCategoriesContent = categoriesContent
         res.forEach((el: videoDisListType) => tempCategoriesContent[selectedRow].list.push(el))
         if (categoriesContent) setCategoriesContent(tempCategoriesContent)
         setCategiryContentLoading(false)
-        console.log(`Add data to category ${tempCategoriesContent[selectedRow].id}`)
+        //console.log(`Add data to category ${tempCategoriesContent[selectedRow].id}`)
       })
         .catch(error => console.log(error));
     }
   }
+
   const addListeners = () => {
     document.addEventListener("keydown", handleKeyDown, true);
     document.addEventListener("keyup", handleKeyUp, true);
-
   }
 
   const removeListeners = () => {
     document.removeEventListener("keydown", handleKeyDown, true);
     document.removeEventListener("keyup", handleKeyUp, true);
-
   }
+
   const handleKeyUp = (e: KeyboardEvent) => {
     removeListeners();
     switch (e.key) {
@@ -463,7 +402,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   }
   const handleEnter = () => {
-    if (expandSideMenue) {
+    if (expandSideMenue) { //opened side menue
       if (sideMenuItem === "home") {
         history.push(`${PAGES}/${HOME}`)
         setLoading(true)
@@ -473,54 +412,43 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
       else if (sideMenuItem === "search") history.push(SEARCH)
       else if (sideMenuItem === "settings") history.push(SETTINGS)
       else if (sideMenuItem === "myList") history.push(MYLIST)
-    } else if (moreOpen) {
-      console.log("More Enter", pages[moreIndex])
+    } else if (moreOpen) {   //open more pages list
       history.push(`${PAGES}/${pages[moreIndex].id}`)
       setMoreOpen(false)
       setLoading(true)
-     
-
-    } else {
-      if (selectedRow === -1) {
-        if (selectedCol <= topMenuLength - 1) {
-          const selectedPageId = pages[selectedCol].id
-          console.log("Menu item", selectedPageId)
+    } else { //selected element in the page
+      if (selectedRow === -1) { // top menue 
+        if (selectedCol <= topMenuLength - 1) { // selected page
+          const selectedPageId = pages[selectedCol].id          
           history.push(`${PAGES}/${selectedPageId}`)
           setLoading(true)
-        } else {
-          console.log("More list")
-          setMoreOpen(!moreOpen)
-          //addListeners()
-          //history.push(MYLIST)
+        } else { // selected More option          
+          setMoreOpen(true)// open more pages list        
         }
-      } else {
-        //console.log("Video", currentVideo())
-        dispatch(addVideo(currentVideo()))
-        //setLoading(true)
+      } else {// selected video element        
+        dispatch(addVideo(currentVideo())) //save selected video info to redux
         history.push(`${VIDEO}/${currentVideo()?.id}`)
-
       }
     }
-
   }
 
   const handleArrowUp = () => {
-    if (expandSideMenue) {
-      console.log("side up")
+    if (expandSideMenue) { // opened side menue
+      //console.log("side up")
       if (sideMenuItem === "search") setSideMenuItem("home")
       else if (sideMenuItem === "myList") setSideMenuItem("search")
       else if (sideMenuItem === "settings") setSideMenuItem("myList")
       else addListeners()
-    } else if (moreOpen) {
+    } else if (moreOpen) { //opened more pages list
       if (moreIndex > 0) setMoreIndex(moreIndex - 1)
       else addListeners()
-    } else {
+    } else { //page content
       if (categories[selectedRow]?.type === "guide" && selectedCol !== 0) { //inside guide category
         setSelectedCol(selectedCol - 1)
       } else if (categories[selectedRow]?.type === "full" && selectedCol > 4) { //inside full category
         setSelectedCol(selectedCol - 5)
-      } else {
-        if (selectedRow > -1) {
+      } else { 
+        if (selectedRow > -1) { // not in top menue
           setSelectedRow(selectedRow - 1) //set previous row
           if (selectedRow > 0 && categories[selectedRow - 1]?.type === "full") { //if previous category type full         
             setSelectedCol(categoriesContent[selectedRow - 1].list.length - 1)  // select the last item in the list
@@ -535,16 +463,15 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   }
   const handleArrowDown = () => {
-    if (expandSideMenue) {
-      console.log("side down")
+    if (expandSideMenue) { //opened side menue      
       if (sideMenuItem === "home") setSideMenuItem("search")
       else if (sideMenuItem === "search") setSideMenuItem("myList")
       else if (sideMenuItem === "myList") setSideMenuItem("settings")
       else addListeners()
-    } else if (moreOpen) {
+    } else if (moreOpen) { //opened more pages list
       if (moreIndex < pages.length - 1) setMoreIndex(moreIndex + 1)
       else addListeners()
-    } else {
+    } else { // on page contents
       if (categories[selectedRow]?.type === "guide") { //inside guide category
         if (selectedCol < categoriesContent[selectedRow].list.length - 1) setSelectedCol(selectedCol + 1)
         uploadCategoiesContent(categories[selectedRow])
@@ -563,29 +490,30 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
 
   }
   const hendleArrowLeft = () => {
-    if (moreOpen) {
+    if (expandSideMenue) { //opened side menue
+      setExpandSideMenue(false)
+      setSideMenuItem(null)
+    }else if (moreOpen) { // opened side menue
       addListeners()
     } else if (selectedCol > 0 && (categories[selectedRow]?.type !== "guide" || selectedRow === -1)) {
       setSelectedCol(selectedCol - 1)
-    } else {
-      console.log("left more 0 Open side menu")
+    } else {//side menue not oppen     
       if (!expandSideMenue) {
         setSideMenuItem("search")
         setExpandSideMenue(true)
       } else addListeners()
-
-      //addListeners()
     }
   }
+
   const handleArrowRight = () => {
-    if (expandSideMenue) {
+    if (expandSideMenue) { //opened side menue
       setExpandSideMenue(false)
       setSideMenuItem(null)
-    } else if (moreOpen) {
+    } else if (moreOpen) { // opened more pages List
       addListeners()
     } else {
       //top menu selector topMenuLength
-      if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + My List
+      if (selectedRow === -1 && selectedCol < topMenuLength) { //specified length + more pages
         setSelectedCol(selectedCol + 1)
         //main content selector
       } else {
@@ -599,14 +527,14 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
     }
 
   }
+  //return selected video details
   const currentVideo = (): videoDisListType => {
     if (selectedRow >= 0 && categoriesContent.length > 0) {
       return categoriesContent[selectedRow].list[selectedCol]
     } else {
       return categoriesContent[0]?.list[0]
     }
-  }
-  //console.log(currentVideo())
+  }  
   return (
     <MainBox>
       {loading ? <Loading /> :
@@ -617,7 +545,6 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             transitionLeaveTimeout={500}>
             {moreOpen ? <MorePages pages={pages} selected={moreIndex} /> : ""}
           </CSSTransitionGroup>
-
           <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
@@ -626,7 +553,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
                   return (<SelectedMenuElement key={topMenuIndex}>{el.name}</SelectedMenuElement>)
                 }
                 else {
-                  return (<MenuElement selected={el.id == pageId} key={topMenuIndex}>{el.name}</MenuElement>)
+                  return (<MenuElement selected={parseInt(el.id) === parseInt(pageId)} key={topMenuIndex}>{el.name}</MenuElement>)
                 }
               } else return false
             }
@@ -667,8 +594,7 @@ const Home: React.FC<Props> = ({ history, match, pageId }) => {
             transitionLeaveTimeout={300}>
             {categories.map((catEl, sellIndex) => {
               if (sellIndex >= selectedRow) { //skip content after move
-                if (catEl.type === "showcase") {
-                  console.log("sellIndex", sellIndex)
+                if (catEl.type === "showcase") {                  
                   return (
                     <Showcase
                       key={sellIndex}

@@ -1,4 +1,3 @@
-import React from "react"
 import styled, { keyframes } from 'styled-components';
 import { ListProps } from "./index"
 import { colors } from "../../constants"
@@ -13,8 +12,7 @@ const selectItem = keyframes`
         transform: scale(1) ; 
         margin-left: -370px;
         opacity: 0;
-    }
-    
+    }    
 `
 const selectedCategory = keyframes`
     from{
@@ -25,8 +23,7 @@ const selectedCategory = keyframes`
         transform: scale(0.5) ; 
         margin-top: -170px;
         opacity: 0;
-    }
-    
+    }    
 `
 const MainContainer = styled.div`
     z-index: 1; 
@@ -38,23 +35,21 @@ const MainContainer = styled.div`
     }
 `
 const CategorRow = styled.div`
-  display: flex;  
-  flex-direction: row;
-  margin-bottom: 20px;
-  padding-top: 20px;
-  overflow: hidden;
-  align-items: flex-start;
-  font-size: 25px;
-  
+    display: flex;  
+    flex-direction: row;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    overflow: hidden;
+    align-items: flex-start;
+    font-size: 25px;  
 `
 const VideoElementNormal = styled.div` 
     flex:1;
-  margin: 10px;  
-  min-width: 300px;
-  max-width: 300px;*/
-  margin-top: 25px; 
-  filter: opacity(65%);
-
+    margin: 10px;  
+    min-width: 12vw;
+    max-width: 300px;
+    margin-top: 25px; 
+    filter: opacity(65%);
 `
 
 const SelectedVideoElementNormal = styled(VideoElementNormal)`    
@@ -73,11 +68,9 @@ const Title = styled.div`
 `
 const Image = styled.img`    
     width: 100%;
-    border-radius: 5px;
-    
+    border-radius: 5px;    
 `
-const SelectedImage = styled.img`
-  /*box-shadow: 0px 0px 40px ${colors.borderPrimary};*/
+const SelectedImage = styled.img`  
   border: solid ${colors.borderPrimary} 2px;
   width: 100%;
   border-radius: 5px;
@@ -133,7 +126,6 @@ const Normal = ({ sellIndex, categories, categoriesContent, selectedCol, selecte
                 })}
             </CSSTransitionGroup>
         </MainContainer>
-
     )
 }
 
