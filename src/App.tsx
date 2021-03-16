@@ -1,6 +1,5 @@
 import React from 'react';
 import { Switch, Route,Redirect } from "react-router-dom";
-//import Home from "./componets/Home"
 import LogIn from "./componets/LogIn"
 import Pages from "./componets/Pages"
 import Video from "./componets/Video"

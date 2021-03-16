@@ -245,7 +245,7 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         if (!loading) {
             if (previousProps?.play_pause !== play_pause) playPauseHandle()
             if (previousProps?.speedUp !== speedUp) fastForward()
-            if (previousProps?.speedDown !== speedDown) {fastBack()}
+            if (previousProps?.speedDown !== speedDown) fastBack()
             if (previousProps?.plus10s !== plus10s) moveUp10Sec()
             if (previousProps?.minus10s !== minus10s) moveDown10Sec()
         } else {

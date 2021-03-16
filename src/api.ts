@@ -1,7 +1,7 @@
 import { domain } from './constants';
 import axios from 'axios';
 
-const fetchConfig = (token = "", met = "GET", user = "", stream = "", type = "", message = "") => {
+const fetchConfig = (token = "", met = "GET") => {
     return {
         method: met,
         headers: {
