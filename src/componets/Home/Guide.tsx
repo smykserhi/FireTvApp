@@ -167,36 +167,35 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
     return (
         <MainBox>
             <TransitionGroup
-                component={null}>
+                component={null}>                   
                 {categoriesContent[sellIndex].list.map((el, colIndex) => {
                     if (selectedRow === sellIndex) {
                         if (colIndex >= selectedCol) {
                             if (colIndex === selectedCol) {
                                 return (
-                                    <CSSTransition timeout={300} classNames="category">
-                                        <SelectedCategorRow key={colIndex} >
+                                    <CSSTransition timeout={300} classNames="category"  key={colIndex} >
+                                        <SelectedCategorRow >
                                             {CategoryData(el, true)}
                                         </SelectedCategorRow>
                                     </CSSTransition>)
                             } else {
                                 return (
-                                    <CSSTransition timeout={300} classNames="category">
-                                        <CategorRow key={colIndex} >
+                                    <CSSTransition timeout={300} classNames="category" key={colIndex} >
+                                        <CategorRow  >
                                             {CategoryData(el, false)}
                                         </CategorRow>
                                     </CSSTransition>
                                 )
                             }
-                        } else return true
+                        } //else return <div></div>
                     } else return (
-                        <CSSTransition timeout={200} classNames="category">
-                            <CategorRow key={colIndex} >
+                        <CSSTransition timeout={200} classNames="category" key={colIndex} >
+                            <CategorRow  >
                                 {CategoryData(el, false)}
                             </CategorRow>
                         </CSSTransition>
                     )
                 })}
-
             </TransitionGroup>
         </MainBox>
     )

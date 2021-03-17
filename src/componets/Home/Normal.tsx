@@ -25,6 +25,7 @@ const selectedCategory = keyframes`
         opacity: 0;
     }    
 `
+
 const MainContainer = styled.div`
     z-index: 1; 
     &.category-enter.category-enter-active {   

@@ -533,21 +533,18 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
     } else {
       return categoriesContent[0]?.list[0]
     }
-  }
+  }  
   return (
     <MainBox>
       {loading ? <Loading /> :
         <div>
           <CSSTransition
-            in={moreOpen} 
-            timeout={500} 
+            in={moreOpen}
+            timeout={500}
             classNames="more"
-            unmountOnExit
-          // transitionName="more"
-          // transitionEnterTimeout={500}
-          // transitionLeaveTimeout={500}
+            unmountOnExit          
           >
-             <MorePages pages={pages} selected={moreIndex} /> 
+            <MorePages pages={pages} selected={moreIndex} />
           </CSSTransition>
           <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
           <MenuBox>
@@ -600,7 +597,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
                   if (catEl.type === "showcase") {
                     return (
                       <CSSTransition
-                        timeout={250} classNames="category" key={sellIndex+1}>
+                        timeout={250} classNames="category" key={sellIndex + 1}>
                         <Showcase
                           key={sellIndex}
                           sellIndex={sellIndex}
@@ -612,18 +609,23 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
                       </CSSTransition>
                     )
                   } else if (catEl.type === "guide") {
-                    return (                      
-                        <Guide
-                          key={catEl.id}
-                          sellIndex={sellIndex}
-                          categories={categories}
-                          categoriesContent={categoriesContent}
-                          selectedCol={selectedCol}
-                          selectedRow={selectedRow}
-                        />                      
+                    return (
+                      <CSSTransition
+                        timeout={250} classNames="category" key={sellIndex + 1}>
+                      <Guide
+                        key={catEl.id}
+                        sellIndex={sellIndex}
+                        categories={categories}
+                        categoriesContent={categoriesContent}
+                        selectedCol={selectedCol}
+                        selectedRow={selectedRow}
+                      />
+                      </CSSTransition>
                     )
                   } else if (catEl.type === "full") {
-                    return (                      
+                    return (
+                      <CSSTransition
+                        timeout={0} classNames="category" key={sellIndex + 1}>
                         <Full
                           key={catEl.id}
                           sellIndex={sellIndex}
@@ -632,11 +634,12 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
                           selectedCol={selectedCol}
                           selectedRow={selectedRow}
                         />
+                      </CSSTransition>
                     )
                   } else {
                     return (
                       <CSSTransition
-                        timeout={250} classNames="category" key={sellIndex+1}>
+                        timeout={250} classNames="category" key={sellIndex + 1}>
                         <Normal
                           key={catEl.id}
                           sellIndex={sellIndex}
