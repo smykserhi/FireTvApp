@@ -15,8 +15,7 @@ import { Loading } from "../Loading"
 import { SideMenu } from "../SideMenu"
 import moment from 'moment';
 import { hexToRGBA } from "../../constants"
-//import * as CSSTransitionGroup  from 'react-transition-group'
-var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 interface ImageProps {
   url: any
@@ -273,9 +272,9 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
                 return true
               })
               Promise.all(list).then(() => {
-                const sortedContent = sortContent(pageCategories, categoriesContents)                
+                const sortedContent = sortContent(pageCategories, categoriesContents)
                 setSelectedCol(0)
-                setSelectedRow(0)               
+                setSelectedRow(0)
                 setPages(pagesData.filter((el: page) => el.id !== pageId))//skip current page from list
                 setCategories(pageCategories)
                 setCategoriesContent(sortedContent)
@@ -288,7 +287,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
         });
     }
   }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
-  
+
   //Update Categoties
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
@@ -314,7 +313,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
             categoriesContents.forEach(el => tempCategoriesContent.push(el))
             pageCategories.forEach(el => tempCategories.push(el))
             const uniqCategory = Array.from(new Map(tempCategories.map((item: pageCategoriesType) => [item.id, item])).values());
-            const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());            
+            const uniqContent = Array.from(new Map(tempCategoriesContent.map((item: videoDisType) => [item.id, item])).values());
             const sortedContent = sortContent(uniqCategory, uniqContent)
             if (categories) setCategories(uniqCategory)
             if (categoriesContent) setCategoriesContent(sortedContent)
@@ -328,7 +327,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
 
   const uploadCategoiesContent = (category: pageCategoriesType) => {
     //console.log("uploadCategoiesContent")
-    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 20 && !categiryContentLoading) {      
+    if (category.total > categoriesContent[selectedRow].list.length && (categoriesContent[selectedRow].list.length - selectedCol) < 20 && !categiryContentLoading) {
       setCategiryContentLoading(true)
       const offset = categoriesContent[selectedRow].list.length
       //console.log("offset uploadCategoiesContent", offset)
@@ -419,7 +418,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
     } else { //selected element in the page
       if (selectedRow === -1) { // top menue 
         if (selectedCol <= topMenuLength - 1) { // selected page
-          const selectedPageId = pages[selectedCol].id          
+          const selectedPageId = pages[selectedCol].id
           history.push(`${PAGES}/${selectedPageId}`)
           setLoading(true)
         } else { // selected More option          
@@ -447,7 +446,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
         setSelectedCol(selectedCol - 1)
       } else if (categories[selectedRow]?.type === "full" && selectedCol > 4) { //inside full category
         setSelectedCol(selectedCol - 5)
-      } else { 
+      } else {
         if (selectedRow > -1) { // not in top menue
           setSelectedRow(selectedRow - 1) //set previous row
           if (selectedRow > 0 && categories[selectedRow - 1]?.type === "full") { //if previous category type full         
@@ -493,7 +492,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
     if (expandSideMenue) { //opened side menue
       setExpandSideMenue(false)
       setSideMenuItem(null)
-    }else if (moreOpen) { // opened side menue
+    } else if (moreOpen) { // opened side menue
       addListeners()
     } else if (selectedCol > 0 && (categories[selectedRow]?.type !== "guide" || selectedRow === -1)) {
       setSelectedCol(selectedCol - 1)
@@ -534,17 +533,22 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
     } else {
       return categoriesContent[0]?.list[0]
     }
-  }  
+  }
   return (
     <MainBox>
       {loading ? <Loading /> :
         <div>
-          <CSSTransitionGroup
-            transitionName="more"
-            transitionEnterTimeout={500}
-            transitionLeaveTimeout={500}>
-            {moreOpen ? <MorePages pages={pages} selected={moreIndex} /> : ""}
-          </CSSTransitionGroup>
+          <CSSTransition
+            in={moreOpen} 
+            timeout={500} 
+            classNames="more"
+            unmountOnExit
+          // transitionName="more"
+          // transitionEnterTimeout={500}
+          // transitionLeaveTimeout={500}
+          >
+             <MorePages pages={pages} selected={moreIndex} /> 
+          </CSSTransition>
           <SideMenu expand={expandSideMenue} selected={sideMenuItem} />
           <MenuBox>
             {pages.map((el, topMenuIndex) => {
@@ -587,62 +591,68 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
               {/* <Image src={currentVideo().mediumImage} alt="Imag"></Image> */}
             </ImageDis>
           </MainDis>
-          <CSSTransitionGroup
-            component={CategoryBox}
-            transitionName="category"
-            transitionEnterTimeout={300}
-            transitionLeaveTimeout={300}>
-            {categories.map((catEl, sellIndex) => {
-              if (sellIndex >= selectedRow) { //skip content after move
-                if (catEl.type === "showcase") {                  
-                  return (
-                    <Showcase
-                      key={sellIndex}
-                      sellIndex={sellIndex}
-                      categories={categories}
-                      categoriesContent={categoriesContent}
-                      selectedCol={selectedCol}
-                      selectedRow={selectedRow}
-                    />
-                  )
-                } else if (catEl.type === "guide") {
-                  return (
-                    <Guide
-                      key={catEl.id}
-                      sellIndex={sellIndex}
-                      categories={categories}
-                      categoriesContent={categoriesContent}
-                      selectedCol={selectedCol}
-                      selectedRow={selectedRow}
-                    />
-                  )
-                } else if (catEl.type === "full") {
-                  return (
-                    <Full
-                      key={catEl.id}
-                      sellIndex={sellIndex}
-                      categories={categories}
-                      categoriesContent={categoriesContent}
-                      selectedCol={selectedCol}
-                      selectedRow={selectedRow}
-                    />
-                  )
-                } else {
-                  return (
-                    <Normal
-                      key={catEl.id}
-                      sellIndex={sellIndex}
-                      categories={categories}
-                      categoriesContent={categoriesContent}
-                      selectedCol={selectedCol}
-                      selectedRow={selectedRow}
-                    />
-                  )
-                }
-              } else return false
-            }
-            )}
-          </CSSTransitionGroup>
+          <CategoryBox>
+            <TransitionGroup
+              component={null}
+            >
+              {categories.map((catEl, sellIndex) => {
+                if (sellIndex >= selectedRow) { //skip content after move
+                  if (catEl.type === "showcase") {
+                    return (
+                      <CSSTransition
+                        timeout={250} classNames="category" key={sellIndex+1}>
+                        <Showcase
+                          key={sellIndex}
+                          sellIndex={sellIndex}
+                          categories={categories}
+                          categoriesContent={categoriesContent}
+                          selectedCol={selectedCol}
+                          selectedRow={selectedRow}
+                        />
+                      </CSSTransition>
+                    )
+                  } else if (catEl.type === "guide") {
+                    return (                      
+                        <Guide
+                          key={catEl.id}
+                          sellIndex={sellIndex}
+                          categories={categories}
+                          categoriesContent={categoriesContent}
+                          selectedCol={selectedCol}
+                          selectedRow={selectedRow}
+                        />                      
+                    )
+                  } else if (catEl.type === "full") {
+                    return (                      
+                        <Full
+                          key={catEl.id}
+                          sellIndex={sellIndex}
+                          categories={categories}
+                          categoriesContent={categoriesContent}
+                          selectedCol={selectedCol}
+                          selectedRow={selectedRow}
+                        />
+                    )
+                  } else {
+                    return (
+                      <CSSTransition
+                        timeout={250} classNames="category" key={sellIndex+1}>
+                        <Normal
+                          key={catEl.id}
+                          sellIndex={sellIndex}
+                          categories={categories}
+                          categoriesContent={categoriesContent}
+                          selectedCol={selectedCol}
+                          selectedRow={selectedRow}
+                        />
+                      </CSSTransition>
+                    )
+                  }
+                } else return false
+              }
+              )}
+            </TransitionGroup>
+          </CategoryBox>
         </div>
       }
     </MainBox>

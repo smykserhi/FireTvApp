@@ -11,9 +11,7 @@ import { CarSport } from "@styled-icons/ionicons-sharp/CarSport"
 import { Speedometer2 } from "@styled-icons/bootstrap/Speedometer2"
 import { Loading } from "../Loading"
 import api from "../../api";
-var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
-
-
+import { CSSTransition } from 'react-transition-group'
 
 interface ButtonProps {
     clicked?: boolean
@@ -36,7 +34,6 @@ const ButtonClickAnimation = keyframes`
     }
 `
 
-
 const ButtonClickAnimation2 = keyframes`
     0% {
         transform: scale(1);
@@ -58,8 +55,6 @@ const MenueAnimation = keyframes`
         transform: translateY(0);        
     }
 `
-
-
 
 const Forward10Button = styled(Forward10) <ButtonProps>`
     width: 3rem;
@@ -113,7 +108,7 @@ const MenueContainer = styled.div`
     &.category-enter.category-enter-active {   
         animation: ${MenueAnimation}  0.4s ease-in-out ;            
       }     
-      &.category-leave.category-leave-active {   
+      &.category-exit.category-exit-active {   
           animation: ${MenueAnimation}  0.5s ease-in-out reverse;     
       }
 `
@@ -426,47 +421,47 @@ const VideoPlayer: React.FC<VideoProps> = ({ url, closeVideo, play_pause, speedU
         <div>
             {!videoReady ? <Loading /> : ""}
             <StyledVideo ref={video} autoPlay id="video">
-                <source src={url} type="application/x-mpegURL" />
-                {/* <source src={url} type="video/mp4" /> */}
+                {/* <source src={url} type="application/x-mpegURL" /> */}
+                <source src={url} type="video/mp4" />
             </StyledVideo>
-            <CSSTransitionGroup
-                transitionName="category"
-                transitionEnterTimeout={400}
-                transitionLeaveTimeout={400}>
-                {showVideoMenue
-                    ? <MenueContainer>
-                        <ProgressContainer>
-                            <ProgressBox>
-                                <ProgressElement width={progress}> </ProgressElement><StyledCarSport width={progress} />
-                            </ProgressBox>
-                        </ProgressContainer>
-                        <ButtonContainer>
-                            <SpeedBox>
-                                Speed:{Speed()}
-                            </SpeedBox>
-                            <CurrentTimeBox>
-                                <TimeContainer>                                    
-                                    {currentTime?.hours > 0 ? `${currentTime?.hours}h:` : ""}
-                                    {currentTime?.minutes > 0 ? `${currentTime?.minutes}m:` : ""}
-                                    {currentTime?.seconds}s
+            <CSSTransition
+                in={showVideoMenue}
+                timeout={400}
+                classNames="category"
+                unmountOnExit
+            >
+                <MenueContainer>
+                    <ProgressContainer>
+                        <ProgressBox>
+                            <ProgressElement width={progress}> </ProgressElement><StyledCarSport width={progress} />
+                        </ProgressBox>
+                    </ProgressContainer>
+                    <ButtonContainer>
+                        <SpeedBox>
+                            Speed:{Speed()}
+                        </SpeedBox>
+                        <CurrentTimeBox>
+                            <TimeContainer>
+                                {currentTime?.hours > 0 ? `${currentTime?.hours}h:` : ""}
+                                {currentTime?.minutes > 0 ? `${currentTime?.minutes}m:` : ""}
+                                {currentTime?.seconds}s
                             </TimeContainer>
-                            </CurrentTimeBox>
-                            <div>
-                                {backSpeed ? <BackwardButton clicked={true} onClick={fastBack} /> : <BackwardButton clicked={false} onClick={fastBack} />}
-                                {minus10Sec ? <Replay10Button clicked={true} onClick={moveDown10Sec} /> : <Replay10Button clicked={false} onClick={moveDown10Sec} />}
-                                {playing ? <PauseCircleButton clicked={play_pause} onClick={playPauseHandle} /> : <PlayCircleButton clicked={play_pause} onClick={playPauseHandle} />}
-                                {plus10Sec ? <Forward10Button clicked={true} onClick={moveUp10Sec} /> : <Forward10Button clicked={false} onClick={moveUp10Sec} />}
-                                {forwardSpeed ? <Forward2Button clicked={true} onClick={fastForward} /> : <Forward2Button clicked={false} onClick={fastForward} />}
-                            </div>
-                            <TimeContainer>                                
-                                {videoDuration?.hours > 0 ? `${videoDuration?.hours}h:` : ""}
-                                {videoDuration?.minutes > 0 ? `${videoDuration?.minutes}m:` : ""}
-                                {videoDuration?.seconds}s
+                        </CurrentTimeBox>
+                        <div>
+                            {backSpeed ? <BackwardButton clicked={true} onClick={fastBack} /> : <BackwardButton clicked={false} onClick={fastBack} />}
+                            {minus10Sec ? <Replay10Button clicked={true} onClick={moveDown10Sec} /> : <Replay10Button clicked={false} onClick={moveDown10Sec} />}
+                            {playing ? <PauseCircleButton clicked={play_pause} onClick={playPauseHandle} /> : <PlayCircleButton clicked={play_pause} onClick={playPauseHandle} />}
+                            {plus10Sec ? <Forward10Button clicked={true} onClick={moveUp10Sec} /> : <Forward10Button clicked={false} onClick={moveUp10Sec} />}
+                            {forwardSpeed ? <Forward2Button clicked={true} onClick={fastForward} /> : <Forward2Button clicked={false} onClick={fastForward} />}
+                        </div>
+                        <TimeContainer>
+                            {videoDuration?.hours > 0 ? `${videoDuration?.hours}h:` : ""}
+                            {videoDuration?.minutes > 0 ? `${videoDuration?.minutes}m:` : ""}
+                            {videoDuration?.seconds}s
                         </TimeContainer>
-                        </ButtonContainer>
-                    </MenueContainer>
-                    : ""}
-            </CSSTransitionGroup>
+                    </ButtonContainer>
+                </MenueContainer>
+            </CSSTransition>
         </div>
     )
 }

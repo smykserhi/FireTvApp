@@ -594,8 +594,8 @@ const Video: React.FC<RouteComponentProps<matchParamsType>> = ({ history, match 
                         <VideoBox>
                             <VideoPlayer
                                 closeVideo={handleCloseVideo}
-                                // url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
-                                url={videoDis ? videoDis.url : ""}
+                                url="https://media.w3.org/2010/05/sintel/trailer_hd.mp4"
+                                // url={videoDis ? videoDis.url : ""}
                                 play_pause={play_pause}
                                 speedUp={speedUp}
                                 speedDown={speedDown}

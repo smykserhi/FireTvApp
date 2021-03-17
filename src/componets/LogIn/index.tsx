@@ -192,6 +192,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
             {error ? <ErrorBox className="error">{error}</ErrorBox> : ""}
             <FormControlsBox >
                 <Input
+                    tabIndex={1}
                     ref={emailRef}
                     autoFocus
                     type="email"
@@ -201,6 +202,7 @@ const LogIn: React.FC<RouteComponentProps> = ({ history }) => {
                     onChange={onChageHandler}
                 />
                 <Input
+                    tabIndex={2}
                     ref={passwordlRef}
                     type="password"
                     name="password"

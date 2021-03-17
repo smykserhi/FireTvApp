@@ -2,7 +2,7 @@ import styled, { keyframes } from 'styled-components';
 import { videoDisListType, ListProps } from "./index"
 import moment from 'moment';
 import { colors } from "../../constants"
-var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 const jelloHorizontal = keyframes`
     0% {
@@ -59,7 +59,7 @@ const SelectedCategorRow = styled(CategorRow)`
     &.category-enter.category-enter-active {   
         animation: ${selectedCategory}  0.4s ease-in-out reverse;            
     }     
-    &.category-leave.category-leave-active {   
+    &.category-exit.category-exit-active {   
         animation: ${selectedCategory}  0.4s ease-in-out ;     
     }
 `
@@ -165,25 +165,40 @@ const Guide = ({ sellIndex, categoriesContent, selectedCol, selectedRow }: ListP
         )
     }
     return (
-        <CSSTransitionGroup
-            component={MainBox}
-            transitionName="category"
-            transitionEnterTimeout={400}
-            transitionLeaveTimeout={400}>
-            {categoriesContent[sellIndex].list.map((el, colIndex) => {
-                if (selectedRow === sellIndex) {
-                    if (colIndex >= selectedCol) {
-                        if (colIndex === selectedCol) {
-                            return (<SelectedCategorRow key={colIndex} >{CategoryData(el, true)}</SelectedCategorRow>)
-                        } else {
-                            return (<CategorRow key={colIndex} >{CategoryData(el, false)}</CategorRow>)
-                        }
-                    } else return true
-                } else return (<CategorRow key={colIndex} >{CategoryData(el, false)}</CategorRow>)
+        <MainBox>
+            <TransitionGroup
+                component={null}>
+                {categoriesContent[sellIndex].list.map((el, colIndex) => {
+                    if (selectedRow === sellIndex) {
+                        if (colIndex >= selectedCol) {
+                            if (colIndex === selectedCol) {
+                                return (
+                                    <CSSTransition timeout={300} classNames="category">
+                                        <SelectedCategorRow key={colIndex} >
+                                            {CategoryData(el, true)}
+                                        </SelectedCategorRow>
+                                    </CSSTransition>)
+                            } else {
+                                return (
+                                    <CSSTransition timeout={300} classNames="category">
+                                        <CategorRow key={colIndex} >
+                                            {CategoryData(el, false)}
+                                        </CategorRow>
+                                    </CSSTransition>
+                                )
+                            }
+                        } else return true
+                    } else return (
+                        <CSSTransition timeout={200} classNames="category">
+                            <CategorRow key={colIndex} >
+                                {CategoryData(el, false)}
+                            </CategorRow>
+                        </CSSTransition>
+                    )
+                })}
 
-            })}
-
-        </CSSTransitionGroup>
+            </TransitionGroup>
+        </MainBox>
     )
 }
 

@@ -48,7 +48,7 @@ const MoreList = styled.div`
     &.more-enter.more-enter-active {   
         animation: ${moreList}  0.5s ease-in-out reverse;            
     }     
-    &.more-leave.more-leave-active {   
+    &.more-exit.more-exit-active {   
         animation: ${moreList}  0.6s ease-in-out ;     
     }
 `
@@ -100,8 +100,8 @@ const MorePages = ({ pages, selected }: MorePagesProps) => {
             <ElementsContainer>
                 {pages.map((page, pagesIndex) => {                    
                     if (pagesIndex > selected - 3 && pagesIndex < selected + 3) {
-                        if (pagesIndex === selected) return <SelectedPagesElement>{page.name}</SelectedPagesElement>
-                        else return <PagesElement>{page.name}</PagesElement>
+                        if (pagesIndex === selected) return <SelectedPagesElement key={page.name}>{page.name}</SelectedPagesElement >
+                        else return <PagesElement key={page.name}>{page.name}</PagesElement >
                     }else return false
                 })}
             </ElementsContainer>

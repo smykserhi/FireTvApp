@@ -1,8 +1,8 @@
 import styled, { keyframes } from 'styled-components';
 import { ListProps } from "./index"
 import { colors } from "../../constants"
-//import { CSSTransitionGroup } from 'react-transition-group'
-var CSSTransitionGroup = require('react-transition-group/CSSTransitionGroup')
+import { CSSTransition, TransitionGroup } from 'react-transition-group' 
+
 const selectItem = keyframes`
     from{
         transform: scale(1.4) ; 
@@ -28,10 +28,10 @@ const selectedCategory = keyframes`
 const MainContainer = styled.div`
     z-index: 1; 
     &.category-enter.category-enter-active {   
-        animation: ${selectedCategory}  0.3s ease-in-out reverse;            
+        animation: ${selectedCategory}  0.4s ease-in-out reverse;            
     }     
-    &.category-leave.category-leave-active {   
-        animation: ${selectedCategory}  0.3s ease-in-out ;     
+    &.category-exit.category-exit-active {   
+        animation: ${selectedCategory}  0.4s ease-in-out ;     
     }
 `
 const CategorRow = styled.div`
@@ -46,8 +46,8 @@ const CategorRow = styled.div`
 const VideoElementNormal = styled.div` 
     flex:1;
     margin: 10px;  
-    min-width: 12vw;
-    max-width: 300px;
+    min-width: 15vw;
+    max-width: 15vw;
     margin-top: 25px; 
     filter: opacity(65%);
 `
@@ -59,7 +59,7 @@ const SelectedVideoElementNormal = styled(VideoElementNormal)`
     &.list-enter.list-enter-active {   
         animation: ${selectItem}  0.3s ease-in-out reverse;            
       }     
-    &.list-leave.list-leave-active {   
+    &.list-exit.list-exit-active {   
         animation: ${selectItem}  0.3s ease-in-out ;     
       }
 `
@@ -90,41 +90,45 @@ const Normal = ({ sellIndex, categories, categoriesContent, selectedCol, selecte
     return (
         <MainContainer>
             <Title >{categories[sellIndex].name}</Title>
-            <CSSTransitionGroup
-                key={sellIndex}
-                component={CategorRow}
-                transitionName="list"
-                transitionEnterTimeout={200}                
-                transitionLeaveTimeout={200}>                
-                {categoriesContent[sellIndex].list.map((el, colIndex) => {
-                    if (selectedRow === sellIndex) { //if selected row
-                        if (colIndex >= selectedCol) {//don't show elements before selected
-                            if (sellIndex === selectedRow && colIndex === selectedCol) {
-                                return (
-                                    <SelectedVideoElementNormal key={colIndex} >
-                                        <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
-                                        <VideoTitle>{el.title}</VideoTitle>
-                                    </SelectedVideoElementNormal>
-                                )
-                            } else {
-                                return (
+            <CategorRow>
+                <TransitionGroup
+                    component={null}>
+                    {categoriesContent[sellIndex].list.map((el, colIndex) => {
+                        if (selectedRow === sellIndex) { //if selected row
+                            if (colIndex >= selectedCol) {//don't show elements before selected
+                                if (sellIndex === selectedRow && colIndex === selectedCol) {
+                                    return (
+                                        <CSSTransition timeout={200} classNames="list" key={el.title}>
+                                            <SelectedVideoElementNormal key={colIndex} >
+                                                <SelectedImage src={el.smallImage} alt="Imag"></SelectedImage>
+                                                <VideoTitle>{el.title}</VideoTitle>
+                                            </SelectedVideoElementNormal>
+                                        </CSSTransition>
+                                    )
+                                } else {
+                                    return (
+                                        <CSSTransition timeout={200} classNames="list" key={el.title}>
+                                            <VideoElementNormal key={colIndex} >
+                                                <Image src={el.smallImage} alt="Imag"></Image>
+                                                <VideoTitle>{el.title}</VideoTitle>
+                                            </VideoElementNormal>
+                                        </CSSTransition>
+                                    )
+                                }
+                            } else return false
+                        } else {
+                            return (
+                                <CSSTransition timeout={200} classNames="list" key={el.title}>
                                     <VideoElementNormal key={colIndex} >
                                         <Image src={el.smallImage} alt="Imag"></Image>
                                         <VideoTitle>{el.title}</VideoTitle>
                                     </VideoElementNormal>
-                                )
-                            }
-                        } else return false
-                    } else {
-                        return (
-                            <VideoElementNormal key={colIndex} >
-                                <Image src={el.smallImage} alt="Imag"></Image>
-                                <VideoTitle>{el.title}</VideoTitle>
-                            </VideoElementNormal>
-                        )
-                    }
-                })}
-            </CSSTransitionGroup>
+                                </CSSTransition>
+                            )
+                        }
+                    })}
+                </TransitionGroup>
+            </CategorRow>
         </MainContainer>
     )
 }
