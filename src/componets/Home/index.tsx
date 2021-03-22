@@ -156,6 +156,7 @@ export interface pageCategoriesType {
   name: string,
   total: number,
   type: string,
+  content_items: []
 }
 export interface page {
   default: boolean,
@@ -257,29 +258,38 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
           let pagesData: page[] = res
           const defaultPage = res.filter((el: page) => el.default === true)
           const pageIdLoad = pageId === HOME ? defaultPage[0].id : pageId
-          api.getPageContent(pageIdLoad, pageIdLoad)
+          api.getPageContent(pageIdLoad)
             .then((res) => {
               const categoriesContents: videoDisType[] = []
-              const pageCategories: pageCategoriesType[] = res
-              let list: any[] = []
-              pageCategories.map((el) => {
-                list.push(
-                  api.getCategoriContent(el.id)
-                    .then((res) => {
-                      categoriesContents.push({ id: el.id, list: res })
-                    })
-                )
-                return true
-              })
-              Promise.all(list).then(() => {
-                const sortedContent = sortContent(pageCategories, categoriesContents)
-                setSelectedCol(0)
-                setSelectedRow(0)
-                setPages(pagesData.filter((el: page) => el.id !== pageId))//skip current page from list
-                setCategories(pageCategories)
-                setCategoriesContent(sortedContent)
-                setLoading(false)
-              })
+              const pageCategories: pageCategoriesType[] = res.categories
+              res.categories.forEach((element:pageCategoriesType) => {
+                categoriesContents.push( {id: element.id, list: element.content_items})
+              });
+              setSelectedCol(0)
+              setSelectedRow(0)
+              setPages(pagesData)
+              setCategories(pageCategories)
+              setCategoriesContent(categoriesContents)              
+              setLoading(false)
+              //let list: any[] = []
+              // pageCategories.map((el) => {
+              //   list.push(
+              //     api.getCategoriContent(el.id)
+              //       .then((res) => {
+              //         categoriesContents.push({ id: el.id, list: res })
+              //       })
+              //   )
+              //   return true
+              // })
+              // Promise.all(list).then(() => {
+              //   const sortedContent = sortContent(pageCategories, categoriesContents)
+              //   setSelectedCol(0)
+              //   setSelectedRow(0)
+              //   setPages(pagesData.filter((el: page) => el.id !== pageId))//skip current page from list
+              //   setCategories(pageCategories)
+              //   setCategoriesContent(sortedContent)
+              //   setLoading(false)
+              // })
             })
         })
         .catch((err) => {
@@ -287,27 +297,34 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
         });
     }
   }, [loading, Token, history, pageId]) //run this effect only if this variebles changed  
-
+  console.log("Pages", pages)
+  console.log("Categories",categories)
+  console.log("categoriesContent",categoriesContent)
   //Update Categoties
   const uploadCategories = () => {
     if (categories.length !== 0 && (categories.length - selectedRow) < 10 && !categoryesloading && categories[selectedRow]?.type !== "guide") {
       setCategoryesloading(true)
       const offset = categories.length
       //console.log("Categories offset", offset)
-      api.getPageContent(pageId, 20, offset)
+      const defaultPage = pages.filter((el: page) => el.default === true)
+      const pageIdLoad = pageId === HOME ? defaultPage[0].id : pageId
+      api.getPageContentById(pageIdLoad, 20, offset)
         .then((newCategiry) => {
           const categoriesContents: videoDisType[] = []
           const pageCategories: pageCategoriesType[] = newCategiry
-          let list: any[] = []
-          pageCategories.forEach((el) => {
-            list.push(
-              api.getCategoriContent(el.id)
-                .then((res) => {
-                  categoriesContents.push({ id: el.id, list: res })
-                })
-            )
-          })
-          Promise.all(list).then(() => {
+          newCategiry.forEach((element:pageCategoriesType) => {
+            categoriesContents.push( {id: element.id, list: element.content_items})
+          });
+          // let list: any[] = []
+          // pageCategories.forEach((el) => {
+          //   list.push(
+          //     api.getCategoriContent(el.id)
+          //       .then((res) => {
+          //         categoriesContents.push({ id: el.id, list: res })
+          //       })
+          //   )
+          // })
+          // Promise.all(list).then(() => {
             let tempCategoriesContent = categoriesContent
             let tempCategories = categories
             categoriesContents.forEach(el => tempCategoriesContent.push(el))
@@ -319,7 +336,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
             if (categoriesContent) setCategoriesContent(sortedContent)
             setCategoryesloading(false)
             //console.log("add categories to page ", pageId)
-          })
+          // })
         })
         .catch(error => console.log(error));
     }
@@ -533,7 +550,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
     } else {
       return categoriesContent[0]?.list[0]
     }
-  }  
+  }
   return (
     <MainBox>
       {loading ? <Loading /> :
@@ -542,7 +559,7 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
             in={moreOpen}
             timeout={500}
             classNames="more"
-            unmountOnExit          
+            unmountOnExit
           >
             <MorePages pages={pages} selected={moreIndex} />
           </CSSTransition>
@@ -612,14 +629,14 @@ const Home: React.FC<Props> = ({ history, pageId }) => {
                     return (
                       <CSSTransition
                         timeout={250} classNames="category" key={sellIndex + 1}>
-                      <Guide
-                        key={catEl.id}
-                        sellIndex={sellIndex}
-                        categories={categories}
-                        categoriesContent={categoriesContent}
-                        selectedCol={selectedCol}
-                        selectedRow={selectedRow}
-                      />
+                        <Guide
+                          key={catEl.id}
+                          sellIndex={sellIndex}
+                          categories={categories}
+                          categoriesContent={categoriesContent}
+                          selectedCol={selectedCol}
+                          selectedRow={selectedRow}
+                        />
                       </CSSTransition>
                     )
                   } else if (catEl.type === "full") {

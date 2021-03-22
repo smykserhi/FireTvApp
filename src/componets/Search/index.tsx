@@ -140,6 +140,7 @@ const SelectedImage = styled.img`
 `
 const SearchQwery = styled.div`    
     margin-left: 5px;
+    position: relative;
 `
 const StyledCarSport = styled(CarSport)`
     width: 5rem;
@@ -166,10 +167,24 @@ const StyledArrowBack = styled(ArrowBack)`
   height: 60%;
   margin-right: 10px;
 `
+const PreviousSearchBox = styled.div`
+    position: absolute;
+    top:100%;
+    background-color: ${colors.bgPrimary};
+    padding: 1rem;
+    border: 1px solid;
+    border-radius: 5px;
+`
+const PreviousSearchElement = styled.div<CharBoxProps>`
+    /*color: red;*/
+    transform: scale(${props => props.selected ? 1.1 : 1});
+    color : ${props => props.selected ? colors.primary : ""};
 
+`
 const Search: React.FC<RouteComponentProps> = ({ history }) => {
+    const localStorageSavedSearch = localStorage.getItem("search")?.split(",")
     const selectToken = (state: StorageType) => state.logIn.token
-    const selectSearch = (state:StorageType)=>state.data.search
+    const selectSearch = (state: StorageType) => state.data.search
     const Token = useSelector(selectToken) //token 
     const reduxSearch = useSelector(selectSearch)
     const dispatch = useDispatch()
@@ -180,11 +195,14 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
     const [loading, setLoading] = useState<boolean>(false) //loading new results
     const [expandSideMenue, setExpandSideMenue] = useState<boolean>(false)
     const [sideMenuItem, setSideMenuItem] = useState<sideMenuType>(null)
+    const [savedSearch, setSavedSearch] = useState<string[]>([])
+    const [selectedSavedSearchElement, setSelectedSavedSearchElement] = useState<number | null>(null) //previous search results
+
 
     useEffect(() => {
         if (!Token) history.push(LOGIN)
         else {
-            addListeners()            
+            addListeners()
             return () => {
                 //component will unmount
                 removeListeners()
@@ -197,10 +215,14 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         if (search !== "") {
             api.searchContent(search)
                 .then(res => {
-                    setSearchResult(res)                    
+                    setSearchResult(res)
+                    //console.log(res)                   
                 })
                 .catch(error => console.log(error));
-        }
+            //console.log("Contains", localStorageSavedSearch.filter(el=>el.includes(search)))
+            //console
+            localStorageSavedSearch?.length && setSavedSearch(localStorageSavedSearch.filter(el => el.includes(search)))
+        } else setSavedSearch([])
     }, [search])
 
     const getSearchContent = (search: string, offset = 0) => {
@@ -212,12 +234,11 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     res.forEach((element: videoDisListType) => {
                         tmpSearchResult.push(element)
                     });
-                    setSearchResult(tmpSearchResult)                    
+                    setSearchResult(tmpSearchResult)
                     setLoading(false)
                 })
                 .catch(error => console.log(error));
         }
-
     }
     const addListeners = () => {
         document.addEventListener("keydown", handleKeyDown, true);
@@ -265,7 +286,7 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         e.preventDefault();
     }
     const hendleBack = () => {
-        history.push(`${PAGES}/${HOME}`)        
+        history.push(`${PAGES}/${HOME}`)
     }
     const handleEnter = () => {
         if (expandSideMenue) {
@@ -283,27 +304,32 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     closeSideMenue()
             }
         } else {
-            if (selectedVideo < 0) { // on keyboard
+            if (selectedVideo < 0) { // on keyboard or
                 console.log("Hit Enter")
-                if (selectedKey >= 0 && selectedKey < keyboard.length) {
-                    if (keyboard[selectedKey] === "<" && search.length > 0) setSearch(search.slice(0, -1))
-                    else if (keyboard[selectedKey] === "<" && search.length === 0) addListeners()
-                    else if (keyboard[selectedKey] === "_") setSearch(search + " ")
-                    else setSearch(search + keyboard[selectedKey])
-                } else if (selectedKey === keyboard.length){ 
-                    dispatch(clearSearch()) // clear search from Redux
-                    //setSearch("")
-                    history.goBack()
+                if (selectedSavedSearchElement !== null) {    // on previous search results
+                    setSearch(savedSearch[selectedSavedSearchElement])
+                    selectVideoElemnt() //                     
+                } else {
+                    if (selectedKey >= 0 && selectedKey < keyboard.length) {
+                        if (keyboard[selectedKey] === "<" && search.length > 0) setSearch(search.slice(0, -1))
+                        else if (keyboard[selectedKey] === "<" && search.length === 0) addListeners()
+                        else if (keyboard[selectedKey] === "_") setSearch(search + " ")
+                        else setSearch(search + keyboard[selectedKey])
+                    } else if (selectedKey === keyboard.length) {
+                        dispatch(clearSearch()) // clear search from Redux
+                        //setSearch("")
+                        history.goBack()
+                    }
+                    else addListeners()
                 }
-                else addListeners()
+
             } else { // on vodeo search
                 dispatch(addVideo(searchResult[selectedVideo])) // add video to redux
                 dispatch(addSearch(search))
+                localStorage.setItem("search", ConverToLocalStorage())
                 history.push(`${VIDEO}/${searchResult[selectedVideo].id}`)
             }
         }
-
-
     }
 
     const handleArrowUp = () => {
@@ -323,18 +349,21 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             }
         } else {
             if (selectedVideo < 0) { // on keyboard
+                console.log("up")
                 if (selectedKey > 5) { //if not first line
                     setSelectedKey(selectedKey - 6)
                     if (selectedKey === keyboard.length) setSelectedKey(keyboard.length - 2) // if "Go Beck"
                     else if (keyboard[selectedKey] === "<") setSelectedKey(keyboard.length - 3)
                     else if (keyboard[selectedKey] === "_") setSelectedKey(keyboard.length - 8)
                 } else {
-                    addListeners()
+                    if (selectedSavedSearchElement !== null && selectedSavedSearchElement > 0) {
+                        setSelectedSavedSearchElement(selectedSavedSearchElement - 1)
+                    } else addListeners()
                 }
             } else { // on vodeo search
                 if (selectedVideo > 3) {
                     setSelectedVideo(selectedVideo - 4)
-                } else addListeners()  
+                } else addListeners()
             }
         }
     }
@@ -355,32 +384,43 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
             }
         } else {
             if (selectedVideo < 0) { // on keyboard
-                if (selectedKey < keyboard.length) {
+                if (selectedKey < keyboard.length && selectedSavedSearchElement === null) {
                     if (selectedKey > keyboard.length - 9 && selectedKey < keyboard.length - 5) setSelectedKey(keyboard.length - 2)
                     else if (selectedKey >= keyboard.length - 5 && selectedKey < keyboard.length - 2) setSelectedKey(keyboard.length - 1)
                     else if (selectedKey >= keyboard.length - 2 && selectedKey < keyboard.length) setSelectedKey(keyboard.length)
                     else setSelectedKey(selectedKey + 6)
                 } else {
-                    if (selectedKey !== keyboard.length) setSelectedKey(keyboard.length)
-                    else addListeners()                    
+                    if (selectedSavedSearchElement !== null) {//previous search
+                        if (selectedSavedSearchElement < savedSearch.length - 1) setSelectedSavedSearchElement(selectedSavedSearchElement + 1)
+                        else {
+                            selectVideoElemnt()
+                        }
+                    } else {
+                        if (selectedKey !== keyboard.length) setSelectedKey(keyboard.length)
+                        else addListeners()
+                    }
                 }
             } else { // on vodeo search                
                 if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
                 if (selectedVideo < searchResult.length - 4) {
                     setSelectedVideo(selectedVideo + 4)
-                } else addListeners()               
+                } else addListeners()
             }
         }
-    }    
+    }
     const hendleArrowLeft = () => {
-        if (expandSideMenue) { 
+        if (expandSideMenue) {
             closeSideMenue()
-        }else if (selectedVideo < 0) {// on keyboard            
+        } else if (selectedVideo < 0) {// on keyboard            
             if (selectedKey % 6 === 0 || selectedKey === 0 || selectedKey === keyboard.length) { //open side menue
                 setExpandSideMenue(true)
                 setSelectedKey(-1)
                 setSideMenuItem("home")
-            } else setSelectedKey(selectedKey - 1)            
+            } else {
+                if (selectedSavedSearchElement !== null) { //previous search
+                    selectVideoElemnt()
+                } else setSelectedKey(selectedKey - 1)
+            }
         } else { // on vodeo search
             if (selectedVideo === 0 || (selectedVideo % 4) === 0) { //return to keyboard
                 setSelectedVideo(-1)
@@ -389,22 +429,30 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         }
     }
     const handleArrowRight = () => {
-        if (expandSideMenue) { 
+        if (expandSideMenue) {
             closeSideMenue()
         } else {
             if (selectedVideo < 0) {// on keyboard
-                if (selectedVideo < 0) { //if on keyboard
-                    if (((selectedKey + 1) % 6 === 0 || selectedKey === keyboard.length - 1) && searchResult.length > 0) {
-                        console.log("out")
-                        setSelectedVideo(0) //move to search result 
-                        setSelectedKey(-1)
-                    } else if (selectedKey < keyboard.length) setSelectedKey(selectedKey + 1)
-                    else {
-                        addListeners()
+                // if (selectedVideo < 0) { //if on keyboard
+                if (((selectedKey + 1) % 6 === 0 || selectedKey === keyboard.length - 1) && searchResult.length > 0) {
+                    console.log("out")
+                    if (savedSearch.length > 0) {  //select firdt of previous serches                          
+                        if (selectedSavedSearchElement === null) setSelectedSavedSearchElement(0)
+                        else { // close previous searches
+                            selectVideoElemnt()
+                        }
+                    } else {
+                        setSelectedVideo(0)//move to search result 
                     }
-                } else {
+                    setSelectedKey(-1)
+                } else if (selectedKey < keyboard.length) setSelectedKey(selectedKey + 1)
+                else {
+                    console.log("here")
                     addListeners()
                 }
+                // } else {
+                //     addListeners()
+                // }
             } else { // on vodeo search
                 console.log("Right on search field ")
                 if (selectedVideo > searchResult.length - 19) getSearchContent(search, searchResult.length)//upload more search results
@@ -415,11 +463,23 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
         }
 
     }
+    //close previous list and select first video element
+    const selectVideoElemnt = () => {
+        setSelectedVideo(0)
+        setSelectedSavedSearchElement(null)
+        setSavedSearch([])
+    }
     //close side menue
     const closeSideMenue = () => {
         setExpandSideMenue(false)
         setSelectedKey(0)
         setSideMenuItem(null)
+    }
+    //convert savedSearch arrey to sting for local storage
+    const ConverToLocalStorage = (): string => {
+        let tmpLocalStorageSavedSearch = localStorageSavedSearch ? localStorageSavedSearch : []
+        if (!tmpLocalStorageSavedSearch.includes(search)) tmpLocalStorageSavedSearch.push(search)
+        return tmpLocalStorageSavedSearch.join()
     }
 
     return (
@@ -430,13 +490,21 @@ const Search: React.FC<RouteComponentProps> = ({ history }) => {
                     if (el === "_") return (<SpaceBox key={index} selected={selectedKey === index ? true : false}> <StyledSpaceBar /></SpaceBox>)
                     else if (el === "<") return (<BackspaceBox key={index} selected={selectedKey === index ? true : false}><StyledBackspaceOutline /></BackspaceBox>)
                     else return (<CharBox key={index} selected={selectedKey === index ? true : false}> {el.toUpperCase()}</CharBox>)
-                })}               
+                })}
                 <BackBox selected={selectedKey === keyboard.length ? true : false}><StyledArrowBack />Go Back</BackBox>
                 <StyledLogo src={Logo} alt="Logo" />
             </KeysBox>
             <ResultBox>
                 <SearchResult>
-                    Search : <SearchQwery>{search}</SearchQwery>
+                    Search : <SearchQwery>
+                        {search}
+                        {savedSearch?.length !== 0
+                            ?
+                            <PreviousSearchBox>
+                                {savedSearch && savedSearch.map((el, index) => <PreviousSearchElement selected={index === selectedSavedSearchElement}>{el}</PreviousSearchElement>)}
+                            </PreviousSearchBox>
+                            : ""}
+                    </SearchQwery>
                 </SearchResult>
                 <ContentBox>
                     {searchResult.length > 0 ? searchResult.map((el, index) => {
