@@ -1,6 +1,6 @@
 This project was created by using TypeScript, Styled Components, Redux and a lot of different stuff 
 
-This applicton will execute on amazon FireTv and operated only by remote controle
+This application will execute on amazon Fire Tv and operated only by remote control
 
 <img width="80%" src="/src/images/Examples/Home.png"/>
 <img width="80%" src="/src/images/Examples/Guide.png"/>
