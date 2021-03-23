@@ -77,21 +77,7 @@ let api = {
             .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
     },
 
-    //Timor https://timor.riivet.com/logs
-    timorLogs: (user: string, stream: string, type: string, message: string) => {
-        return fetch(`https://timor.riivet.com/logs`, TimotfetchConfig({ user, stream, type, message }))
-            .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
-    },
-    //https://timor.riivet.com/session
-    timorSession: (user: string, stream: string, position: number, watched: number, volume: number, version: string) => {
-        return fetch(`https://timor.riivet.com/sessions`, TimotfetchConfig({ user, stream, position, watched, volume, version }))
-            .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
-    },
-    //https://magpie.riivet.com/watch
-    magpieReport: (report: object) => {
-        return fetch(`https://magpie.riivet.com/watch`, TimotfetchConfig({ ...report }))
-            .then((res) => { if (!res.ok) { throw Error(res.statusText) } return res.json() })
-    }
+   
 
 
 
