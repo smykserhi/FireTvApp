@@ -12,17 +12,6 @@ export const HOME = "home"
 
 //Constants 
 
-export const host = 'speedsport.tv';
-export const domain = 'https://speedsport.tv';
-
-// export const domain ='https://test2.riivet.com'
-// export const host = 'test2.riivet.com';
-
-// export const domain ='https://dirttrackdigest.tv'
-// export const host = 'dirttrackdigest.tv';
-
-// export const domain ='https://pitrow.tv'
-// export const host = 'pitrow.tv';
 
 
 //How many items would be displayed in top menu + My List
