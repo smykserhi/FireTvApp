@@ -9,6 +9,6 @@ const allRedusers = combineReducers({
     data: dataReducer,
     logIn: logInReducer
 })
-
+//have to be delete in prodaction  composeWithDevTools( )
 export const store = createStore(allRedusers, composeWithDevTools( ))
 

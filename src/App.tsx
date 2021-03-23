@@ -1,24 +1,35 @@
 import React from 'react';
-import { Switch, Route} from "react-router-dom";
-import Home from "./componets/Home"
+import { Switch, Route,Redirect } from "react-router-dom";
 import LogIn from "./componets/LogIn"
-import Upcoming from "./componets/Upcoming"
+import Pages from "./componets/Pages"
+import Video from "./componets/Video"
 import MyList from "./componets/MyList"
+import Search from "./componets/Search"
+import Settings from "./componets/Settings"
 import NotFound from "./componets/NotFound"
 import * as ROUTIES from "./constants"
+import styled from 'styled-components';
+import {colors } from "./constants"
 
-
-const  App: React.FC=() =>{    
+const AppBox = styled.div`
+  background-color: ${colors.bgPrimary};
+  color: ${colors.textPrimary}
+`
+ 
+const App: React.FC = () => {
   return (
-    <div>      
-      <Switch>        
-        <Route exact path={ROUTIES.HOME}> <Home/></Route>
+    <AppBox>
+      <Switch>
+        <Redirect exact from={ROUTIES.ROOT} to={`${ROUTIES.PAGES}/${ROUTIES.HOME}`} />
+        <Route path={`${ROUTIES.PAGES}/:id?`}> <Pages /></Route>
         <Route path={ROUTIES.LOGIN}> <LogIn /></Route>
-        <Route path={ROUTIES.UPCOMING}> < Upcoming/></Route>
+        <Route path={`${ROUTIES.VIDEO}/:id`}> < Video /></Route>
         <Route path={ROUTIES.MYLIST}> <MyList /></Route>
-        <Route > <NotFound /></Route>       
+        <Route path={ROUTIES.SEARCH}> <Search /></Route>
+        <Route path={ROUTIES.SETTINGS}> <Settings /></Route>
+        <Route > <NotFound /></Route>
       </Switch>
-    </div>
+    </AppBox>
   )
 }
 

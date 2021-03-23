@@ -1,8 +1,18 @@
-import React from "react"
+import styled from "styled-components"
+
+const StyledDiv = styled.div`
+    display: flex;
+    justify-content : center;
+    align-items: center;
+    height: 100vh;
+`
 
 const  NotFound = ()=>{
     return (
-        <h1>NotFound component</h1>
+        <StyledDiv>
+            <h1>NotFound component</h1>
+        </StyledDiv>
+        
     )
 }
 
